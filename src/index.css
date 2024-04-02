@@ -7,5 +7,33 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --background-color: #cfdef3;
+  --secondary-background-color: #e0eafc;
 }
 
+[data-theme="dark"] {
+  --background-color: #0a0a23;
+  --secondary-background-color: #0d1b2a;
+}
+/*
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #0a0a23;
+    --secondary-background-color: #0d1b2a;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background-color: #cfdef3;
+    --secondary-background-color: #e0eafc;
+  }
+} */
+
+body {
+  background: linear-gradient(
+    to bottom,
+    var(--background-color) 0%,
+    var(--secondary-background-color) 100%
+  );
+}

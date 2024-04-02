@@ -19,11 +19,11 @@ const DEFAULT_STYLES = {
 
 export default {
   Container: styled(Box)<Props>`
+    border-radius: 3px;
     width: ${({ styles }) => styles?.width || DEFAULT_STYLES.width};
     height: ${({ styles }) => styles?.height || DEFAULT_STYLES.height};
     min-height: ${({ styles }) =>
       styles?.minHeight || DEFAULT_STYLES.minHeight};
     background-color: white;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   `,
 };

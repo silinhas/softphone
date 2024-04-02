@@ -1,3 +1,4 @@
+import { Paper } from "@mui/material";
 import Styles, { ContainerStyles } from "./styles";
 
 interface Props {
@@ -7,8 +8,14 @@ interface Props {
 
 export const Container = ({ children, styles }: Props) => {
   return (
-    <Styles.Container styles={styles} display={"flex"} flexDirection={"column"}>
-      {children}
-    </Styles.Container>
+    <Paper elevation={3}>
+      <Styles.Container
+        styles={styles}
+        display={"flex"}
+        flexDirection={"column"}
+      >
+        {children}
+      </Styles.Container>
+    </Paper>
   );
 };
