@@ -1,27 +1,25 @@
 import { Typography } from "@mui/material";
-import { InactiveView } from "../views";
 import Layout from "./Layout";
 import { useSoftphone } from "../context/context";
+import PhoneDisabledIcon from "@mui/icons-material/PhoneDisabled";
+import { log } from "../utils";
 
 interface Props {
   children: React.ReactNode;
 }
 
 export const ErrorBoundary = ({ children }: Props) => {
-  const { error } = useSoftphone();
+  const { alert } = useSoftphone();
 
-  if (error) {
-    console.error({ error });
-
+  if (alert?.type === "error" && alert?.severity === "critical") {
+    log("error", alert);
     return (
-      <Layout>
-        <Layout.View>
-          <InactiveView />
-          <Typography variant="h6" color="error">
-            {error.message}
-          </Typography>
-        </Layout.View>
-      </Layout>
+      <Layout.View>
+        <PhoneDisabledIcon sx={{ fontSize: "10rem" }} color="disabled" />
+        <Typography variant="h6" color="gray">
+          Unable to initialize the Softphone
+        </Typography>
+      </Layout.View>
     );
   }
 

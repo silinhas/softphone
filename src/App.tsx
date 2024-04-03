@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Softphone, SoftphoneProvider } from ".";
+import { Softphone, useSoftphone } from ".";
 import { Box } from "@mui/material";
 import ControlPanel from "./ControlPanel";
 import { useState } from "react";
@@ -14,8 +14,12 @@ const Layout = styled.div`
 
 const App = () => {
   const [identity, setIdentity] = useState("");
+  const softphone = useSoftphone();
 
   const handleSetIdentity = (identity: string) => {
+    if (!identity) {
+      softphone.destroyDevice();
+    }
     setIdentity(identity);
   };
 
@@ -23,9 +27,7 @@ const App = () => {
     <Layout>
       <ControlPanel identity={identity} handleSetIdentity={handleSetIdentity} />
       <Box>
-        <SoftphoneProvider>
-          <Softphone identity={identity} />
-        </SoftphoneProvider>
+        <Softphone identity={identity} autoRegister />
       </Box>
     </Layout>
   );

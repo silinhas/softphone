@@ -17,21 +17,24 @@ export type InitialState = {
   view: Views;
   status: Status;
   identity: string;
-  error?: {
-    type: "identity" | "token" | "device" | "general";
+  alert?: {
     message: string;
     context?: string;
+    severity?: "critical" | "regular";
+    type: "error" | "warning" | "info" | "success";
   };
 };
 
 export type SoftphoneAction = {
-  type: "setView" | "setStatus" | "setIdentity" | "setError" | "setDevice";
+  type: "setView" | "setStatus" | "setIdentity" | "setAlert" | "setDevice";
   payload: Partial<InitialState>;
 };
 
 export type SoftphoneDispatch = {
   setView: (view: Views) => void;
   setStatus: (status: Status) => void;
-  initializeDevice: (identity: string) => void;
-  setError: (error: InitialState["error"]) => void;
+  initializeDevice: (identity: string, autoRegister?: boolean) => void;
+  setAlert: (alert: InitialState["alert"]) => void;
+  clearAlert: () => void;
+  destroyDevice: () => void;
 };

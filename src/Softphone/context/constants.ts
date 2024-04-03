@@ -15,7 +15,8 @@ export const INITIAL_STATE: InitialState = {
 export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {
   setView: () => {},
   setStatus: () => {},
-  setError: () => {},
+  setAlert: () => {},
+  clearAlert: () => {},
   initializeDevice: () => {},
 };
 

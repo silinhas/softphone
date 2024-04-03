@@ -1,3 +1,5 @@
+import "@twilio-labs/serverless-runtime-types";
+
 import {
   Context,
   ServerlessCallback,
@@ -21,14 +23,12 @@ export const handler: ServerlessFunctionSignature = (
   event: MyEvent,
   callback: ServerlessCallback
 ) => {
-  const IDENTITY = event.identity;
-
-  if (!IDENTITY) {
+  const identity = event.identity;
+  if (!identity) {
     return callback("Identity not provided");
   }
 
-  const { ACCOUNT_SID } = context;
-  const { TWIML_APPLICATION_SID, API_KEY, API_SECRET } = context;
+  const { ACCOUNT_SID, TWIML_APPLICATION_SID, API_KEY, API_SECRET } = context;
 
   if (!ACCOUNT_SID || !TWIML_APPLICATION_SID || !API_KEY || !API_SECRET) {
     return callback("Environment variables not configured correctly");
@@ -37,13 +37,16 @@ export const handler: ServerlessFunctionSignature = (
   const { AccessToken } = Twilio.jwt;
   const { VoiceGrant } = AccessToken;
 
-  const accessToken = new AccessToken(ACCOUNT_SID, API_KEY, API_SECRET);
-  accessToken.identity = IDENTITY;
+  const accessToken = new AccessToken(ACCOUNT_SID, API_KEY, API_SECRET, {
+    ttl: 86400,
+    identity,
+  });
 
   const grant = new VoiceGrant({
     outgoingApplicationSid: TWIML_APPLICATION_SID,
     incomingAllow: true,
   });
+
   accessToken.addGrant(grant);
 
   const response = new Twilio.Response();
@@ -54,7 +57,7 @@ export const handler: ServerlessFunctionSignature = (
 
   response.appendHeader("Content-Type", "application/json");
   response.setBody({
-    identity: IDENTITY,
+    identity: identity,
     token: accessToken.toJwt(),
   });
   callback(null, response);

@@ -4,51 +4,46 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import { ContainerStyles } from "./components/Container/styles";
-import { useSoftphone, useSoftphoneDispatch } from "./context/context";
-import { ActiveView, InactiveView } from "./views";
-import { SelectStatus } from "./components";
+import { useSoftphoneDispatch } from "./context/context";
+import { AlertSnackBar, Status } from "./components";
 import { useEffect } from "react";
 import Layout from "./layouts/Layout";
 import ErrorBoundary from "./layouts/ErrorBoundary";
+import { Main } from "./layouts/Main";
 
 interface Props {
   identity: string;
+  autoRegister?: boolean;
   styles?: ContainerStyles;
+  destroySoftphone?: () => void;
 }
 
-const Softphone = ({ identity, styles }: Props) => {
-  const softphone = useSoftphone();
-  const { initializeDevice, setError } = useSoftphoneDispatch();
+const Softphone = ({ identity, autoRegister, styles }: Props) => {
+  const { initializeDevice, setAlert, clearAlert } = useSoftphoneDispatch();
 
   useEffect(() => {
-    if (identity) {
-      setError(undefined);
-      initializeDevice(identity);
-    } else {
-      setError({
-        message: "Please enter a valid identity",
-        type: "identity",
+    if (!identity) {
+      setAlert({
+        type: "error",
+        severity: "critical",
+        message: "Identity is required to initialize the Softphone.",
         context: `The identity is required but got ${identity} instead. When Initializing the Softphone.`,
       });
+    } else {
+      clearAlert();
+      initializeDevice(identity, autoRegister);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [identity]);
 
-  console.log("device", softphone.device);
-
   return (
-    <ErrorBoundary>
-      <Layout styles={styles}>
-        <Layout.Top>
-          <SelectStatus />
-        </Layout.Top>
-        <Layout.View>
-          {softphone.view === "inactive" && <InactiveView />}
-          {softphone.view === "active" && <ActiveView />}
-        </Layout.View>
-        {/* <Layout.Bottom>bottom</Layout.Bottom> */}
-      </Layout>
-    </ErrorBoundary>
+    <Layout styles={styles}>
+      <ErrorBoundary>
+        <Main />
+      </ErrorBoundary>
+      <Status />
+      <AlertSnackBar />
+    </Layout>
   );
 };
 

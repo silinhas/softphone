@@ -25,10 +25,10 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         identity: action.payload.identity as string,
       };
     }
-    case "setError": {
+    case "setAlert": {
       return {
         ...state,
-        error: action.payload.error,
+        alert: action.payload.alert,
       };
     }
     case "setDevice": {
@@ -55,36 +55,99 @@ export const SoftphoneProvider = ({
   };
 
   const setStatus = (status: Status) => {
-    dispatch({ type: "setStatus", payload: { status } });
+    if (status === "available" && softphone.device) {
+      registerDevice(softphone.device);
+    } else if (status === "do-not-disturb" && softphone.device) {
+      unregisterDevice(softphone.device);
+    }
   };
 
   const setIdentity = (identity: string) => {
     dispatch({ type: "setIdentity", payload: { identity } });
   };
 
-  const setError = (error: InitialState["error"]) => {
-    dispatch({ type: "setError", payload: { error } });
+  const setAlert = (alert: InitialState["alert"]) => {
+    dispatch({ type: "setAlert", payload: { alert } });
   };
 
-  const initializeDevice = async (identity: string) => {
+  const clearAlert = () => {
+    dispatch({ type: "setAlert", payload: { alert: undefined } });
+  };
+
+  const initializeDevice = async (identity: string, autoRegister = false) => {
     try {
       const token = await getToken(identity);
       setIdentity(identity);
 
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      // populate dropdown with available audio devices
       const device = new Device(token, DEVICE_OPTIONS);
       addDeviceListeners(device);
 
-      // TODO: check if token is valid
-      // device.register();
+      if (autoRegister) {
+        registerDevice(device);
+      }
 
+      dispatch({ type: "setView", payload: { view: "active" } });
       dispatch({ type: "setDevice", payload: { device } });
     } catch (error) {
-      setError({
-        type: "token",
+      setAlert({
+        type: "error",
         message: "Failed to get token",
         context: error as string,
       });
     }
+  };
+
+  const registerDevice = async (device: Device) => {
+    try {
+      await device.register();
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Failed to register device",
+        context: error as string,
+      });
+    }
+  };
+
+  const unregisterDevice = async (device: Device) => {
+    try {
+      await device.unregister();
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Failed to unregister device",
+        context: error as string,
+      });
+    }
+  };
+
+  const destroyDevice = () => {
+    try {
+      if (!softphone.device) {
+        setAlert({
+          type: "warning",
+          message: "Device does not exist",
+        });
+        return;
+      }
+      softphone.device.destroy();
+      resetSoftphone();
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Failed to destroy device",
+        context: error as string,
+      });
+    }
+  };
+
+  const resetSoftphone = () => {
+    dispatch({ type: "setDevice", payload: { device: undefined } });
+    dispatch({ type: "setView", payload: { view: "inactive" } });
+    dispatch({ type: "setStatus", payload: { status: "do-not-disturb" } });
+    dispatch({ type: "setIdentity", payload: { identity: "" } });
   };
 
   const addDeviceListeners = (device: Device) => {
@@ -96,6 +159,11 @@ export const SoftphoneProvider = ({
 
     device.on("error", (twilioError, call) => {
       console.log("An error has occurred: ", twilioError);
+      setAlert({
+        type: "error",
+        message: "An error has occurred",
+        context: twilioError.message,
+      });
     });
 
     device.on("incoming", (call) => {
@@ -104,6 +172,7 @@ export const SoftphoneProvider = ({
 
     device.on("registered", () => {
       console.log("device registered");
+      dispatch({ type: "setStatus", payload: { status: "available" } });
     });
 
     device.on("registering", () => {
@@ -112,42 +181,13 @@ export const SoftphoneProvider = ({
 
     device.on("unregistered", () => {
       console.log("device unregistered");
+      dispatch({ type: "setStatus", payload: { status: "do-not-disturb" } });
     });
 
     device.on("tokenWillExpire", async () => {
       console.log("token will expire");
-      // const token = await getToken(softphone.identity);
-      // device.updateToken(token);
-    });
-
-    device.on("unregistered", () => {
-      console.log("unregistered");
     });
   };
-
-  // const registerDevice = async (device: Device) => {
-  //   try {
-  //     await device.register();
-  //   } catch (error) {
-  //     setError({
-  //       type: "device",
-  //       message: "Failed to register device",
-  //       context: error as string,
-  //     });
-  //   }
-  // };
-
-  // const unregisterDevice = async (device: Device) => {
-  //   try {
-  //     await device.unregister();
-  //   } catch (error) {
-  //     setError({
-  //       type: "device",
-  //       message: "Failed to unregister device",
-  //       context: error as string,
-  //     });
-  //   }
-  // };
 
   return (
     <SoftphoneContext.Provider value={softphone}>
@@ -155,8 +195,10 @@ export const SoftphoneProvider = ({
         value={{
           setView,
           setStatus,
-          setError,
+          setAlert,
+          clearAlert,
           initializeDevice,
+          destroyDevice,
         }}
       >
         {children}
