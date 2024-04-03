@@ -14,11 +14,11 @@ const Layout = styled.div`
 
 const App = () => {
   const [identity, setIdentity] = useState("");
-  const softphone = useSoftphone();
+  const { destroyDevice } = useSoftphone();
 
   const handleSetIdentity = (identity: string) => {
     if (!identity) {
-      softphone.destroyDevice();
+      destroyDevice();
     }
     setIdentity(identity);
   };

@@ -2,6 +2,7 @@ import { Alert, Box, Collapse, IconButton } from "@mui/material";
 import { useSoftphone } from "../../context/context";
 import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import { log } from "../../utils";
 
 interface AlertState {
   open: boolean;
@@ -25,6 +26,9 @@ export const AlertSnackBar = () => {
         severity: softphone.alert.type,
         message: softphone.alert.message,
       });
+      if (softphone.alert.type === "error") {
+        log("error", softphone.alert);
+      }
     } else {
       setAlert({ open: false, severity: "info", message: "" });
     }

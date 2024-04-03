@@ -6,7 +6,6 @@ import { useState } from "react";
 
 export const Status = () => {
   const softphone = useSoftphone();
-  console.log("rendering Status");
   const [open, setOpen] = useState(true);
   return (
     <Box position={"relative"} zIndex={999}>
