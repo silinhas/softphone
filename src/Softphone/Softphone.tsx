@@ -10,15 +10,23 @@ import { useEffect } from "react";
 import Layout from "./layouts/Layout";
 import ErrorBoundary from "./layouts/ErrorBoundary";
 import { Main } from "./layouts/Main";
+import { ThemeProvider } from "styled-components";
+import { createTheme } from "@mui/material";
 
 interface Props {
   identity: string;
   autoRegister?: boolean;
+  showStatus?: boolean;
   styles?: ContainerStyles;
-  destroySoftphone?: () => void;
 }
+const theme = createTheme();
 
-const Softphone = ({ identity, autoRegister, styles }: Props) => {
+const Softphone = ({
+  identity,
+  autoRegister,
+  showStatus = true,
+  styles,
+}: Props) => {
   const { initializeDevice, setAlert, clearAlert } = useSoftphoneDispatch();
 
   useEffect(() => {
@@ -27,7 +35,7 @@ const Softphone = ({ identity, autoRegister, styles }: Props) => {
         type: "error",
         severity: "critical",
         message: "Identity is required to initialize the Softphone.",
-        context: `The identity is required but got ${identity} instead. When Initializing the Softphone.`,
+        context: `The identity is required. When Initializing the Softphone.`,
       });
     } else {
       clearAlert();
@@ -37,13 +45,15 @@ const Softphone = ({ identity, autoRegister, styles }: Props) => {
   }, [identity]);
 
   return (
-    <Layout styles={styles}>
-      <ErrorBoundary>
-        <Main />
-      </ErrorBoundary>
-      <Status />
-      <AlertSnackBar />
-    </Layout>
+    <ThemeProvider theme={theme}>
+      <Layout styles={styles}>
+        <ErrorBoundary>
+          <Main />
+        </ErrorBoundary>
+        {showStatus && <Status />}
+        <AlertSnackBar />
+      </Layout>
+    </ThemeProvider>
   );
 };
 

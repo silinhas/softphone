@@ -13,7 +13,7 @@ export const Layout = ({ children, styles }: LayoutProps) => {
 
 Layout.Top = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Box px={3} flex={" 0 1 auto"}>
+    <Box px={3} flex={"0 1 auto"}>
       {children}
     </Box>
   );
@@ -21,14 +21,14 @@ Layout.Top = ({ children }: { children: React.ReactNode }) => {
 
 Layout.View = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Box flexGrow={1} alignContent={"center"} textAlign={"center"}>
+    <Box height={"100%"} textAlign={"center"}>
       {children}
     </Box>
   );
 };
 
 Layout.Bottom = ({ children }: { children: React.ReactNode }) => {
-  return <Box flex={" 0 1 auto"}>{children}</Box>;
+  return <Box flex={"0 1 auto"}>{children}</Box>;
 };
 
 export default Layout;

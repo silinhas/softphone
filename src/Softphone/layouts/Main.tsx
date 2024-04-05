@@ -1,6 +1,6 @@
 import { SelectStatus } from "../components";
 import { useSoftphone } from "../context/context";
-import { ActiveView, InactiveView } from "../views";
+import { ActiveView } from "../views";
 import Layout from "./Layout";
 
 export const Main = () => {
@@ -11,10 +11,7 @@ export const Main = () => {
       <Layout.Top>
         <SelectStatus />
       </Layout.Top>
-      <Layout.View>
-        {softphone.view === "inactive" && <InactiveView />}
-        {softphone.view === "active" && <ActiveView />}
-      </Layout.View>
+      <Layout.View>{softphone.view === "active" && <ActiveView />}</Layout.View>
     </>
   );
 };

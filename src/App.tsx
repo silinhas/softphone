@@ -27,7 +27,7 @@ const App = () => {
     <Layout>
       <ControlPanel identity={identity} handleSetIdentity={handleSetIdentity} />
       <Box>
-        <Softphone identity={identity} autoRegister />
+        <Softphone identity={"Apollo"} autoRegister />
       </Box>
     </Layout>
   );

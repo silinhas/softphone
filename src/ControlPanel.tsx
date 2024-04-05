@@ -10,7 +10,9 @@ const ControlPanel = ({ identity, handleSetIdentity }: Props) => {
   const [identityInput, setIdentityInput] = useState("");
 
   const handleClickSetIdentity = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event:
+      | React.MouseEvent<HTMLButtonElement>
+      | React.KeyboardEvent<HTMLDivElement>
   ) => {
     event.preventDefault();
 
@@ -43,6 +45,11 @@ const ControlPanel = ({ identity, handleSetIdentity }: Props) => {
           disabled={identity !== ""}
           value={identityInput}
           onChange={(event) => setIdentityInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              handleClickSetIdentity(event);
+            }
+          }}
         />
         <Button
           variant="contained"

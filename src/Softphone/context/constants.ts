@@ -7,7 +7,7 @@ export const STATUS: { value: Status; label: string; color: string }[] = [
 ];
 
 export const INITIAL_STATE: InitialState = {
-  view: "inactive",
+  view: "active",
   status: "do-not-disturb",
   identity: "",
 };
