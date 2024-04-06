@@ -23,7 +23,9 @@ export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {
   clearSelectedContact: () => {},
 };
 
-const TIME_TO_CHECK_TOKEN_WILL_EXPIRE = 7200000;
+export const TOKEN_TIME_TO_LIVE = 86400000; // 24 hr
+export const TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN = 300000; // each 5 min;
+const TIME_TO_CHECK_TOKEN_WILL_EXPIRE = 7200000; // 2 hr
 
 export const DEVICE_OPTIONS: Device.Options = {
   // logLevel: "DEBUG",

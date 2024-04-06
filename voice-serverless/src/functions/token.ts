@@ -9,6 +9,7 @@ import {
 type MyEvent = {
   Body?: string;
   identity?: string;
+  ttl?: number;
 };
 
 type MyContext = {
@@ -23,7 +24,8 @@ export const handler: ServerlessFunctionSignature = (
   event: MyEvent,
   callback: ServerlessCallback
 ) => {
-  const identity = event.identity;
+  const { identity, ttl = 86400 } = event;
+
   if (!identity) {
     return callback("Identity not provided");
   }
@@ -38,7 +40,7 @@ export const handler: ServerlessFunctionSignature = (
   const { VoiceGrant } = AccessToken;
 
   const accessToken = new AccessToken(ACCOUNT_SID, API_KEY, API_SECRET, {
-    ttl: 86400,
+    ttl,
     identity,
   });
 

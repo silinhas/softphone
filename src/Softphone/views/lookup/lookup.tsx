@@ -1,5 +1,4 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CloseIcon from "@mui/icons-material/Close";
 import {
   Autocomplete,
   // createFilterOptions,
@@ -31,8 +30,7 @@ const mockData: Contact[] = [
 ];
 
 const LookupView = () => {
-  const { setView, selectContact, clearSelectedContact } =
-    useSoftphoneDispatch();
+  const { setView, selectContact } = useSoftphoneDispatch();
 
   const handleChangeLookup = (
     event: React.SyntheticEvent,

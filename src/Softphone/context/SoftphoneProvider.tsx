@@ -1,9 +1,14 @@
 import { useReducer } from "react";
 import { SoftphoneContext, SoftphoneDispatchContext } from "./context";
-import { DEVICE_OPTIONS, INITIAL_STATE } from "./constants";
+import {
+  DEVICE_OPTIONS,
+  INITIAL_STATE,
+  TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN,
+  TOKEN_TIME_TO_LIVE,
+} from "./constants";
 import { Contact, InitialState, SoftphoneAction, Status, Views } from "./types";
 import { getToken } from "../services/voice";
-import { Device } from "@twilio/voice-sdk";
+import { Device, TwilioError } from "@twilio/voice-sdk";
 import { isValidPhoneNumber } from "libphonenumber-js";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
@@ -83,7 +88,8 @@ export const SoftphoneProvider = ({
 
   const initializeDevice = async (identity: string, autoRegister = false) => {
     try {
-      const token = await getToken(identity);
+      const token = await getToken(identity, TOKEN_TIME_TO_LIVE);
+
       setIdentity(identity);
 
       await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -112,7 +118,7 @@ export const SoftphoneProvider = ({
     } catch (error) {
       setAlert({
         type: "error",
-        message: "Failed to register device",
+        message: "Failed to register device. Try again.",
         context: error as string,
       });
     }
@@ -140,7 +146,6 @@ export const SoftphoneProvider = ({
         return;
       }
       softphone.device.destroy();
-      resetSoftphone();
     } catch (error) {
       setAlert({
         type: "error",
@@ -158,19 +163,34 @@ export const SoftphoneProvider = ({
   };
 
   const addDeviceListeners = (device: Device) => {
-    console.log("adding device listeners");
-
     device.on("destroyed", () => {
-      console.log("device destroyed");
+      resetSoftphone();
     });
 
-    device.on("error", (twilioError, call) => {
-      console.log("An error has occurred: ", twilioError);
-      setAlert({
-        type: "error",
-        message: "An error has occurred",
-        context: twilioError.message,
-      });
+    device.on("error", (twilioError: TwilioError.TwilioError, call) => {
+      switch (twilioError.name) {
+        case "AccessTokenExpired": {
+          getToken(device?.identity || "", TOKEN_TIME_TO_LIVE)
+            .then((newToken) => {
+              device.updateToken(newToken);
+            })
+            .catch((error) => {
+              setAlert({
+                type: "error",
+                message: "An error occurred.",
+                context: JSON.stringify(error),
+              });
+            });
+          break;
+        }
+        default: {
+          setAlert({
+            type: "error",
+            message: "An error occurred.",
+            context: JSON.stringify(twilioError),
+          });
+        }
+      }
     });
 
     device.on("incoming", (call) => {
@@ -191,8 +211,16 @@ export const SoftphoneProvider = ({
       dispatch({ type: "setStatus", payload: { status: "do-not-disturb" } });
     });
 
-    device.on("tokenWillExpire", async () => {
-      console.log("token will expire");
+    device.on("tokenWillExpire", () => {
+      const timer = setInterval(async () => {
+        if (device?.identity) {
+          const newToken = await getToken(device.identity, TOKEN_TIME_TO_LIVE);
+          if (device.state === "registered") {
+            device.updateToken(newToken);
+          }
+          clearInterval(timer);
+        }
+      }, TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN);
     });
   };
 
