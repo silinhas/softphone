@@ -3,6 +3,8 @@ import { Device } from "@twilio/voice-sdk";
 export type Views =
   | "inactive"
   | "active"
+  | "lookup"
+  | "contact"
   | "on-call"
   | "ringing"
   | "dialing"
@@ -17,6 +19,7 @@ export type InitialState = {
   view: Views;
   status: Status;
   identity: string;
+  contactSelected?: Contact;
   alert?: {
     message: string;
     context?: string;
@@ -26,7 +29,13 @@ export type InitialState = {
 };
 
 export type SoftphoneAction = {
-  type: "setView" | "setStatus" | "setIdentity" | "setAlert" | "setDevice";
+  type:
+    | "setView"
+    | "setStatus"
+    | "setIdentity"
+    | "setAlert"
+    | "setDevice"
+    | "selectContact";
   payload: Partial<InitialState>;
 };
 
@@ -37,4 +46,14 @@ export type SoftphoneDispatch = {
   setAlert: (alert: InitialState["alert"]) => void;
   clearAlert: () => void;
   destroyDevice: () => void;
+  selectContact: (contact: Contact) => void;
+  clearSelectedContact: () => void;
+};
+
+export type Contact = {
+  id: string;
+  identity: string;
+  label: string;
+  data?: unknown;
+  type?: "phone" | "identifier";
 };

@@ -1,9 +1,10 @@
 import { useReducer } from "react";
 import { SoftphoneContext, SoftphoneDispatchContext } from "./context";
 import { DEVICE_OPTIONS, INITIAL_STATE } from "./constants";
-import { InitialState, SoftphoneAction, Status, Views } from "./types";
+import { Contact, InitialState, SoftphoneAction, Status, Views } from "./types";
 import { getToken } from "../services/voice";
 import { Device } from "@twilio/voice-sdk";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
   switch (action.type) {
@@ -35,6 +36,12 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
       return {
         ...state,
         device: action.payload.device as Device,
+      };
+    }
+    case "selectContact": {
+      return {
+        ...state,
+        contactSelected: action.payload.contactSelected as Contact,
       };
     }
     default: {
@@ -189,6 +196,24 @@ export const SoftphoneProvider = ({
     });
   };
 
+  const selectContact = (contactSelected: Contact) => {
+    if (!contactSelected) return;
+
+    contactSelected.type = isValidPhoneNumber(contactSelected.identity, "US")
+      ? "phone"
+      : "identifier";
+
+    dispatch({ type: "selectContact", payload: { contactSelected } });
+    dispatch({ type: "setView", payload: { view: "contact" } });
+  };
+
+  const clearSelectedContact = () => {
+    dispatch({
+      type: "selectContact",
+      payload: { contactSelected: undefined },
+    });
+  };
+
   return (
     <SoftphoneContext.Provider value={softphone}>
       <SoftphoneDispatchContext.Provider
@@ -199,6 +224,8 @@ export const SoftphoneProvider = ({
           clearAlert,
           initializeDevice,
           destroyDevice,
+          selectContact,
+          clearSelectedContact,
         }}
       >
         {children}

@@ -1,3 +1,5 @@
+import LookupView from "./lookup/lookup";
 import ActiveView from "./active/active";
+import ContactView from "./contact/contact";
 
-export { ActiveView };
+export { ActiveView, LookupView, ContactView };

@@ -17,27 +17,29 @@ export const SelectStatus = () => {
   };
 
   return (
-    <FormControl fullWidth sx={{ m: 1, minWidth: 120 }} size="small">
-      <InputLabel id="softphone-status">Status</InputLabel>
-      <Select
-        labelId="softphone-status"
-        id="softphone-status-select"
-        value={status}
-        label="Status"
-        onChange={handleChange}
-      >
-        {/* Display Status and color */}
-        {STATUS.map((status) => (
-          <MenuItem key={status.value} value={status.value}>
-            <Box display={"flex"} alignItems={"baseline"}>
-              <Styles.StatusCircle color={status.color} />
-              <Typography variant="caption" color="textSecondary">
-                {status.label}
-              </Typography>
-            </Box>
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <Box mx={4} pt={1.5}>
+      <FormControl fullWidth size="small">
+        <InputLabel id="softphone-status">Status</InputLabel>
+        <Select
+          labelId="softphone-status"
+          id="softphone-status-select"
+          value={status}
+          label="Status"
+          onChange={handleChange}
+        >
+          {/* Display Status and color */}
+          {STATUS.map((status) => (
+            <MenuItem key={status.value} value={status.value}>
+              <Box display={"flex"} alignItems={"baseline"}>
+                <Styles.StatusCircle color={status.color} />
+                <Typography variant="caption" color="textSecondary">
+                  {status.label}
+                </Typography>
+              </Box>
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
   );
 };

@@ -14,7 +14,7 @@ const Layout = styled.div`
 
 const App = () => {
   const [identity, setIdentity] = useState("");
-  const { destroyDevice } = useSoftphone();
+  const { destroyDevice, lookupContact } = useSoftphone();
 
   const handleSetIdentity = (identity: string) => {
     if (!identity) {
@@ -23,9 +23,21 @@ const App = () => {
     setIdentity(identity);
   };
 
+  const handleLookupContact = (contactToLookup: string) => {
+    lookupContact({
+      identity: contactToLookup,
+      label: contactToLookup,
+      id: contactToLookup,
+    });
+  };
+
   return (
     <Layout>
-      <ControlPanel identity={identity} handleSetIdentity={handleSetIdentity} />
+      <ControlPanel
+        identity={identity}
+        handleSetIdentity={handleSetIdentity}
+        handleLookupContact={handleLookupContact}
+      />
       <Box>
         <Softphone identity={"Apollo"} autoRegister />
       </Box>

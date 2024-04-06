@@ -1,23 +1,28 @@
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import DialpadIcon from "@mui/icons-material/Dialpad";
-import { Box } from "@mui/material";
 import { ActionButton } from "@/Softphone/components";
+import { useSoftphoneDispatch } from "@/Softphone/context/context";
+import { Stack } from "@/Softphone/layouts/Stack";
 
 const ActiveView = () => {
+  const { setView } = useSoftphoneDispatch();
   return (
-    <Box
-      display={"flex"}
-      flexDirection={"column"}
-      justifyContent={"space-evenly"}
-      alignItems={"center"}
-      height={"100%"}
-    >
-      <LocalPhoneIcon sx={{ fontSize: "10rem" }} color="disabled" />
-      <ActionButton
-        onClick={() => console.log("click")}
-        icon={<DialpadIcon fontSize="large" />}
-      />
-    </Box>
+    <Stack>
+      <Stack.Segment
+        flex={0.7}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
+        <LocalPhoneIcon sx={{ fontSize: "10rem" }} color="disabled" />
+      </Stack.Segment>
+      <Stack.Segment flex={0.3}>
+        <ActionButton
+          onClick={() => setView("lookup")}
+          icon={<DialpadIcon fontSize="large" />}
+        />
+      </Stack.Segment>
+    </Stack>
   );
 };
 export default ActiveView;

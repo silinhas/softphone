@@ -6,19 +6,5 @@ interface Props extends IconButtonProps {
 }
 
 export const ActionButton = ({ icon, ...iconButtonProps }: Props) => {
-  return (
-    <Styles.IconButton
-      {...iconButtonProps}
-      sx={{
-        border: "1px solid",
-        transition: "background-color 0.2s ease-in-out, color 0.2s ease-in-out",
-        ":hover": {
-          color: (theme) => theme.palette.common.white,
-          backgroundColor: (theme) => theme.palette.info.dark,
-        },
-      }}
-    >
-      {icon}
-    </Styles.IconButton>
-  );
+  return <Styles.IconButton {...iconButtonProps}>{icon}</Styles.IconButton>;
 };

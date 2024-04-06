@@ -19,6 +19,8 @@ export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {
   clearAlert: () => {},
   initializeDevice: () => {},
   destroyDevice: () => {},
+  selectContact: () => {},
+  clearSelectedContact: () => {},
 };
 
 const TIME_TO_CHECK_TOKEN_WILL_EXPIRE = 7200000;
