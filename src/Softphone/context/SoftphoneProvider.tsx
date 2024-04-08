@@ -112,7 +112,7 @@ export const SoftphoneProvider = ({
     } catch (error) {
       setAlert({
         type: "error",
-        message: "Failed to get token",
+        message: "Failed to initialize device.",
         context: error as string,
       });
     }

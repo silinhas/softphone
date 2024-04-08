@@ -10,6 +10,7 @@ export const INITIAL_STATE: InitialState = {
   view: "active",
   status: "do-not-disturb",
   identity: "",
+  contactList: [],
 };
 
 export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {
@@ -21,6 +22,7 @@ export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {
   destroyDevice: () => {},
   selectContact: () => {},
   clearSelectedContact: () => {},
+  setContactList: () => {},
 };
 
 export const TOKEN_TIME_TO_LIVE = 86400000; // 24 hr

@@ -1,5 +1,8 @@
 const getToken = async (identity: string, ttl?: number) => {
-  const url = new URL("http://localhost:3000/token");
+  const url = new URL(
+    `${import.meta.env.SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN}/token`
+  );
+
   url.searchParams.append("identity", identity);
 
   if (ttl) {
