@@ -6,10 +6,10 @@ import {
   TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN,
   TOKEN_TIME_TO_LIVE,
 } from "./constants";
-import { Contact, InitialState, SoftphoneAction, Status, Views } from "./types";
+import { InitialState, SoftphoneAction, Status, Views } from "./types";
 import { getToken } from "../services/voice";
 import { Device, TwilioError } from "@twilio/voice-sdk";
-import { isValidPhoneNumber } from "libphonenumber-js";
+import Contact, { ContactConstructorArgs } from "../types/Contact";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
   switch (action.type) {
@@ -47,6 +47,12 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
       return {
         ...state,
         contactSelected: action.payload.contactSelected as Contact,
+      };
+    }
+    case "setContactList": {
+      return {
+        ...state,
+        contactList: action.payload.contactList as Contact[],
       };
     }
     default: {
@@ -167,7 +173,7 @@ export const SoftphoneProvider = ({
       resetSoftphone();
     });
 
-    device.on("error", (twilioError: TwilioError.TwilioError, call) => {
+    device.on("error", (twilioError: TwilioError.TwilioError /*, call */) => {
       switch (twilioError.name) {
         case "AccessTokenExpired": {
           getToken(device?.identity || "", TOKEN_TIME_TO_LIVE)
@@ -193,7 +199,7 @@ export const SoftphoneProvider = ({
       }
     });
 
-    device.on("incoming", (call) => {
+    device.on("incoming", (/* call */) => {
       console.log("incoming call");
     });
 
@@ -225,12 +231,6 @@ export const SoftphoneProvider = ({
   };
 
   const selectContact = (contactSelected: Contact) => {
-    if (!contactSelected) return;
-
-    contactSelected.type = isValidPhoneNumber(contactSelected.identity, "US")
-      ? "phone"
-      : "identifier";
-
     dispatch({ type: "selectContact", payload: { contactSelected } });
     dispatch({ type: "setView", payload: { view: "contact" } });
   };
@@ -239,6 +239,23 @@ export const SoftphoneProvider = ({
     dispatch({
       type: "selectContact",
       payload: { contactSelected: undefined },
+    });
+  };
+
+  const setContactList = (
+    contactList: (Contact | ContactConstructorArgs)[]
+  ) => {
+    const contactListParsed = contactList.map((contact) => {
+      if (contact instanceof Contact) {
+        return contact;
+      } else {
+        return new Contact(contact);
+      }
+    });
+
+    dispatch({
+      type: "setContactList",
+      payload: { contactList: contactListParsed },
     });
   };
 
@@ -254,6 +271,7 @@ export const SoftphoneProvider = ({
           destroyDevice,
           selectContact,
           clearSelectedContact,
+          setContactList,
         }}
       >
         {children}

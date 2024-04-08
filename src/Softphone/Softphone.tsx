@@ -12,11 +12,13 @@ import ErrorBoundary from "./layouts/ErrorBoundary";
 import { Main } from "./layouts/Main";
 import { ThemeProvider } from "styled-components";
 import { createTheme } from "@mui/material";
+import { Contact, ContactConstructorArgs } from "./types";
 
 interface Props {
   identity: string;
   autoRegister?: boolean;
   showStatus?: boolean;
+  contactList: ContactConstructorArgs[] | Contact[];
   styles?: ContainerStyles;
 }
 const theme = createTheme();
@@ -25,9 +27,11 @@ const Softphone = ({
   identity,
   autoRegister,
   showStatus = true,
+  contactList,
   styles,
 }: Props) => {
-  const { initializeDevice, setAlert, clearAlert } = useSoftphoneDispatch();
+  const { initializeDevice, setAlert, clearAlert, setContactList } =
+    useSoftphoneDispatch();
 
   useEffect(() => {
     if (!identity) {
@@ -40,9 +44,12 @@ const Softphone = ({
     } else {
       clearAlert();
       initializeDevice(identity, autoRegister);
+      if (contactList) {
+        setContactList(contactList);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identity]);
+  }, [identity, contactList]);
 
   return (
     <ThemeProvider theme={theme}>

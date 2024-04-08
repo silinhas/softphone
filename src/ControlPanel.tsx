@@ -12,7 +12,7 @@ const ControlPanel = ({
   handleSetIdentity,
   handleLookupContact,
 }: Props) => {
-  const [identityInput, setIdentityInput] = useState("");
+  const [identityInput, setIdentityInput] = useState(identity);
   const [contactInput, setContactInput] = useState("");
 
   const handleClickSetIdentity = (
@@ -88,7 +88,6 @@ const ControlPanel = ({
           fullWidth
           label="Set contact to lookup"
           variant="outlined"
-          disabled={identity !== ""}
           value={contactInput}
           onChange={(event) => setContactInput(event.target.value)}
           onKeyDown={(event) => {

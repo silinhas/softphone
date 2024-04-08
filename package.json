@@ -19,11 +19,13 @@
     "@twilio/voice-sdk": "^2.10.2",
     "libphonenumber-js": "^1.10.60",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/react": "^17.0.76",
     "@types/react-dom": "^17.0.25",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "@typescript-eslint/parser": "^7.0.2",
     "@vitejs/plugin-react": "^4.2.1",

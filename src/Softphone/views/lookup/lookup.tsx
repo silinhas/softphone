@@ -1,35 +1,27 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PhoneIcon from "@mui/icons-material/Phone";
+import PersonIcon from "@mui/icons-material/Person";
 import {
   Autocomplete,
-  // createFilterOptions,
   Box,
   FilterOptionsState,
   TextField,
   createFilterOptions,
-  // FilterOptionsState,
 } from "@mui/material";
 import { ActionButton } from "@/Softphone/components";
-import { useSoftphoneDispatch } from "@/Softphone/context/context";
+import {
+  useSoftphone,
+  useSoftphoneDispatch,
+} from "@/Softphone/context/context";
 import { Stack } from "@/Softphone/layouts/Stack";
 import React from "react";
-import { Contact } from "@/Softphone/context/types";
+import FiberNewIcon from "@mui/icons-material/FiberNew";
+import { Contact } from "@/Softphone/types";
 
 const filter = createFilterOptions<Contact>();
 
-const mockData: Contact[] = [
-  {
-    id: "1",
-    identity: "jhondoe",
-    label: "John Doe",
-  },
-  {
-    id: "2",
-    identity: "janedoe",
-    label: "Jane Doe",
-  },
-];
-
 const LookupView = () => {
+  const { contactList } = useSoftphone();
   const { setView, selectContact } = useSoftphoneDispatch();
 
   const handleChangeLookup = (
@@ -47,14 +39,29 @@ const LookupView = () => {
     const filtered = filter(options, params);
 
     if (filtered.length === 0) {
-      filtered.push({
-        id: "new",
-        identity: params.inputValue,
-        label: `${params.inputValue} (NEW)`,
-      });
+      filtered.push(new Contact({ identity: params.inputValue, isNew: true }));
     }
 
     return filtered;
+  };
+
+  const renderOption = (
+    props: React.HTMLAttributes<HTMLLIElement>,
+    option: Contact
+  ) => {
+    return (
+      <Box component={"li"} {...props} key={option.id}>
+        <Box display={"flex"} gap={1}>
+          <Box component={"span"}>
+            {option.type === "phone" ? <PhoneIcon /> : <PersonIcon />}
+          </Box>
+          <Box display={"flex"}>{option.label}</Box>
+          <Box component={"span"}>
+            {option.isNew && <FiberNewIcon color="success" />}
+          </Box>
+        </Box>
+      </Box>
+    );
   };
 
   return (
@@ -67,17 +74,17 @@ const LookupView = () => {
       >
         <Box width={"100%"} mx={4}>
           <Autocomplete
-            options={mockData}
-            getOptionLabel={(option) => {
-              if (typeof option === "string") return option;
-              return option.label;
-            }}
+            options={contactList}
+            renderOption={renderOption}
+            filterOptions={handleFilterOptionsLookup}
             onChange={handleChangeLookup}
+            getOptionKey={(option) => option.id || option.identity}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             fullWidth
             size="small"
             selectOnFocus
             clearOnBlur
-            filterOptions={handleFilterOptionsLookup}
+            loadingText={"Loading..."}
             noOptionsText={"No results found."}
             renderInput={(params) => (
               <TextField
@@ -98,4 +105,5 @@ const LookupView = () => {
     </Stack>
   );
 };
+
 export default LookupView;

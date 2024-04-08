@@ -12,8 +12,61 @@ const Layout = styled.div`
   justify-content: space-evenly;
 `;
 
+const mockData = [
+  {
+    id: "1",
+    identity: "John Doe",
+    label: "John Doe",
+  },
+  {
+    id: "2",
+    identity: "Jane Doe",
+    label: "Jane Doe",
+  },
+  {
+    id: "3",
+    identity: "John Smith",
+    label: "John Smith",
+  },
+  {
+    id: "4",
+    identity: "Jane Smith",
+    label: "Jane Smith",
+  },
+  {
+    id: "5",
+    identity: "John Doe",
+    label: "John Doe",
+  },
+  {
+    id: "6",
+    identity: "Jane Doe",
+    label: "Jane Doe",
+  },
+  {
+    id: "7",
+    identity: "John Smith",
+    label: "John Smith",
+  },
+  {
+    id: "8",
+    identity: "Jane Smith",
+    label: "Jane Smith",
+  },
+  {
+    id: "9",
+    identity: "John Doe",
+    label: "John Doe",
+  },
+  {
+    id: "10",
+    identity: "Jane Doe",
+    label: "Jane Doe",
+  },
+];
+
 const App = () => {
-  const [identity, setIdentity] = useState("");
+  const [identity, setIdentity] = useState("Apollo");
   const { destroyDevice, lookupContact } = useSoftphone();
 
   const handleSetIdentity = (identity: string) => {
@@ -24,11 +77,7 @@ const App = () => {
   };
 
   const handleLookupContact = (contactToLookup: string) => {
-    lookupContact({
-      identity: contactToLookup,
-      label: contactToLookup,
-      id: contactToLookup,
-    });
+    lookupContact(contactToLookup);
   };
 
   return (
@@ -39,7 +88,7 @@ const App = () => {
         handleLookupContact={handleLookupContact}
       />
       <Box>
-        <Softphone identity={"Apollo"} autoRegister />
+        <Softphone identity={identity} autoRegister contactList={mockData} />
       </Box>
     </Layout>
   );
