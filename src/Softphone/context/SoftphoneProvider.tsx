@@ -204,16 +204,12 @@ export const SoftphoneProvider = ({
     });
 
     device.on("registered", () => {
-      console.log("device registered");
       dispatch({ type: "setStatus", payload: { status: "available" } });
     });
 
-    device.on("registering", () => {
-      console.log("device registering");
-    });
+    device.on("registering", () => {});
 
     device.on("unregistered", () => {
-      console.log("device unregistered");
       dispatch({ type: "setStatus", payload: { status: "do-not-disturb" } });
     });
 
