@@ -28,6 +28,7 @@ const LookupView = () => {
     event: React.SyntheticEvent,
     contact: Contact | null
   ) => {
+    event.preventDefault();
     if (!contact || !contact.identity) return;
     selectContact(contact);
   };
