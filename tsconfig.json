@@ -16,7 +16,6 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
 
@@ -25,7 +24,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "declaration": true
+
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
