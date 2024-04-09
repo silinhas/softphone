@@ -9,7 +9,7 @@ import {
 import { InitialState, SoftphoneAction, Status, Views } from "./types";
 import { getToken } from "../services/voice";
 import { Device, TwilioError } from "@twilio/voice-sdk";
-import Contact, { ContactInput } from "../types/Contact";
+import { Contact, ContactInput, TwilioServices } from "../types";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
   switch (action.type) {
@@ -63,8 +63,10 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
 
 export const SoftphoneProvider = ({
   children,
+  twilioServices,
 }: {
   children: React.ReactNode;
+  twilioServices: TwilioServices;
 }) => {
   const [softphone, dispatch] = useReducer(softphoneReducer, INITIAL_STATE);
 
@@ -95,7 +97,11 @@ export const SoftphoneProvider = ({
   const initializeDevice = useCallback(
     async (identity: string, autoRegister = false) => {
       try {
-        const token = await getToken(identity, TOKEN_TIME_TO_LIVE);
+        const token = await getToken(
+          twilioServices.token,
+          identity,
+          TOKEN_TIME_TO_LIVE
+        );
 
         setIdentity(identity);
 
@@ -180,7 +186,11 @@ export const SoftphoneProvider = ({
     device.on("error", (twilioError: TwilioError.TwilioError /*, call */) => {
       switch (twilioError.name) {
         case "AccessTokenExpired": {
-          getToken(device?.identity || "", TOKEN_TIME_TO_LIVE)
+          getToken(
+            twilioServices.token,
+            device?.identity || "",
+            TOKEN_TIME_TO_LIVE
+          )
             .then((newToken) => {
               device.updateToken(newToken);
             })
@@ -220,7 +230,11 @@ export const SoftphoneProvider = ({
     device.on("tokenWillExpire", () => {
       const timer = setInterval(async () => {
         if (device?.identity) {
-          const newToken = await getToken(device.identity, TOKEN_TIME_TO_LIVE);
+          const newToken = await getToken(
+            twilioServices.token,
+            device.identity,
+            TOKEN_TIME_TO_LIVE
+          );
           if (device.state === "registered") {
             device.updateToken(newToken);
           }
