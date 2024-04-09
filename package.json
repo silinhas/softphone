@@ -16,7 +16,6 @@
   ],
   "scripts": {
     "dev": "vite",
-    "prepare": "npm run build",
     "build": "tsc && vite build",
     "build:softphone": "vite build --config vite.config.softphone.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
