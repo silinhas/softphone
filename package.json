@@ -46,13 +46,13 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "gh-pages": "^6.1.1",
-    "styled-components": "^6.1.8",
+    "styled-components": "^5.3.6",
     "typescript": "^5.2.2",
     "vite": "^5.1.4",
     "vite-plugin-dts": "^3.8.1"
   },
   "peerDependencies": {
-    "styled-components": ">=6"
+    "styled-components": ">=5.3"
   },
   "engines": {
     "node": ">=16.16.0",
