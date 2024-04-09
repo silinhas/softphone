@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ContactInput, Softphone, useSoftphone } from ".";
+import Softphone, { ContactInput, useSoftphone } from "../Softphone";
 import { Box } from "@mui/material";
 import ControlPanel from "./ControlPanel";
 import { useState } from "react";
@@ -43,7 +43,8 @@ const App = () => {
     {
       id: "3",
       identity: "John Smith",
-      label: "available",
+      label: "John Smith",
+      status: "available",
     },
     {
       id: "4",

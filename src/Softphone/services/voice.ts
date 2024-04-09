@@ -1,17 +1,19 @@
-const getToken = async (identity: string, ttl?: number) => {
-  const url = new URL(
-    `${import.meta.env.SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN}/token`
-  );
+const getToken = async (url: string, identity: string, ttl?: number) => {
+  try {
+    const fetchTokenUrl = new URL(url);
 
-  url.searchParams.append("identity", identity);
+    fetchTokenUrl.searchParams.append("identity", identity);
 
-  if (ttl) {
-    url.searchParams.append("ttl", ttl.toString());
+    if (ttl) {
+      fetchTokenUrl.searchParams.append("ttl", ttl.toString());
+    }
+
+    const response = await fetch(fetchTokenUrl.toString());
+    const data = await response.json();
+    return data.token;
+  } catch (error) {
+    throw new Error("Failed to fetch token.");
   }
-
-  const response = await fetch(url.toString());
-  const data = await response.json();
-  return data.token;
 };
 
 export { getToken };

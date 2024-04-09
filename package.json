@@ -1,14 +1,26 @@
 {
-  "name": "softphone",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@telaclaims-tech/softphone",
+  "version": "0.0.9",
   "type": "module",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.es.js",
+  "types": "dist/Softphone/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js"
+    }
+  },
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:softphone": "vite build --config vite.config.softphone.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "deploy": "vite build && gh-pages -d dist"
+    "publish-pkg": "npm run build:softphone && npm version patch && git push && npm publish"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -34,11 +46,16 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "gh-pages": "^6.1.1",
-    "styled-components": "^6.1.8",
+    "styled-components": "^5.3.6",
     "typescript": "^5.2.2",
-    "vite": "^5.1.4"
+    "vite": "^5.1.4",
+    "vite-plugin-dts": "^3.8.1"
   },
   "peerDependencies": {
-    "styled-components": ">=6"
+    "styled-components": ">=5.3"
+  },
+  "engines": {
+    "node": ">=16.16.0",
+    "npm": ">=8.11.0"
   }
 }
