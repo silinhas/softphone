@@ -10,7 +10,6 @@ import { InitialState, SoftphoneAction, Status, Views } from "./types";
 import { getToken } from "../services/voice";
 import { Device, TwilioError } from "@twilio/voice-sdk";
 import Contact, { ContactInput } from "../types/Contact";
-import { log } from "../utils";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
   switch (action.type) {
