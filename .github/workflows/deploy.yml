@@ -9,6 +9,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN: ${{ vars.SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN }}
+
 # Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -39,8 +42,10 @@ jobs:
         run: npm ci
       - name: Build
         env:
-          SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN: ${{ secrets.SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN }}
+          SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN: ${{ vars.SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN }}
         run: npm run build
+      - name: display env
+        run: echo $SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
