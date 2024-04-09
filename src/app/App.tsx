@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ContactInput, Softphone, useSoftphone } from ".";
+import { ContactInput, Softphone, useSoftphone } from "../Softphone";
 import { Box } from "@mui/material";
 import ControlPanel from "./ControlPanel";
 import { useState } from "react";

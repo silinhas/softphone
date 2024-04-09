@@ -1,14 +1,28 @@
 {
-  "name": "softphone",
+  "name": "@telaclaims-tech/softphone",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js"
+    }
+  },
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "dev": "vite",
+    "prepare": "npm run build",
     "build": "tsc && vite build",
+    "build:softphone": "vite build --config vite.config.softphone.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "deploy": "vite build && gh-pages -d dist"
+    "publish-pkg": "npm run build:softphone && npm version patch && git push && npm publish"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -36,9 +50,14 @@
     "gh-pages": "^6.1.1",
     "styled-components": "^6.1.8",
     "typescript": "^5.2.2",
-    "vite": "^5.1.4"
+    "vite": "^5.1.4",
+    "vite-plugin-dts": "^3.8.1"
   },
   "peerDependencies": {
     "styled-components": ">=6"
+  },
+  "engines": {
+    "node": ">=16.16.0",
+    "npm": ">=8.11.0"
   }
 }
