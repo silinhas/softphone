@@ -6,11 +6,12 @@ import {
   useSoftphoneDispatch,
 } from "@/Softphone/context/context";
 import { Stack } from "@/Softphone/layouts/Stack";
-import { Box } from "@mui/material";
+import { Avatar, Box, Tooltip, Typography } from "@mui/material";
+import Styles from "./contact.styles";
 
 const ContactView = () => {
   const { contactSelected } = useSoftphone();
-  const { setView, clearSelectedContact } = useSoftphoneDispatch();
+  const { setView, clearSelectedContact, makeCall } = useSoftphoneDispatch();
 
   return (
     <Stack>
@@ -21,10 +22,29 @@ const ContactView = () => {
         alignItems={"center"}
       >
         {contactSelected && (
-          <Box>
-            <h2>Selected Lookup</h2>
-            <p>{contactSelected.label}</p>
-            <p>{contactSelected.type}</p>
+          <Box
+            display={"flex"}
+            flexDirection={"column"}
+            alignItems={"center"}
+            gap={2}
+          >
+            <Box position={"relative"}>
+              <Avatar
+                alt={contactSelected.label}
+                sx={{ height: 80, width: 80, fontSize: 40 }}
+                src="/static/images/avatar/1.jpg"
+              >
+                {contactSelected.type === "phone" && (
+                  <PhoneIcon sx={{ fontSize: 40 }} />
+                )}
+              </Avatar>
+              <Tooltip title={contactSelected.status.label} placement="right">
+                <Styles.StyledBadge color={contactSelected.status.color} />
+              </Tooltip>
+            </Box>
+            <Typography variant="body1" fontWeight={400}>
+              {contactSelected.label}
+            </Typography>
           </Box>
         )}
       </Stack.Segment>
@@ -36,6 +56,7 @@ const ContactView = () => {
         gap={5}
       >
         <ActionButton
+          color="primary"
           onClick={() => {
             setView("active");
             clearSelectedContact();
@@ -43,7 +64,8 @@ const ContactView = () => {
           icon={<CloseIcon fontSize="large" />}
         />
         <ActionButton
-          onClick={() => console.log("make call")}
+          color="success"
+          onClick={() => makeCall(contactSelected)}
           icon={<PhoneIcon fontSize="large" />}
         />
       </Stack.Segment>

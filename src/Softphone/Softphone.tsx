@@ -12,13 +12,13 @@ import ErrorBoundary from "./layouts/ErrorBoundary";
 import { Main } from "./layouts/Main";
 import { ThemeProvider } from "styled-components";
 import { createTheme } from "@mui/material";
-import { Contact, ContactConstructorArgs } from "./types";
+import { ContactInput } from "./types";
 
 interface Props {
   identity: string;
   autoRegister?: boolean;
   showStatus?: boolean;
-  contactList: ContactConstructorArgs[] | Contact[];
+  contactList: ContactInput[];
   styles?: ContainerStyles;
 }
 const theme = createTheme();
@@ -48,8 +48,9 @@ const Softphone = ({
         setContactList(contactList);
       }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identity, contactList]);
+  }, [identity]);
 
   return (
     <ThemeProvider theme={theme}>

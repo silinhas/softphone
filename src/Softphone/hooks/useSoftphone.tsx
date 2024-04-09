@@ -2,15 +2,13 @@ import {
   useSoftphoneDispatch,
   useSoftphone as useInternalSoftphone,
 } from "../context/context";
-import { Contact, type ContactConstructorArgs } from "../types";
+import { Contact, ContactInput } from "../types";
 
 export const useSoftphone = () => {
   const softphone = useInternalSoftphone();
   const { destroyDevice, selectContact, setAlert } = useSoftphoneDispatch();
 
-  const lookupContact = (
-    contactToLookup: string | ContactConstructorArgs | Contact
-  ) => {
+  const lookupContact = (contactToLookup: string | ContactInput) => {
     if (softphone.identity && softphone.device?.state !== "destroyed") {
       let contact: Contact;
 

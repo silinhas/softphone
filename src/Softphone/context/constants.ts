@@ -23,6 +23,7 @@ export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {
   selectContact: () => {},
   clearSelectedContact: () => {},
   setContactList: () => {},
+  makeCall: () => {},
 };
 
 export const TOKEN_TIME_TO_LIVE = 86400000; // 24 hr

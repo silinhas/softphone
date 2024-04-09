@@ -1,6 +1,7 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PhoneIcon from "@mui/icons-material/Phone";
 import PersonIcon from "@mui/icons-material/Person";
+import CircleIcon from "@mui/icons-material/Circle";
 import {
   Autocomplete,
   Box,
@@ -52,7 +53,12 @@ const LookupView = () => {
   ) => {
     return (
       <Box component={"li"} {...props} key={option.id}>
-        <Box display={"flex"} gap={1}>
+        <Box display={"flex"} gap={1} alignItems={"center"}>
+          <Box component={"span"}>
+            <CircleIcon
+              sx={{ width: 12, height: 12, color: option.status.color }}
+            />
+          </Box>
           <Box component={"span"}>
             {option.type === "phone" ? <PhoneIcon /> : <PersonIcon />}
           </Box>
@@ -99,6 +105,7 @@ const LookupView = () => {
       </Stack.Segment>
       <Stack.Segment flex={0.3}>
         <ActionButton
+          color="primary"
           onClick={() => setView("active")}
           icon={<ArrowBackIcon fontSize="large" />}
         />

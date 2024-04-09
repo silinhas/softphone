@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useCallback, useReducer } from "react";
 import { SoftphoneContext, SoftphoneDispatchContext } from "./context";
 import {
   DEVICE_OPTIONS,
@@ -9,7 +9,8 @@ import {
 import { InitialState, SoftphoneAction, Status, Views } from "./types";
 import { getToken } from "../services/voice";
 import { Device, TwilioError } from "@twilio/voice-sdk";
-import Contact, { ContactConstructorArgs } from "../types/Contact";
+import Contact, { ContactInput } from "../types/Contact";
+import { log } from "../utils";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
   switch (action.type) {
@@ -84,39 +85,43 @@ export const SoftphoneProvider = ({
     dispatch({ type: "setIdentity", payload: { identity } });
   };
 
-  const setAlert = (alert: InitialState["alert"]) => {
+  const setAlert = useCallback((alert: InitialState["alert"]) => {
     dispatch({ type: "setAlert", payload: { alert } });
-  };
+  }, []);
 
-  const clearAlert = () => {
+  const clearAlert = useCallback(() => {
     dispatch({ type: "setAlert", payload: { alert: undefined } });
-  };
+  }, []);
 
-  const initializeDevice = async (identity: string, autoRegister = false) => {
-    try {
-      const token = await getToken(identity, TOKEN_TIME_TO_LIVE);
+  const initializeDevice = useCallback(
+    async (identity: string, autoRegister = false) => {
+      try {
+        const token = await getToken(identity, TOKEN_TIME_TO_LIVE);
 
-      setIdentity(identity);
+        setIdentity(identity);
 
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      // populate dropdown with available audio devices
-      const device = new Device(token, DEVICE_OPTIONS);
-      addDeviceListeners(device);
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        // populate dropdown with available audio devices
+        const device = new Device(token, DEVICE_OPTIONS);
+        addDeviceListeners(device);
 
-      if (autoRegister) {
-        registerDevice(device);
+        if (autoRegister) {
+          registerDevice(device);
+        }
+
+        dispatch({ type: "setView", payload: { view: "active" } });
+        dispatch({ type: "setDevice", payload: { device } });
+      } catch (error) {
+        setAlert({
+          type: "error",
+          message: "Failed to initialize device.",
+          context: error as string,
+        });
       }
-
-      dispatch({ type: "setView", payload: { view: "active" } });
-      dispatch({ type: "setDevice", payload: { device } });
-    } catch (error) {
-      setAlert({
-        type: "error",
-        message: "Failed to initialize device.",
-        context: error as string,
-      });
-    }
-  };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const registerDevice = async (device: Device) => {
     try {
@@ -238,9 +243,7 @@ export const SoftphoneProvider = ({
     });
   };
 
-  const setContactList = (
-    contactList: (Contact | ContactConstructorArgs)[]
-  ) => {
+  const setContactList = useCallback((contactList: ContactInput[]) => {
     const contactListParsed = contactList.map((contact) => {
       if (contact instanceof Contact) {
         return contact;
@@ -253,6 +256,26 @@ export const SoftphoneProvider = ({
       type: "setContactList",
       payload: { contactList: contactListParsed },
     });
+  }, []);
+
+  const makeCall = async (contact?: Contact) => {
+    const contactToCall = contact || softphone.contactSelected;
+
+    if (!contactToCall) {
+      setAlert({
+        type: "error",
+        message: "No contact selected",
+      });
+      return;
+    }
+
+    const call = await softphone.device?.connect({
+      params: {
+        To: contactToCall.identity,
+      },
+    });
+
+    console.log("call", call);
   };
 
   return (
@@ -268,6 +291,7 @@ export const SoftphoneProvider = ({
           selectContact,
           clearSelectedContact,
           setContactList,
+          makeCall,
         }}
       >
         {children}

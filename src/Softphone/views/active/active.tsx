@@ -18,6 +18,7 @@ const ActiveView = () => {
       </Stack.Segment>
       <Stack.Segment flex={0.3}>
         <ActionButton
+          color="primary"
           onClick={() => setView("lookup")}
           icon={<DialpadIcon fontSize="large" />}
         />

@@ -1,3 +1,3 @@
-import Contact, { ContactConstructorArgs } from "./Contact";
+import Contact, { ContactInput } from "./Contact";
 
-export { Contact, type ContactConstructorArgs };
+export { Contact, type ContactInput };
