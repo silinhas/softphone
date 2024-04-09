@@ -298,3 +298,5 @@ export const SoftphoneProvider = ({
     </SoftphoneContext.Provider>
   );
 };
+
+export default SoftphoneProvider;

@@ -25,6 +25,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
+    "esModuleInterop": true,
     "emitDeclarationOnly": true,
     "outDir": "dist",
     "declaration": true,

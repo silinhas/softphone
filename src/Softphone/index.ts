@@ -1,6 +1,12 @@
-import Softphone from "./Softphone";
-import { SoftphoneProvider } from "./context/SoftphoneProvider";
-import { useSoftphone } from "./hooks/useSoftphone";
-import { ContactInput } from "./types";
+export { type ContactInput } from "./types";
+export * from "./types";
 
-export { Softphone, SoftphoneProvider, useSoftphone, type ContactInput };
+export { default as SoftphoneProvider } from "./context/SoftphoneProvider";
+export * from "./context/types";
+export * from "./context/SoftphoneProvider";
+
+export { useSoftphone } from "./hooks/useSoftphone";
+export * from "./hooks/useSoftphone";
+
+import Softphone from "./Softphone";
+export default Softphone;
