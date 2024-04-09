@@ -25,11 +25,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "esModuleInterop": true,
-    "emitDeclarationOnly": true,
-    "outDir": "dist",
     "declaration": true,
-    "declarationMap": true
+    "emitDeclarationOnly": true
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
