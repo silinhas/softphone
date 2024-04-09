@@ -38,7 +38,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build
+        run: |
+          export SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN=${{ secrets.SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN }}
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
