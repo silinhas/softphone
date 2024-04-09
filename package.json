@@ -1,6 +1,5 @@
 {
   "name": "@telaclaims-tech/softphone",
-  "private": true,
   "version": "0.0.1",
   "type": "module",
   "main": "dist/index.umd.js",
