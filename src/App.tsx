@@ -43,7 +43,7 @@ const App = () => {
     {
       id: "3",
       identity: "John Smith",
-      label: "John Smith",
+      label: "available",
     },
     {
       id: "4",
