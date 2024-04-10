@@ -31,7 +31,6 @@
     "@mui/system": "^5.15.15",
     "@twilio/voice-sdk": "^2.10.2",
     "libphonenumber-js": "^1.10.60",
-    "npm": "^10.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "uuid": "^9.0.1"
@@ -50,9 +49,6 @@
     "typescript": "^5.2.2",
     "vite": "^5.1.4",
     "vite-plugin-dts": "^3.8.1"
-  },
-  "peerDependencies": {
-    "react": "^17.0.0 || ^18.0.0"
   },
   "engines": {
     "node": ">=16.16.0",

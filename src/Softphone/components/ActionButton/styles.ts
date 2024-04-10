@@ -19,13 +19,8 @@ const successColorStyles = (theme: Theme) => `
   }
 `;
 
-type IconButtonProps = {
-  theme?: Theme;
-  color?: "primary" | "success";
-};
-
 export default {
-  IconButton: styled(IconButtonMui)<IconButtonProps>(
+  IconButton: styled(IconButtonMui)(
     ({ theme, color }) => `
     border: 1px solid;
     transition: color 0.2s, background-color 0.2s;

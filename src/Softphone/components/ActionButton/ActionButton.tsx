@@ -1,7 +1,7 @@
-import { IconButtonPropsColorOverrides } from "@mui/material";
+import { IconButtonProps } from "@mui/material";
 import Styles from "./styles";
 
-interface Props extends IconButtonPropsColorOverrides {
+interface Props extends IconButtonProps {
   icon: React.ReactNode;
 }
 
