@@ -1,8 +1,7 @@
 import { IconButton as IconButtonMui } from "@mui/material";
-import { styled } from "@mui/system";
-import { Theme } from "@mui/material";
+import { Theme, styled } from "@mui/system";
 
-const primaryColorStyles = ({ theme }: { theme: Theme }) => `
+const primaryColorStyles = (theme: Theme) => `
   color: ${theme.palette.common.black};
   background-color: ${theme.palette.common.white};
   &:hover {
@@ -11,7 +10,7 @@ const primaryColorStyles = ({ theme }: { theme: Theme }) => `
   }
 `;
 
-const successColorStyles = ({ theme }: { theme: Theme }) => `
+const successColorStyles = (theme: Theme) => `
   color: ${theme.palette.common.black};
   background-color: ${theme.palette.common.white};
   &:hover {
@@ -21,7 +20,7 @@ const successColorStyles = ({ theme }: { theme: Theme }) => `
 `;
 
 type IconButtonProps = {
-  theme: Theme;
+  theme?: Theme;
   color?: "primary" | "success";
 };
 
@@ -31,8 +30,8 @@ export default {
     border: 1px solid;
     transition: color 0.2s, background-color 0.2s;
 
-    ${color === "primary" && primaryColorStyles({ theme })}
-    ${color === "success" && successColorStyles({ theme })}
+    ${color === "primary" && primaryColorStyles(theme)}
+    ${color === "success" && successColorStyles(theme)}
   `
   ),
 };
