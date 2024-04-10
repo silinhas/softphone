@@ -1,8 +1,8 @@
 import { IconButton as IconButtonMui } from "@mui/material";
-import styled, { DefaultTheme } from "styled-components";
+import { styled } from "@mui/system";
+import { Theme } from "@mui/material";
 
-// Función auxiliar para estilos de color "primary"
-const primaryColorStyles = ({ theme }: { theme: DefaultTheme }) => `
+const primaryColorStyles = ({ theme }: { theme: Theme }) => `
   color: ${theme.palette.common.black};
   background-color: ${theme.palette.common.white};
   &:hover {
@@ -11,8 +11,7 @@ const primaryColorStyles = ({ theme }: { theme: DefaultTheme }) => `
   }
 `;
 
-// Función auxiliar para estilos de color "success"
-const successColorStyles = ({ theme }: { theme: DefaultTheme }) => `
+const successColorStyles = ({ theme }: { theme: Theme }) => `
   color: ${theme.palette.common.black};
   background-color: ${theme.palette.common.white};
   &:hover {
@@ -21,18 +20,19 @@ const successColorStyles = ({ theme }: { theme: DefaultTheme }) => `
   }
 `;
 
-// Aplica las funciones auxiliares condicionalmente
+type IconButtonProps = {
+  theme: Theme;
+  color?: "primary" | "success";
+};
 
 export default {
-  IconButton: styled(IconButtonMui)`
-    &&& {
-      border: 1px solid;
-      transition: color 0.2s, background-color 0.2s;
+  IconButton: styled(IconButtonMui)<IconButtonProps>(
+    ({ theme, color }) => `
+    border: 1px solid;
+    transition: color 0.2s, background-color 0.2s;
 
-      ${({ color, theme }) =>
-        color === "primary" && primaryColorStyles({ theme })}
-      ${({ color, theme }) =>
-        color === "success" && successColorStyles({ theme })}
-    }
-  `,
+    ${color === "primary" && primaryColorStyles({ theme })}
+    ${color === "success" && successColorStyles({ theme })}
+  `
+  ),
 };

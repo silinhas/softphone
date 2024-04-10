@@ -10,10 +10,8 @@ import { useEffect } from "react";
 import Layout from "./layouts/Layout";
 import ErrorBoundary from "./layouts/ErrorBoundary";
 import { Main } from "./layouts/Main";
-import { ThemeProvider } from "styled-components";
-import { createTheme } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material";
 import { ContactInput } from "./types";
-
 interface Props {
   identity: string;
   autoRegister?: boolean;

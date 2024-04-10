@@ -1,10 +1,9 @@
-import styled from "styled-components";
 import Softphone, { ContactInput, useSoftphone } from "../Softphone";
-import { Box } from "@mui/material";
+import { Box, styled } from "@mui/material";
 import ControlPanel from "./ControlPanel";
 import { useState } from "react";
 
-const Layout = styled.div`
+const Layout = styled("div")`
   display: flex;
   flex-direction: row;
   align-items: center;
