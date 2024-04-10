@@ -31,8 +31,13 @@ const ContactView = () => {
             <Box position={"relative"}>
               <Avatar
                 alt={contactSelected.label}
-                sx={{ height: 80, width: 80, fontSize: 40 }}
-                src="/static/images/avatar/1.jpg"
+                sx={{
+                  height: 80,
+                  width: 80,
+                  fontSize: 40,
+                  border: "1px solid ",
+                }}
+                src={contactSelected.avatar}
               >
                 {contactSelected.type === "phone" && (
                   <PhoneIcon sx={{ fontSize: 40 }} />

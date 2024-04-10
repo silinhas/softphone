@@ -19,6 +19,15 @@ const successColorStyles = (theme: Theme) => `
   }
 `;
 
+const errorColorStyles = (theme: Theme) => `
+  color: ${theme.palette.common.black};
+  background-color: ${theme.palette.common.white};
+  &:hover {
+    color: ${theme.palette.common.white};
+    background-color: ${theme.palette.error.main};
+  }
+`;
+
 export default {
   IconButton: styled(IconButtonMui)(
     ({ theme, color }) => `
@@ -27,6 +36,7 @@ export default {
 
     ${color === "primary" && primaryColorStyles(theme)}
     ${color === "success" && successColorStyles(theme)}
+    ${color === "error" && errorColorStyles(theme)}
   `
   ),
 };

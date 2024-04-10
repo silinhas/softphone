@@ -29,56 +29,43 @@ const App = () => {
   const contactList: ContactInput[] = [
     {
       id: "1",
-      identity: "3053303975",
-      label: "+13053303975",
+      identity: "9793303975",
+      label: "9793303975",
       status: "available",
+      avatar:
+        "https://gravatar.com/avatar/3923e72894ae47c4589919409550c9bd?s=400&d=robohash&r=x",
     },
     {
       id: "2",
-      identity: "305",
+      identity: "+13053303976",
       label: "Jane Doe",
       status: "unavailable",
     },
     {
       id: "3",
-      identity: "John Smith",
+      identity: "jhon-smith",
       label: "John Smith",
       status: "available",
     },
     {
       id: "4",
-      identity: "Jane Smith",
-      label: "Jane Smith",
+      identity: "apollo-2",
+      label: "Apollo 2",
+      status: "available",
+      avatar:
+        "https://gravatar.com/avatar/3923e72894ae47c4589919409550c8bd?s=400&d=robohash&r=x",
     },
     {
       id: "5",
-      identity: "John Doe",
-      label: "John Doe",
+      identity: "jane-doe",
+      label: "Jane Doe",
+      status: "unavailable",
     },
     {
       id: "6",
-      identity: "Jane Doe",
-      label: "Jane Doe",
-    },
-    {
-      id: "7",
-      identity: "John Smith",
+      identity: "john-smith",
       label: "John Smith",
-    },
-    {
-      id: "8",
-      identity: "Jane Smith",
-      label: "Jane Smith",
-    },
-    {
-      id: "9",
-      identity: "John Doe",
-      label: "John Doe",
-    },
-    {
-      id: "10",
-      identity: "Jane Doe",
-      label: "Jane Doe",
+      status: "available",
     },
   ];
 
