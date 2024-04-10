@@ -6,6 +6,7 @@ import { Stack } from "@/Softphone/layouts/Stack";
 
 const ActiveView = () => {
   const { setView } = useSoftphoneDispatch();
+
   return (
     <Stack>
       <Stack.Segment

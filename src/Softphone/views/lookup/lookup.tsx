@@ -53,13 +53,13 @@ const LookupView = () => {
   ) => {
     return (
       <Box component={"li"} {...props} key={option.id}>
-        <Box display={"flex"} gap={1} alignItems={"center"}>
+        <Box display={"flex"} gap={1}>
           <Box component={"span"}>
             <CircleIcon
               sx={{ width: 12, height: 12, color: option.status.color }}
             />
           </Box>
-          <Box component={"span"}>
+          <Box component={"span"} alignSelf={"end"}>
             {option.type === "phone" ? <PhoneIcon /> : <PersonIcon />}
           </Box>
           <Box display={"flex"}>{option.label}</Box>

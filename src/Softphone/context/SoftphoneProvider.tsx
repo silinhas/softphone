@@ -8,7 +8,7 @@ import {
 } from "./constants";
 import { InitialState, SoftphoneAction, Status, Views } from "./types";
 import { getToken } from "../services/voice";
-import { Device, TwilioError } from "@twilio/voice-sdk";
+import { Call, Device, TwilioError } from "@twilio/voice-sdk";
 import { Contact, ContactInput, TwilioServices } from "../types";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
@@ -41,6 +41,12 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
       return {
         ...state,
         device: action.payload.device as Device,
+      };
+    }
+    case "setCall": {
+      return {
+        ...state,
+        call: action.payload.call as Call,
       };
     }
     case "selectContact": {
@@ -83,6 +89,14 @@ export const SoftphoneProvider = ({
   };
 
   const setIdentity = (identity: string) => {
+    if (!Contact.validateIdentity(identity)) {
+      setAlert({
+        type: "error",
+        message: "Invalid identity",
+        context: `${identity} is not a valid identity.`,
+      });
+      return;
+    }
     dispatch({ type: "setIdentity", payload: { identity } });
   };
 
@@ -105,7 +119,7 @@ export const SoftphoneProvider = ({
 
         setIdentity(identity);
 
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+        // await navigator.mediaDevices.getUserMedia({ audio: true });
         // populate dropdown with available audio devices
         const device = new Device(token, DEVICE_OPTIONS);
         addDeviceListeners(device);
@@ -244,6 +258,58 @@ export const SoftphoneProvider = ({
     });
   };
 
+  const addCallListeners = (call: Call) => {
+    call.on("accept", (acceptedCall: Call) => {
+      console.log("accept event", { acceptedCall });
+      dispatch({ type: "setCall", payload: { call: acceptedCall } });
+      setView("on-call");
+    });
+
+    call.on("cancel", () => {
+      console.log("cancel event");
+    });
+
+    call.on("disconnect", (disconnectedCall: Call) => {
+      console.log("disconnect event", { disconnectedCall });
+      dispatch({ type: "setCall", payload: { call: undefined } });
+      setView("active");
+    });
+
+    call.on("error", (twilioError: TwilioError.TwilioError) => {
+      setAlert({
+        type: "error",
+        message: "An error occurred.",
+        context: JSON.stringify(twilioError),
+      });
+    });
+
+    call.on("mute", (isMute: boolean, mutedCall: Call) => {
+      console.log("mute event", { isMute, mutedCall });
+    });
+
+    call.on("reconnected", () => {
+      console.log("reconnected event");
+    });
+
+    call.on("reconnecting", (twilioError: TwilioError.TwilioError) => {
+      console.log("reconnecting event", { twilioError });
+      setAlert({
+        type: "error",
+        message: "An error occurred. Reconnecting..",
+        context: JSON.stringify(twilioError),
+      });
+    });
+
+    call.on("reject", () => {
+      console.log("reject event");
+    });
+
+    call.on("ringing", (hasEarlyMedia: boolean) => {
+      console.log("ringing event", { hasEarlyMedia });
+      setView("ringing");
+    });
+  };
+
   const selectContact = (contactSelected: Contact) => {
     dispatch({ type: "selectContact", payload: { contactSelected } });
     dispatch({ type: "setView", payload: { view: "contact" } });
@@ -257,18 +323,27 @@ export const SoftphoneProvider = ({
   };
 
   const setContactList = useCallback((contactList: ContactInput[]) => {
-    const contactListParsed = contactList.map((contact) => {
-      if (contact instanceof Contact) {
-        return contact;
-      } else {
-        return new Contact(contact);
-      }
-    });
+    try {
+      const contactListParsed = contactList.map((contact) => {
+        if (contact instanceof Contact) {
+          return contact;
+        } else {
+          return new Contact(contact);
+        }
+      });
 
-    dispatch({
-      type: "setContactList",
-      payload: { contactList: contactListParsed },
-    });
+      dispatch({
+        type: "setContactList",
+        payload: { contactList: contactListParsed },
+      });
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Failed to set contact list",
+        context: error as string,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const makeCall = async (contact?: Contact) => {
@@ -282,13 +357,35 @@ export const SoftphoneProvider = ({
       return;
     }
 
-    const call = await softphone.device?.connect({
-      params: {
-        To: contactToCall.identity,
-      },
-    });
+    try {
+      const call = await softphone.device?.connect({
+        params: {
+          To: contactToCall.identity,
+        },
+      });
 
-    console.log("call", call);
+      if (call) {
+        addCallListeners(call);
+      }
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Failed to make call",
+        context: error as string,
+      });
+    }
+  };
+
+  const hangUp = () => {
+    try {
+      softphone.device?.disconnectAll();
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Failed to hang up",
+        context: error as string,
+      });
+    }
   };
 
   return (
@@ -305,6 +402,7 @@ export const SoftphoneProvider = ({
           clearSelectedContact,
           setContactList,
           makeCall,
+          hangUp,
         }}
       >
         {children}

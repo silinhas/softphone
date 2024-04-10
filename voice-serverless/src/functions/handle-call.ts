@@ -36,6 +36,9 @@ export const handler: ServerlessFunctionSignature = (
       callerId: context.CALLER_ID,
     });
 
+    console.log({ attr, eventTo: event.To });
+    console.log({ callerId: context.CALLER_ID });
+
     dial[attr]({}, event.To);
   } else {
     twiml.say("Thanks for calling!");

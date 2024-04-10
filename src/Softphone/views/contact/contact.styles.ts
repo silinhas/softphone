@@ -1,7 +1,7 @@
-import styled from "styled-components";
+import { styled } from "@mui/system";
 
 export default {
-  StyledBadge: styled.div`
+  StyledBadge: styled("div")`
     width: 1rem;
     height: 1rem;
     background-color: ${({ color }) => color};
