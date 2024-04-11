@@ -9,11 +9,16 @@ import {
   useSoftphone,
   useSoftphoneDispatch,
 } from "@/Softphone/context/context";
-import { Avatar, Box, Typography } from "@mui/material";
+import { Avatar, Box, Tooltip, Typography } from "@mui/material";
+import { Mic } from "@mui/icons-material";
 
 const OnCallView = () => {
-  const { contactSelected } = useSoftphone();
+  const { contactSelected, callActions, call } = useSoftphone();
   const { hangUp } = useSoftphoneDispatch();
+
+  const handleMute = () => {
+    call?.mute(!call.isMuted());
+  };
 
   return (
     <Stack>
@@ -34,36 +39,70 @@ const OnCallView = () => {
               {contactSelected?.label}
             </Typography>
           </Box>
-          <>ON_CALL_VIEW</>
         </Box>
       </Stack.Segment>
       <Stack.Segment flex={0.3}>
         <Box display={"flex"} gap={1} justifyContent={"center"}>
-          <ActionButton
-            color="primary"
-            onClick={() => console.log("Mute")}
-            icon={<MicOffIcon fontSize="large" />}
-          />
-          <ActionButton
-            color="primary"
-            onClick={() => console.log("hold call")}
-            icon={<PhonePausedIcon fontSize="large" />}
-          />
-          <ActionButton
-            color="primary"
-            onClick={() => console.log("show keypad")}
-            icon={<DialpadIcon fontSize="large" />}
-          />
-          <ActionButton
-            color="primary"
-            onClick={() => console.log("Transfer Call")}
-            icon={<PhoneForwardedIcon fontSize="large" />}
-          />
-          <ActionButton
-            color="error"
-            onClick={hangUp}
-            icon={<CallEndIcon fontSize="large" />}
-          />
+          {callActions?.mute && (
+            <Tooltip title={call?.isMuted() ? "Unmute" : "Mute"}>
+              <span>
+                <ActionButton
+                  active={call?.isMuted()}
+                  color="primary"
+                  onClick={handleMute}
+                  icon={
+                    call?.isMuted() ? (
+                      <MicOffIcon fontSize="large" />
+                    ) : (
+                      <Mic fontSize="large" />
+                    )
+                  }
+                />
+              </span>
+            </Tooltip>
+          )}
+          {callActions?.hold && (
+            <Tooltip title="Hold Call">
+              <span>
+                <ActionButton
+                  color="primary"
+                  onClick={() => console.log("hold call")}
+                  icon={<PhonePausedIcon fontSize="large" />}
+                />
+              </span>
+            </Tooltip>
+          )}
+          {callActions?.keypad && (
+            <Tooltip title="Keypad">
+              <span>
+                <ActionButton
+                  color="primary"
+                  onClick={() => console.log("show keypad")}
+                  icon={<DialpadIcon fontSize="large" />}
+                />
+              </span>
+            </Tooltip>
+          )}
+          {callActions?.transfer && (
+            <Tooltip title="Transfer Call">
+              <span>
+                <ActionButton
+                  color="primary"
+                  onClick={() => console.log("Transfer Call")}
+                  icon={<PhoneForwardedIcon fontSize="large" />}
+                />
+              </span>
+            </Tooltip>
+          )}
+          <Tooltip title="Hang Up">
+            <span>
+              <ActionButton
+                color="error"
+                onClick={hangUp}
+                icon={<CallEndIcon fontSize="large" />}
+              />
+            </span>
+          </Tooltip>
         </Box>
       </Stack.Segment>
     </Stack>

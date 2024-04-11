@@ -11,12 +11,13 @@ import Layout from "./layouts/Layout";
 import ErrorBoundary from "./layouts/ErrorBoundary";
 import { Main } from "./layouts/Main";
 import { ThemeProvider, createTheme } from "@mui/material";
-import { ContactInput } from "./types";
+import { CallActions, ContactInput } from "./types";
 interface Props {
   identity: string;
   autoRegister?: boolean;
   showStatus?: boolean;
   contactList: ContactInput[];
+  callActions?: CallActions;
   styles?: ContainerStyles;
 }
 const theme = createTheme();
@@ -26,10 +27,10 @@ const Softphone = ({
   autoRegister,
   showStatus = true,
   contactList,
+  callActions,
   styles,
 }: Props) => {
-  const { initializeDevice, setAlert, clearAlert, setContactList } =
-    useSoftphoneDispatch();
+  const { initializeDevice, setAlert } = useSoftphoneDispatch();
 
   useEffect(() => {
     if (!identity) {
@@ -40,11 +41,7 @@ const Softphone = ({
         context: `The identity is required. When Initializing the Softphone.`,
       });
     } else {
-      clearAlert();
-      initializeDevice(identity, autoRegister);
-      if (contactList) {
-        setContactList(contactList);
-      }
+      initializeDevice({ identity, autoRegister, contactList, callActions });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

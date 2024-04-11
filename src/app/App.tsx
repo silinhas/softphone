@@ -1,4 +1,4 @@
-import Softphone, { ContactInput, useSoftphone } from "../Softphone";
+import { Softphone, ContactInput, useSoftphone } from "../Softphone";
 import { Box, styled } from "@mui/material";
 import ControlPanel from "./ControlPanel";
 import { useState } from "react";

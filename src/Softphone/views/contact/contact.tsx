@@ -13,6 +13,7 @@ const ContactView = () => {
   const { contactSelected } = useSoftphone();
   const { setView, clearSelectedContact, makeCall } = useSoftphoneDispatch();
 
+  console.log({ contactSelected });
   return (
     <Stack>
       <Stack.Segment
@@ -37,7 +38,7 @@ const ContactView = () => {
                   fontSize: 40,
                   border: "1px solid ",
                 }}
-                src={contactSelected.avatar}
+                src={contactSelected.avatar || "/"}
               >
                 {contactSelected.type === "phone" && (
                   <PhoneIcon sx={{ fontSize: 40 }} />
