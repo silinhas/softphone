@@ -9,7 +9,13 @@ import {
 import { InitialState, SoftphoneAction, Status, Views } from "./types";
 import { getToken } from "../services/voice";
 import { Call, Device, TwilioError } from "@twilio/voice-sdk";
-import { Contact, ContactInput, TwilioServices } from "../types";
+import {
+  Contact,
+  ContactInput,
+  SoftphoneSettings,
+  TwilioServices,
+  defaultSoftphoneSettings,
+} from "../types";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
   switch (action.type) {
@@ -61,6 +67,15 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         contactList: action.payload.contactList as Contact[],
       };
     }
+    case "setCallActions": {
+      return {
+        ...state,
+        callActions: {
+          ...state.callActions,
+          ...(action.payload.callActions as SoftphoneSettings["callActions"]),
+        },
+      };
+    }
     default: {
       throw Error("Unknown action: " + action.type);
     }
@@ -80,11 +95,12 @@ export const SoftphoneProvider = ({
     dispatch({ type: "setView", payload: { view } });
   };
 
-  const setStatus = (status: Status) => {
+  const setStatus = async (status: Status) => {
+    console.log(status, softphone.device);
     if (status === "available" && softphone.device) {
-      registerDevice(softphone.device);
+      await registerDevice(softphone.device);
     } else if (status === "do-not-disturb" && softphone.device) {
-      unregisterDevice(softphone.device);
+      await unregisterDevice(softphone.device);
     }
   };
 
@@ -109,14 +125,21 @@ export const SoftphoneProvider = ({
   }, []);
 
   const initializeDevice = useCallback(
-    async (identity: string, autoRegister = false) => {
+    async (softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings) => {
+      const { identity, autoRegister, contactList, callActions } =
+        softphoneSettings;
+
       try {
+        setAlert({
+          type: "info",
+          message: "Initializing device...",
+        });
         const token = await getToken(
           twilioServices.token,
           identity,
           TOKEN_TIME_TO_LIVE
         );
-
+        clearAlert();
         setIdentity(identity);
 
         // await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -128,6 +151,14 @@ export const SoftphoneProvider = ({
           registerDevice(device);
         }
 
+        if (contactList) {
+          setContactList(contactList);
+        }
+
+        if (callActions) {
+          setCallActions(callActions);
+        }
+
         dispatch({ type: "setView", payload: { view: "active" } });
         dispatch({ type: "setDevice", payload: { device } });
       } catch (error) {
@@ -135,6 +166,7 @@ export const SoftphoneProvider = ({
           type: "error",
           message: "Failed to initialize device.",
           context: error as string,
+          severity: "critical",
         });
       }
     },
@@ -285,6 +317,7 @@ export const SoftphoneProvider = ({
 
     call.on("mute", (isMute: boolean, mutedCall: Call) => {
       console.log("mute event", { isMute, mutedCall });
+      dispatch({ type: "setCall", payload: { call: mutedCall } });
     });
 
     call.on("reconnected", () => {
@@ -306,6 +339,7 @@ export const SoftphoneProvider = ({
 
     call.on("ringing", (hasEarlyMedia: boolean) => {
       console.log("ringing event", { hasEarlyMedia });
+      dispatch({ type: "setCall", payload: { call } });
       setView("ringing");
     });
   };
@@ -346,6 +380,13 @@ export const SoftphoneProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const setCallActions = (callActions: SoftphoneSettings["callActions"]) => {
+    dispatch({
+      type: "setCallActions",
+      payload: { callActions },
+    });
+  };
+
   const makeCall = async (contact?: Contact) => {
     const contactToCall = contact || softphone.contactSelected;
 
@@ -365,6 +406,7 @@ export const SoftphoneProvider = ({
       });
 
       if (call) {
+        dispatch({ type: "setCall", payload: { call } });
         addCallListeners(call);
       }
     } catch (error) {
@@ -400,7 +442,6 @@ export const SoftphoneProvider = ({
           destroyDevice,
           selectContact,
           clearSelectedContact,
-          setContactList,
           makeCall,
           hangUp,
         }}

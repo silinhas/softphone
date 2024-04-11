@@ -34,6 +34,7 @@ export const handler: ServerlessFunctionSignature = (
 
     const dial = twiml.dial({
       callerId: context.CALLER_ID,
+      answerOnBridge: true,
     });
 
     console.log({ attr, eventTo: event.To });

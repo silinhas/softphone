@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import { CallStatus, SelectStatus } from "../components";
 import { useSoftphone } from "../context/context";
 import {
@@ -10,12 +11,14 @@ import {
 import Layout from "./Layout";
 
 export const Main = () => {
-  const { view, device } = useSoftphone();
+  const { view, device, call } = useSoftphone();
 
   return (
     <>
       <Layout.Top>
-        {device?.isBusy ? <CallStatus /> : <SelectStatus />}
+        <Box height={"4em"}>
+          {device?.isBusy && call ? <CallStatus /> : <SelectStatus />}
+        </Box>
       </Layout.Top>
       <Layout.View>
         {view === "active" && <ActiveView />}

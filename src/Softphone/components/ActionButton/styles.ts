@@ -1,42 +1,54 @@
-import { IconButton as IconButtonMui } from "@mui/material";
+import { IconButton as IconButtonMui, IconButtonProps } from "@mui/material";
 import { Theme, styled } from "@mui/system";
 
-const primaryColorStyles = (theme: Theme) => `
-  color: ${theme.palette.common.black};
-  background-color: ${theme.palette.common.white};
-  &:hover {
-    color: ${theme.palette.common.white};
-    background-color: ${theme.palette.info.dark};
-  }
-`;
+interface Props extends IconButtonProps {
+  active: "true" | "false";
+}
 
-const successColorStyles = (theme: Theme) => `
-  color: ${theme.palette.common.black};
-  background-color: ${theme.palette.common.white};
+const createColorStyles = (
+  theme: Theme,
+  active: boolean,
+  mainColor: string,
+  hoverColor: string
+) => `
+  color: ${active ? theme.palette.common.white : theme.palette.common.black};
+  background-color: ${active ? mainColor : theme.palette.common.white};
   &:hover {
-    color: ${theme.palette.common.white};
-    background-color: ${theme.palette.success.main};
-  }
-`;
-
-const errorColorStyles = (theme: Theme) => `
-  color: ${theme.palette.common.black};
-  background-color: ${theme.palette.common.white};
-  &:hover {
-    color: ${theme.palette.common.white};
-    background-color: ${theme.palette.error.main};
+    color: ${!active ? theme.palette.common.white : theme.palette.common.black};
+    background-color: ${!active ? hoverColor : theme.palette.common.white};
   }
 `;
 
 export default {
-  IconButton: styled(IconButtonMui)(
-    ({ theme, color }) => `
+  IconButton: styled(IconButtonMui)<Props>(
+    ({ theme, color, active }) => `
     border: 1px solid;
     transition: color 0.2s, background-color 0.2s;
 
-    ${color === "primary" && primaryColorStyles(theme)}
-    ${color === "success" && successColorStyles(theme)}
-    ${color === "error" && errorColorStyles(theme)}
+    ${
+      color === "primary"
+        ? createColorStyles(
+            theme,
+            JSON.parse(active),
+            theme.palette.info.dark,
+            theme.palette.info.dark
+          )
+        : color === "success"
+        ? createColorStyles(
+            theme,
+            JSON.parse(active),
+            theme.palette.success.main,
+            theme.palette.success.main
+          )
+        : color === "error"
+        ? createColorStyles(
+            theme,
+            JSON.parse(active),
+            theme.palette.error.main,
+            theme.palette.error.main
+          )
+        : ""
+    }
   `
   ),
 };

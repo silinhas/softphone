@@ -1,5 +1,5 @@
 import { Call, Device } from "@twilio/voice-sdk";
-import { Contact, ContactInput } from "../types";
+import { Contact, SoftphoneSettings } from "../types";
 
 export type Views =
   | "inactive"
@@ -19,6 +19,7 @@ export type InitialState = {
   identity: string;
   contactSelected?: Contact;
   contactList: Contact[];
+  callActions: SoftphoneSettings["callActions"];
   alert?: {
     message: string;
     context?: string;
@@ -36,20 +37,20 @@ export type SoftphoneAction = {
     | "setDevice"
     | "setCall"
     | "selectContact"
-    | "setContactList";
+    | "setContactList"
+    | "setCallActions";
   payload: Partial<InitialState>;
 };
 
 export type SoftphoneDispatch = {
   setView: (view: Views) => void;
   setStatus: (status: Status) => void;
-  initializeDevice: (identity: string, autoRegister?: boolean) => void;
+  initializeDevice: (softphoneSettings: SoftphoneSettings) => void;
   setAlert: (alert: InitialState["alert"]) => void;
   clearAlert: () => void;
   destroyDevice: () => void;
   selectContact: (contact: Contact) => void;
   clearSelectedContact: () => void;
-  setContactList: (contactList: ContactInput[]) => void;
   makeCall: (contact?: Contact) => void;
   hangUp: () => void;
 };
