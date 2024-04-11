@@ -1,4 +1,9 @@
-import { ActionButton, Keypad } from "@/Softphone/components";
+import {
+  ActionButton,
+  Contact,
+  Keypad,
+  TimeIndicator,
+} from "@/Softphone/components";
 import CallEndIcon from "@mui/icons-material/CallEnd";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import PhonePausedIcon from "@mui/icons-material/PhonePaused";
@@ -9,12 +14,12 @@ import {
   useSoftphone,
   useSoftphoneDispatch,
 } from "@/Softphone/context/context";
-import { Avatar, Box, Tooltip, Typography } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import { Mic } from "@mui/icons-material";
 import { useState } from "react";
 
 const OnCallView = () => {
-  const { contactSelected, callActions, call } = useSoftphone();
+  const { callActions, call } = useSoftphone();
   const { hangUp } = useSoftphoneDispatch();
   const [showKeypad, setShowKeypad] = useState(false);
 
@@ -28,6 +33,9 @@ const OnCallView = () => {
 
   return (
     <Stack>
+      <Stack.Segment flex={0.1} display={"flex"} justifyContent={"center"}>
+        <TimeIndicator />
+      </Stack.Segment>
       <Stack.Segment
         flex={0.7}
         display={"flex"}
@@ -35,16 +43,7 @@ const OnCallView = () => {
         alignItems={"center"}
       >
         <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
-          <Box display={"flex"} gap={1}>
-            <Avatar
-              alt={contactSelected?.label}
-              sx={{ width: 30, height: 30, border: "1px solid" }}
-              src={contactSelected?.avatar}
-            />
-            <Typography variant="body1" fontWeight={400}>
-              {contactSelected?.label}
-            </Typography>
-          </Box>
+          <Contact />
           {showKeypad && <Keypad />}
         </Box>
       </Stack.Segment>

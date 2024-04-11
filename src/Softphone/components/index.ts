@@ -6,3 +6,5 @@ export { Status } from "./Status/Status";
 export { CallStatus } from "./Status/CallStatus";
 export { CallLoadingIndicator } from "./CallLoadingIndicator/CallLoadingIndicator";
 export { Keypad } from "./Keypad/Keypad";
+export { TimeIndicator } from "./TimeIndicator/TimeIndicator";
+export { Contact } from "./Contact/Contact";
