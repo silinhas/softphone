@@ -43,8 +43,7 @@ const OnCallView = () => {
         alignItems={"center"}
       >
         <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
-          <Contact />
-          {showKeypad && <Keypad />}
+          {showKeypad ? <Keypad /> : <Contact />}
         </Box>
       </Stack.Segment>
       <Stack.Segment flex={0.3}>
