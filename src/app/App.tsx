@@ -12,7 +12,7 @@ const Layout = styled("div")`
 `;
 
 const App = () => {
-  const [identity, setIdentity] = useState("Apollo");
+  const [identity, setIdentity] = useState("");
   const { destroyDevice, lookupContact } = useSoftphone();
 
   const handleSetIdentity = (identity: string) => {
@@ -37,24 +37,21 @@ const App = () => {
     },
     {
       id: "2",
-      identity: "+13053303976",
-      label: "Jane Doe",
-      status: "unavailable",
+      identity: "apollo1",
+      label: "Apollo 1",
+      status: "available",
+      avatar:
+        "https://gravatar.com/avatar/3923e64254ae47c4589919409550r2cd?s=400&d=robohash&r=x",
     },
     {
       id: "3",
-      identity: "jhon-smith",
-      label: "John Smith",
-      status: "available",
-    },
-    {
-      id: "4",
-      identity: "apollo-2",
+      identity: "apollo2",
       label: "Apollo 2",
       status: "available",
       avatar:
-        "https://gravatar.com/avatar/3923e72894ae47c4589919409550c8bd?s=400&d=robohash&r=x",
+        "https://gravatar.com/avatar/3923e72894ae47c4589919409550r2cd?s=400&d=robohash&r=x",
     },
+
     {
       id: "5",
       identity: "jane-doe",

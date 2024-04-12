@@ -4,6 +4,7 @@ import { useSoftphone } from "../context/context";
 import {
   ActiveView,
   ContactView,
+  IncomingView,
   LookupView,
   OnCallView,
   RingingView,
@@ -26,6 +27,7 @@ export const Main = () => {
         {view === "contact" && <ContactView />}
         {view === "ringing" && <RingingView />}
         {view === "on-call" && <OnCallView />}
+        {view === "incoming" && <IncomingView />}
       </Layout.View>
     </>
   );

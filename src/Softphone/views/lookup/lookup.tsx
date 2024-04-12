@@ -40,9 +40,7 @@ const LookupView = () => {
   ) => {
     const filtered = filter(options, params);
 
-    if (filtered.length === 0) {
-      filtered.push(new Contact({ identity: params.inputValue, isNew: true }));
-    }
+    filtered.push(new Contact({ identity: params.inputValue, isNew: true }));
 
     return filtered;
   };
