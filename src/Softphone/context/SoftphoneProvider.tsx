@@ -391,7 +391,6 @@ export const SoftphoneProvider = ({
 
   const setContactList = useCallback((contactList: ContactInput[]) => {
     try {
-      console.log({ contactList });
       const contactListParsed = contactList.map((contact) => {
         return Contact.buildContact(contact);
       });
