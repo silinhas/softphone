@@ -17,7 +17,7 @@ export type InitialState = {
   call?: Call;
   view: Views;
   status: Status;
-  identity: string;
+  contact: Contact;
   contactSelected?: Contact;
   contactList: Contact[];
   callActions: SoftphoneSettings["callActions"];
@@ -33,7 +33,7 @@ export type SoftphoneAction = {
   type:
     | "setView"
     | "setStatus"
-    | "setIdentity"
+    | "setContact"
     | "setAlert"
     | "setDevice"
     | "setCall"

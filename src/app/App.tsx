@@ -1,7 +1,7 @@
 import { Softphone, ContactInput, useSoftphone } from "../Softphone";
 import { Box, styled } from "@mui/material";
 import ControlPanel from "./ControlPanel";
-import { useState } from "react";
+import React from "react";
 
 const Layout = styled("div")`
   display: flex;
@@ -12,14 +12,14 @@ const Layout = styled("div")`
 `;
 
 const App = () => {
-  const [identity, setIdentity] = useState("");
+  const [contact, setContact] = React.useState<ContactInput>();
   const { destroyDevice, lookupContact } = useSoftphone();
 
-  const handleSetIdentity = (identity: string) => {
-    if (!identity) {
+  const handleSetContact = (contact: ContactInput | undefined) => {
+    if (!contact) {
       destroyDevice();
     }
-    setIdentity(identity);
+    setContact(contact);
   };
 
   const handleLookupContact = (contactToLookup: string) => {
@@ -29,52 +29,54 @@ const App = () => {
   const contactList: ContactInput[] = [
     {
       id: "1",
-      identity: "9793303975",
-      label: "9793303975",
+      identity: "apollo1",
+      label: "Apollo 1",
       status: "available",
       avatar:
         "https://gravatar.com/avatar/3923e72894ae47c4589919409550c9bd?s=400&d=robohash&r=x",
     },
     {
       id: "2",
-      identity: "apollo1",
-      label: "Apollo 1",
-      status: "available",
-      avatar:
-        "https://gravatar.com/avatar/3923e64254ae47c4589919409550r2cd?s=400&d=robohash&r=x",
-    },
-    {
-      id: "3",
       identity: "apollo2",
       label: "Apollo 2",
       status: "available",
       avatar:
         "https://gravatar.com/avatar/3923e72894ae47c4589919409550r2cd?s=400&d=robohash&r=x",
     },
-
     {
-      id: "5",
+      id: "3",
       identity: "jane-doe",
       label: "Jane Doe",
       status: "unavailable",
     },
     {
-      id: "6",
+      id: "4",
       identity: "john-smith",
       label: "John Smith",
       status: "available",
     },
+    {
+      id: "5",
+      identity: "sarah-jones",
+      label: "Sarah Jones",
+      status: "unknown",
+    },
   ];
+
+  // React.useEffect(() => {
+  //   setContact(contactList[0]);
+  // }, []);
 
   return (
     <Layout>
       <ControlPanel
-        identity={identity}
-        handleSetIdentity={handleSetIdentity}
+        contactList={contactList}
+        contact={contact}
+        handleSetContact={handleSetContact}
         handleLookupContact={handleLookupContact}
       />
       <Box>
-        <Softphone identity={identity} autoRegister contactList={contactList} />
+        <Softphone contact={contact} autoRegister contactList={contactList} />
       </Box>
     </Layout>
   );

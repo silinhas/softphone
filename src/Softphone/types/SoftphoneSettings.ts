@@ -2,14 +2,14 @@ import { CallActions } from "./CallActions";
 import { ContactInput } from "./Contact";
 
 export type SoftphoneSettings = {
-  identity: string;
+  contact: ContactInput;
   autoRegister?: boolean;
   contactList?: ContactInput[];
   callActions?: CallActions;
 };
 
 export const defaultSoftphoneSettings: SoftphoneSettings = {
-  identity: "",
+  contact: { identity: "" },
   autoRegister: false,
   contactList: [],
   callActions: {

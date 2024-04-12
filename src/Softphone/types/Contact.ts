@@ -43,6 +43,10 @@ class Contact {
     this.avatar = contactConstructorArgs.avatar;
   }
 
+  static buildContact(contact: ContactInput): Contact {
+    return contact instanceof Contact ? contact : new Contact(contact);
+  }
+
   static validateIdentity(identity: string): boolean {
     return !/\s/.test(identity);
   }
@@ -51,6 +55,18 @@ class Contact {
     return isValidPhoneNumber(label, "US")
       ? parsePhoneNumber(label, "US").format("NATIONAL").toString()
       : label;
+  }
+
+  public toJSON(): ContactConstructorArgs {
+    return {
+      identity: this.identity,
+      id: this.id,
+      label: this.label,
+      data: this.data,
+      isNew: this.isNew,
+      status: this.status.status,
+      avatar: this.avatar,
+    };
   }
 }
 
