@@ -259,8 +259,12 @@ export const SoftphoneProvider = ({
       }
     });
 
-    device.on("incoming", (/* call */) => {
-      console.log("incoming call");
+    device.on("incoming", (call: Call) => {
+      console.log("incoming call", { call });
+      addCallListeners(call);
+      selectContact(new Contact({ identity: call.parameters.From }));
+      dispatch({ type: "setCall", payload: { call } });
+      setView("incoming");
     });
 
     device.on("registered", () => {
@@ -308,6 +312,7 @@ export const SoftphoneProvider = ({
     });
 
     call.on("error", (twilioError: TwilioError.TwilioError) => {
+      console.log("error event", { twilioError });
       setAlert({
         type: "error",
         message: "An error occurred.",
@@ -316,7 +321,6 @@ export const SoftphoneProvider = ({
     });
 
     call.on("mute", (isMute: boolean, mutedCall: Call) => {
-      console.log("mute event", { isMute, mutedCall });
       dispatch({ type: "setCall", payload: { call: mutedCall } });
     });
 
@@ -335,6 +339,9 @@ export const SoftphoneProvider = ({
 
     call.on("reject", () => {
       console.log("reject event");
+      setView("active");
+      clearSelectedContact();
+      dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
     call.on("ringing", (hasEarlyMedia: boolean) => {

@@ -7,7 +7,8 @@ export type Views =
   | "lookup"
   | "contact"
   | "ringing"
-  | "on-call";
+  | "on-call"
+  | "incoming";
 
 export type Status = "available" | "do-not-disturb";
 

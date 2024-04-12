@@ -37,6 +37,7 @@ const ContactView = () => {
           icon={<CloseIcon fontSize="large" />}
         />
         <ActionButton
+          active
           color="success"
           onClick={() => makeCall(contactSelected)}
           icon={<PhoneIcon fontSize="large" />}

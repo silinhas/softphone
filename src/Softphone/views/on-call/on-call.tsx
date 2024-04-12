@@ -102,6 +102,7 @@ const OnCallView = () => {
           <Tooltip title="Hang Up">
             <span>
               <ActionButton
+                active
                 color="error"
                 onClick={hangUp}
                 icon={<CallEndIcon fontSize="large" />}
