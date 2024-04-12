@@ -320,7 +320,7 @@ export const SoftphoneProvider = ({
       });
     });
 
-    call.on("mute", (isMute: boolean, mutedCall: Call) => {
+    call.on("mute", (_isMute: boolean, mutedCall: Call) => {
       dispatch({ type: "setCall", payload: { call: mutedCall } });
     });
 
