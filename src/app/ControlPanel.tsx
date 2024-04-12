@@ -1,32 +1,42 @@
-import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import { ContactInput } from "@/Softphone";
+import {
+  Avatar,
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 
 interface Props {
-  identity: string;
-  handleSetIdentity: (identity: string) => void;
+  contactList: ContactInput[];
+  contact?: ContactInput;
+  handleSetContact: (contact: ContactInput | undefined) => void;
   handleLookupContact: (contactToLookup: string) => void;
 }
 
 const ControlPanel = ({
-  identity,
-  handleSetIdentity,
+  contact,
+  handleSetContact,
   handleLookupContact,
+  contactList,
 }: Props) => {
-  const [identityInput, setIdentityInput] = useState(identity);
   const [contactInput, setContactInput] = useState("");
 
-  const handleClickSetIdentity = (
-    event:
-      | React.MouseEvent<HTMLButtonElement>
-      | React.KeyboardEvent<HTMLDivElement>
-  ) => {
+  const handleSelectContact = (event: SelectChangeEvent<string | "">) => {
     event.preventDefault();
 
-    if (!identity) {
-      handleSetIdentity(identityInput);
-    } else {
-      setIdentityInput("");
-      handleSetIdentity("");
+    const selectedContact = contactList.find(
+      (contact) => contact.identity === event.target.value
+    );
+    if (selectedContact) {
+      handleSetContact(selectedContact);
     }
   };
 
@@ -52,59 +62,85 @@ const ControlPanel = ({
         px: 5,
       }}
     >
-      <Box display={"flex"} flexDirection={"column"}>
+      <Box display={"flex"} flexDirection={"column"} gap={2}>
         <Typography variant="h4">Control Panel</Typography>
 
-        {/* Identity */}
-        <Box my={2} width={"100%"}>
-          <TextField
-            id="identity"
+        <Box>
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">
+              Select your contact
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={contact?.identity || ""}
+              onChange={handleSelectContact}
+              renderValue={(value) => {
+                const selectedContact = contactList.find(
+                  (contact) => contact.identity === value
+                );
+                return (
+                  <Box display={"flex"}>
+                    <Avatar
+                      alt={selectedContact?.label}
+                      sx={{ width: 24, height: 24, mr: 1 }}
+                      src={selectedContact?.avatar || "/"}
+                    />
+                    <Typography variant={"subtitle1"}>
+                      {selectedContact?.label}
+                    </Typography>
+                  </Box>
+                );
+              }}
+            >
+              {contactList.map((contact) => (
+                <MenuItem key={contact.identity} value={contact.identity}>
+                  <Avatar
+                    alt={contact.label}
+                    sx={{ width: 24, height: 24, mr: 1 }}
+                    src={contact.avatar || "/"}
+                  />
+                  <Typography variant={"subtitle1"}>{contact.label}</Typography>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
             fullWidth
-            label="Set your identity"
+            variant="contained"
+            color={"error"}
+            disabled={!contact}
+            onClick={() => handleSetContact(undefined)}
+          >
+            Remove Identity
+          </Button>
+        </Box>
+
+        {/* Lookup Contact */}
+        <Box>
+          <TextField
+            id="contact"
+            fullWidth
+            label="Set contact to lookup"
             variant="outlined"
-            disabled={identity !== ""}
-            value={identityInput}
-            onChange={(event) => setIdentityInput(event.target.value)}
+            value={contactInput}
+            onChange={(event) => setContactInput(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
-                handleClickSetIdentity(event);
+                handleClickLookupContact(event);
               }
             }}
           />
           <Button
             fullWidth
             variant="contained"
-            color={identity ? "error" : "primary"}
-            disabled={!identityInput}
-            onClick={handleClickSetIdentity}
+            color={"primary"}
+            disabled={!contactInput}
+            onClick={handleClickLookupContact}
           >
-            {identity ? "Remove Identity" : "Set Identity"}
+            Set Contact
           </Button>
         </Box>
-
-        {/* Lookup Contact */}
-        <TextField
-          id="contact"
-          fullWidth
-          label="Set contact to lookup"
-          variant="outlined"
-          value={contactInput}
-          onChange={(event) => setContactInput(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              handleClickLookupContact(event);
-            }
-          }}
-        />
-        <Button
-          fullWidth
-          variant="contained"
-          color={"primary"}
-          disabled={!contactInput}
-          onClick={handleClickLookupContact}
-        >
-          Set Contact
-        </Button>
       </Box>
     </Paper>
   );

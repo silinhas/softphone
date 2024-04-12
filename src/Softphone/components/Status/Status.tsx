@@ -5,8 +5,10 @@ import InfoIcon from "@mui/icons-material/Info";
 import { useState } from "react";
 
 export const Status = () => {
-  const softphone = useSoftphone();
+  const { contact, device } = useSoftphone();
+
   const [open, setOpen] = useState(true);
+
   return (
     <Box position={"relative"} zIndex={999}>
       <Collapse
@@ -27,19 +29,19 @@ export const Status = () => {
           <Typography variant="caption">
             {`Identity: `}
             <Typography variant="caption" component={"span"} fontWeight={"500"}>
-              {softphone.identity || "unknown"}
+              {contact.identity || "unknown"}
             </Typography>
           </Typography>
           <Typography variant="caption">
             {`Status: `}
             <Typography variant="caption" component={"span"} fontWeight={"500"}>
-              {softphone.device?.state || "unavailable"}
+              {device?.state || "unavailable"}
             </Typography>
           </Typography>
           <Typography variant="caption">
             {`Busy: `}
             <Typography variant="caption" component={"span"} fontWeight={"500"}>
-              {softphone.device?.isBusy ? "Yes" : "No"}
+              {device?.isBusy ? "Yes" : "No"}
             </Typography>
           </Typography>
           <IconButton size="small" onClick={() => setOpen(false)}>

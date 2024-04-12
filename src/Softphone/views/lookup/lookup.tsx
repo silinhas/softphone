@@ -1,9 +1,9 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PhoneIcon from "@mui/icons-material/Phone";
-import PersonIcon from "@mui/icons-material/Person";
 import CircleIcon from "@mui/icons-material/Circle";
 import {
   Autocomplete,
+  Avatar,
   Box,
   FilterOptionsState,
   TextField,
@@ -40,7 +40,19 @@ const LookupView = () => {
   ) => {
     const filtered = filter(options, params);
 
-    filtered.push(new Contact({ identity: params.inputValue, isNew: true }));
+    const optionFound = options.find(
+      (option) => option.label === params.inputValue
+    );
+
+    if (!optionFound) {
+      const sanitizedInput = params.inputValue
+        .replace(/\s+/g, "")
+        .toLocaleLowerCase();
+
+      if (sanitizedInput) {
+        filtered.push(new Contact({ identity: sanitizedInput, isNew: true }));
+      }
+    }
 
     return filtered;
   };
@@ -51,15 +63,19 @@ const LookupView = () => {
   ) => {
     return (
       <Box component={"li"} {...props} key={option.id}>
-        <Box display={"flex"} gap={1}>
+        <Box display={"flex"} gap={1} alignItems={"end"}>
           <Box component={"span"}>
             <CircleIcon
               sx={{ width: 12, height: 12, color: option.status.color }}
             />
           </Box>
-          <Box component={"span"} alignSelf={"end"}>
-            {option.type === "phone" ? <PhoneIcon /> : <PersonIcon />}
-          </Box>
+          <Avatar
+            src={option.avatar || "/"}
+            alt={option.label}
+            sx={{ width: 24, height: 24 }}
+          >
+            {option.type === "phone" && <PhoneIcon sx={{ fontSize: 16 }} />}
+          </Avatar>
           <Box display={"flex"}>{option.label}</Box>
           <Box component={"span"}>
             {option.isNew && <FiberNewIcon color="success" />}

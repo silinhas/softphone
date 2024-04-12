@@ -31,10 +31,10 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         status: action.payload.status as Status,
       };
     }
-    case "setIdentity": {
+    case "setContact": {
       return {
         ...state,
-        identity: action.payload.identity as string,
+        contact: action.payload.contact as Contact,
       };
     }
     case "setAlert": {
@@ -104,16 +104,11 @@ export const SoftphoneProvider = ({
     }
   };
 
-  const setIdentity = (identity: string) => {
-    if (!Contact.validateIdentity(identity)) {
-      setAlert({
-        type: "error",
-        message: "Invalid identity",
-        context: `${identity} is not a valid identity.`,
-      });
-      return;
-    }
-    dispatch({ type: "setIdentity", payload: { identity } });
+  const setContact = (contact: ContactInput) => {
+    dispatch({
+      type: "setContact",
+      payload: { contact: Contact.buildContact(contact) },
+    });
   };
 
   const setAlert = useCallback((alert: InitialState["alert"]) => {
@@ -126,7 +121,7 @@ export const SoftphoneProvider = ({
 
   const initializeDevice = useCallback(
     async (softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings) => {
-      const { identity, autoRegister, contactList, callActions } =
+      const { contact, autoRegister, contactList, callActions } =
         softphoneSettings;
 
       try {
@@ -136,11 +131,12 @@ export const SoftphoneProvider = ({
         });
         const token = await getToken(
           twilioServices.token,
-          identity,
+          contact.identity,
           TOKEN_TIME_TO_LIVE
         );
         clearAlert();
-        setIdentity(identity);
+
+        setContact(contact);
 
         // await navigator.mediaDevices.getUserMedia({ audio: true });
         // populate dropdown with available audio devices
@@ -152,7 +148,10 @@ export const SoftphoneProvider = ({
         }
 
         if (contactList) {
-          setContactList(contactList);
+          const contactListWithoutCurrentContact = contactList.filter(
+            ({ identity }) => identity !== contact.identity
+          );
+          setContactList(contactListWithoutCurrentContact);
         }
 
         if (callActions) {
@@ -221,7 +220,10 @@ export const SoftphoneProvider = ({
     dispatch({ type: "setDevice", payload: { device: undefined } });
     dispatch({ type: "setView", payload: { view: "inactive" } });
     dispatch({ type: "setStatus", payload: { status: "do-not-disturb" } });
-    dispatch({ type: "setIdentity", payload: { identity: "" } });
+    dispatch({
+      type: "setContact",
+      payload: { contact: new Contact({ identity: "" }) },
+    });
   };
 
   const addDeviceListeners = (device: Device) => {
@@ -262,7 +264,20 @@ export const SoftphoneProvider = ({
     device.on("incoming", (call: Call) => {
       console.log("incoming call", { call });
       addCallListeners(call);
-      selectContact(new Contact({ identity: call.parameters.From }));
+
+      let contact: Contact;
+      const contactFromCustomParams = call?.customParameters?.get("contact");
+      const contactFromParams = { identity: call.parameters.From };
+
+      console.log({ contactFromCustomParams, contactFromParams });
+
+      if (contactFromCustomParams) {
+        contact = new Contact(JSON.parse(contactFromCustomParams));
+      } else {
+        contact = new Contact(contactFromParams);
+      }
+
+      selectContact(contact);
       dispatch({ type: "setCall", payload: { call } });
       setView("incoming");
     });
@@ -299,16 +314,21 @@ export const SoftphoneProvider = ({
       console.log("accept event", { acceptedCall });
       dispatch({ type: "setCall", payload: { call: acceptedCall } });
       setView("on-call");
+      // !!! check this issue (https://github.com/twilio/twilio-voice.js/issues/140) and uncomment this line after fixing it and remove messageReceived for call
     });
 
     call.on("cancel", () => {
       console.log("cancel event");
+      setView("active");
+      clearSelectedContact();
+      dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
     call.on("disconnect", (disconnectedCall: Call) => {
       console.log("disconnect event", { disconnectedCall });
-      dispatch({ type: "setCall", payload: { call: undefined } });
       setView("active");
+      clearSelectedContact();
+      dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
     call.on("error", (twilioError: TwilioError.TwilioError) => {
@@ -349,6 +369,12 @@ export const SoftphoneProvider = ({
       dispatch({ type: "setCall", payload: { call } });
       setView("ringing");
     });
+
+    call.on("messageReceived", (message) => {
+      console.log("messageReceived event", { message });
+      //the voiceEventSid can be used for tracking the message
+      console.log("voiceEventSid: ", message.voiceEventSid);
+    });
   };
 
   const selectContact = (contactSelected: Contact) => {
@@ -365,12 +391,9 @@ export const SoftphoneProvider = ({
 
   const setContactList = useCallback((contactList: ContactInput[]) => {
     try {
+      console.log({ contactList });
       const contactListParsed = contactList.map((contact) => {
-        if (contact instanceof Contact) {
-          return contact;
-        } else {
-          return new Contact(contact);
-        }
+        return Contact.buildContact(contact);
       });
 
       dispatch({
@@ -408,7 +431,8 @@ export const SoftphoneProvider = ({
     try {
       const call = await softphone.device?.connect({
         params: {
-          To: contactToCall.identity,
+          to: contactToCall.identity,
+          contact: JSON.stringify(softphone.contact),
         },
       });
 

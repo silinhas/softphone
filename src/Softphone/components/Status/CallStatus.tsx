@@ -4,16 +4,6 @@ import CallIcon from "@mui/icons-material/Call";
 
 export const CallStatus = () => {
   const { call } = useSoftphone();
-  const { direction, callerInfo, customParameters, parameters } = call || {};
-
-  console.log({
-    direction,
-    callerInfo,
-    customParameters,
-    isMuted: call?.isMuted(),
-    parameters,
-    status: call?.status(),
-  });
 
   const callStatus = call?.status();
 

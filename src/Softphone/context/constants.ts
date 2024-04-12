@@ -1,6 +1,6 @@
 import { Device } from "@twilio/voice-sdk";
 import { InitialState, SoftphoneDispatch, Status } from "./types";
-import { defaultSoftphoneSettings } from "../types";
+import { Contact, defaultSoftphoneSettings } from "../types";
 
 export const STATUS: { value: Status; label: string; color: string }[] = [
   { value: "available", label: "Available", color: "#3498db" },
@@ -10,7 +10,7 @@ export const STATUS: { value: Status; label: string; color: string }[] = [
 export const INITIAL_STATE: InitialState = {
   view: "active",
   status: "do-not-disturb",
-  identity: "",
+  contact: new Contact({ identity: "" }),
   contactList: [],
   callActions: defaultSoftphoneSettings.callActions,
 };

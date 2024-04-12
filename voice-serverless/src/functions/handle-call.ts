@@ -5,8 +5,8 @@ import {
 } from "@twilio-labs/serverless-runtime-types/types";
 
 type MyEvent = {
-  Body?: string;
-  To?: string;
+  to?: string;
+  contact?: string;
 };
 
 type MyContext = {
@@ -26,18 +26,49 @@ export const handler: ServerlessFunctionSignature = (
   event: MyEvent,
   callback: ServerlessCallback
 ) => {
-  console.log({ context });
   const twiml = new Twilio.twiml.VoiceResponse();
+  const { to, contact } = event;
 
-  if (event.To) {
-    const attr = isAValidPhoneNumber(event.To) ? "number" : "client";
+  if (to) {
+    const attr = isAValidPhoneNumber(to) ? "number" : "client";
 
     const dial = twiml.dial({
       callerId: context.CALLER_ID,
-      answerOnBridge: true,
+      timeout: 15,
+      // answerOnBridge: true, //!!! check this issue (https://github.com/twilio/twilio-voice.js/issues/140)
     });
 
-    dial[attr]({}, event.To);
+    if (attr === "client") {
+      dial
+        .client(
+          {
+            statusCallback: "/callback",
+            statusCallbackMethod: "POST",
+            statusCallbackEvent: [
+              "initiated",
+              "ringing",
+              "answered",
+              "completed",
+            ],
+          },
+          to
+        )
+        .parameter({ name: "contact", value: contact });
+    } else {
+      dial.number(
+        {
+          statusCallback: "/callback",
+          statusCallbackMethod: "POST",
+          statusCallbackEvent: [
+            "initiated",
+            "ringing",
+            "answered",
+            "completed",
+          ],
+        },
+        to
+      );
+    }
   } else {
     twiml.say("Thanks for calling!");
   }

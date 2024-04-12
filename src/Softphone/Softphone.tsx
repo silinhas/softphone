@@ -13,7 +13,7 @@ import { Main } from "./layouts/Main";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { CallActions, ContactInput } from "./types";
 interface Props {
-  identity: string;
+  contact?: ContactInput;
   autoRegister?: boolean;
   showStatus?: boolean;
   contactList: ContactInput[];
@@ -23,7 +23,7 @@ interface Props {
 const theme = createTheme();
 
 const Softphone = ({
-  identity,
+  contact,
   autoRegister,
   showStatus = true,
   contactList,
@@ -33,7 +33,7 @@ const Softphone = ({
   const { initializeDevice, setAlert } = useSoftphoneDispatch();
 
   useEffect(() => {
-    if (!identity) {
+    if (!contact?.identity) {
       setAlert({
         type: "error",
         severity: "critical",
@@ -41,10 +41,10 @@ const Softphone = ({
         context: `The identity is required. When Initializing the Softphone.`,
       });
     } else {
-      initializeDevice({ identity, autoRegister, contactList, callActions });
+      initializeDevice({ contact, autoRegister, contactList, callActions });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identity]);
+  }, [contact?.identity]);
 
   return (
     <ThemeProvider theme={theme}>
