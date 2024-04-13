@@ -1,6 +1,6 @@
 import Contact, { ContactInput } from "./Contact";
 import { TwilioServices } from "./TwilioServices";
-import { CallActions } from "./CallActions";
+import { CallActions, Actions } from "./CallActions";
 import {
   defaultSoftphoneSettings,
   SoftphoneSettings,
@@ -8,5 +8,5 @@ import {
 
 export { Contact, type ContactInput };
 export { type TwilioServices };
-export { type CallActions };
+export { type CallActions, type Actions };
 export { defaultSoftphoneSettings, type SoftphoneSettings };

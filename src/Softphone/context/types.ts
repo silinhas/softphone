@@ -19,8 +19,8 @@ export type InitialState = {
   status: Status;
   contact: Contact;
   contactSelected?: Contact;
-  contactList: Contact[];
   callActions: SoftphoneSettings["callActions"];
+  actions: SoftphoneSettings["actions"];
   alert?: {
     message: string;
     context?: string;
@@ -38,8 +38,8 @@ export type SoftphoneAction = {
     | "setDevice"
     | "setCall"
     | "selectContact"
-    | "setContactList"
-    | "setCallActions";
+    | "setCallActions"
+    | "setActions";
   payload: Partial<InitialState>;
 };
 

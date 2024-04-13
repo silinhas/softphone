@@ -11,8 +11,8 @@ export const INITIAL_STATE: InitialState = {
   view: "active",
   status: "do-not-disturb",
   contact: new Contact({ identity: "" }),
-  contactList: [],
   callActions: defaultSoftphoneSettings.callActions,
+  actions: defaultSoftphoneSettings.actions,
 };
 
 export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {
@@ -28,7 +28,6 @@ export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {
   hangUp: () => {},
 };
 
-export const TOKEN_TIME_TO_LIVE = 86400000; // 24 hr
 export const TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN = 300000; // each 5 min;
 const TIME_TO_CHECK_TOKEN_WILL_EXPIRE = 7200000; // 2 hr
 

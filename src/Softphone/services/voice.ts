@@ -1,12 +1,7 @@
-const getToken = async (url: string, identity: string, ttl?: number) => {
+const getToken = async (url: string, identity: string) => {
   try {
     const fetchTokenUrl = new URL(url);
-
     fetchTokenUrl.searchParams.append("identity", identity);
-
-    if (ttl) {
-      fetchTokenUrl.searchParams.append("ttl", ttl.toString());
-    }
 
     const response = await fetch(fetchTokenUrl.toString());
     const data = await response.json();

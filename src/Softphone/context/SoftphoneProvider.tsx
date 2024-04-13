@@ -4,7 +4,6 @@ import {
   DEVICE_OPTIONS,
   INITIAL_STATE,
   TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN,
-  TOKEN_TIME_TO_LIVE,
 } from "./constants";
 import { InitialState, SoftphoneAction, Status, Views } from "./types";
 import { getToken } from "../services/voice";
@@ -61,12 +60,6 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         contactSelected: action.payload.contactSelected as Contact,
       };
     }
-    case "setContactList": {
-      return {
-        ...state,
-        contactList: action.payload.contactList as Contact[],
-      };
-    }
     case "setCallActions": {
       return {
         ...state,
@@ -74,6 +67,12 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
           ...state.callActions,
           ...(action.payload.callActions as SoftphoneSettings["callActions"]),
         },
+      };
+    }
+    case "setActions": {
+      return {
+        ...state,
+        actions: action.payload.actions as SoftphoneSettings["actions"],
       };
     }
     default: {
@@ -121,21 +120,19 @@ export const SoftphoneProvider = ({
 
   const initializeDevice = useCallback(
     async (softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings) => {
-      const { contact, autoRegister, contactList, callActions } =
-        softphoneSettings;
+      const { contact, autoRegister, callActions, actions } = softphoneSettings;
+
+      const { onFetchToken } = actions;
 
       try {
         setAlert({
           type: "info",
           message: "Initializing device...",
         });
-        const token = await getToken(
-          twilioServices.token,
-          contact.identity,
-          TOKEN_TIME_TO_LIVE
-        );
-        clearAlert();
 
+        const token = await onFetchToken(contact.identity);
+
+        clearAlert();
         setContact(contact);
 
         // await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -147,15 +144,12 @@ export const SoftphoneProvider = ({
           registerDevice(device);
         }
 
-        if (contactList) {
-          const contactListWithoutCurrentContact = contactList.filter(
-            ({ identity }) => identity !== contact.identity
-          );
-          setContactList(contactListWithoutCurrentContact);
+        if (callActions) {
+          dispatch({ type: "setCallActions", payload: { callActions } });
         }
 
-        if (callActions) {
-          setCallActions(callActions);
+        if (actions) {
+          dispatch({ type: "setActions", payload: { actions } });
         }
 
         dispatch({ type: "setView", payload: { view: "active" } });
@@ -234,11 +228,7 @@ export const SoftphoneProvider = ({
     device.on("error", (twilioError: TwilioError.TwilioError /*, call */) => {
       switch (twilioError.name) {
         case "AccessTokenExpired": {
-          getToken(
-            twilioServices.token,
-            device?.identity || "",
-            TOKEN_TIME_TO_LIVE
-          )
+          getToken(twilioServices.token, device?.identity || "")
             .then((newToken) => {
               device.updateToken(newToken);
             })
@@ -249,6 +239,14 @@ export const SoftphoneProvider = ({
                 context: JSON.stringify(error),
               });
             });
+          break;
+        }
+        case "AuthorizationTokenMissingError": {
+          setAlert({
+            type: "error",
+            message: "An error occurred.",
+            context: JSON.stringify(twilioError),
+          });
           break;
         }
         default: {
@@ -297,8 +295,7 @@ export const SoftphoneProvider = ({
         if (device?.identity) {
           const newToken = await getToken(
             twilioServices.token,
-            device.identity,
-            TOKEN_TIME_TO_LIVE
+            device.identity
           );
           if (device.state === "registered") {
             device.updateToken(newToken);
@@ -386,33 +383,6 @@ export const SoftphoneProvider = ({
     dispatch({
       type: "selectContact",
       payload: { contactSelected: undefined },
-    });
-  };
-
-  const setContactList = useCallback((contactList: ContactInput[]) => {
-    try {
-      const contactListParsed = contactList.map((contact) => {
-        return Contact.buildContact(contact);
-      });
-
-      dispatch({
-        type: "setContactList",
-        payload: { contactList: contactListParsed },
-      });
-    } catch (error) {
-      setAlert({
-        type: "error",
-        message: "Failed to set contact list",
-        context: error as string,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const setCallActions = (callActions: SoftphoneSettings["callActions"]) => {
-    dispatch({
-      type: "setCallActions",
-      payload: { callActions },
     });
   };
 
