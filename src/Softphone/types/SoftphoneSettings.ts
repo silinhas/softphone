@@ -1,17 +1,17 @@
-import { CallActions } from "./CallActions";
+import { Actions, CallActions } from "./CallActions";
 import { ContactInput } from "./Contact";
 
 export type SoftphoneSettings = {
   contact: ContactInput;
   autoRegister?: boolean;
-  contactList?: ContactInput[];
   callActions?: CallActions;
+  actions: Actions;
 };
 
 export const defaultSoftphoneSettings: SoftphoneSettings = {
   contact: { identity: "" },
+  actions: { onFetchToken: async () => "" },
   autoRegister: false,
-  contactList: [],
   callActions: {
     hold: true,
     mute: true,

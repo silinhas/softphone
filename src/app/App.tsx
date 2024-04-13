@@ -2,6 +2,7 @@ import { Softphone, ContactInput, useSoftphone } from "../Softphone";
 import { Box, styled } from "@mui/material";
 import ControlPanel from "./ControlPanel";
 import React from "react";
+import { isValidPhoneNumber } from "libphonenumber-js/min";
 
 const Layout = styled("div")`
   display: flex;
@@ -22,7 +23,7 @@ const App = () => {
     setContact(contact);
   };
 
-  const handleLookupContact = (contactToLookup: string) => {
+  const handleDirectLookupContact = (contactToLookup: string) => {
     lookupContact(contactToLookup);
   };
 
@@ -63,6 +64,34 @@ const App = () => {
     },
   ];
 
+  const handleFetchToken = async (identity: string) => {
+    const response = await fetch(
+      `${
+        import.meta.env.SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN
+      }/token?identity=${identity}`
+    );
+    const { data } = await response.json();
+
+    return data.token;
+  };
+
+  const handleLookupContact = async (contactToLookup: string) => {
+    const results = contactList.filter((contact) =>
+      contact.identity.includes(contactToLookup)
+    );
+
+    if (!results.length && isValidPhoneNumber(contactToLookup, "US")) {
+      return [
+        {
+          identity: contactToLookup,
+          isNew: true,
+        },
+      ];
+    }
+
+    return results;
+  };
+
   // React.useEffect(() => {
   //   setContact(contactList[0]);
   // }, []);
@@ -73,10 +102,17 @@ const App = () => {
         contactList={contactList}
         contact={contact}
         handleSetContact={handleSetContact}
-        handleLookupContact={handleLookupContact}
+        handleLookupContact={handleDirectLookupContact}
       />
       <Box>
-        <Softphone contact={contact} autoRegister contactList={contactList} />
+        <Softphone
+          contact={contact}
+          autoRegister
+          actions={{
+            onFetchToken: handleFetchToken,
+            onLookupContact: handleLookupContact,
+          }}
+        />
       </Box>
     </Layout>
   );

@@ -6,11 +6,7 @@ import { SoftphoneProvider } from "../Softphone";
 
 ReactDOM.render(
   <React.StrictMode>
-    <SoftphoneProvider
-      twilioServices={{
-        token: `${import.meta.env.SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN}/token`,
-      }}
-    >
+    <SoftphoneProvider>
       <App />
     </SoftphoneProvider>
   </React.StrictMode>,

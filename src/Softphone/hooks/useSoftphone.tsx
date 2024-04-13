@@ -5,11 +5,7 @@ import {
 import { Contact, ContactInput } from "../types";
 
 export const useSoftphone = () => {
-  const {
-    contact: registeredContact,
-    device,
-    contactList,
-  } = useInternalSoftphone();
+  const { contact: registeredContact, device } = useInternalSoftphone();
   const { destroyDevice, selectContact, setAlert } = useSoftphoneDispatch();
 
   const lookupContact = (contactToLookup: string | ContactInput) => {
@@ -41,11 +37,7 @@ export const useSoftphone = () => {
       return;
     }
 
-    const existingContact = contactList.find(
-      (c) => c.identity === contact.identity
-    );
-
-    selectContact(existingContact || contact);
+    selectContact(contact);
   };
 
   return {

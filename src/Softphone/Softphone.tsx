@@ -11,13 +11,13 @@ import Layout from "./layouts/Layout";
 import ErrorBoundary from "./layouts/ErrorBoundary";
 import { Main } from "./layouts/Main";
 import { ThemeProvider, createTheme } from "@mui/material";
-import { CallActions, ContactInput } from "./types";
+import { Actions, CallActions, ContactInput } from "./types";
 interface Props {
   contact?: ContactInput;
   autoRegister?: boolean;
   showStatus?: boolean;
-  contactList: ContactInput[];
   callActions?: CallActions;
+  actions: Actions;
   styles?: ContainerStyles;
 }
 const theme = createTheme();
@@ -26,8 +26,8 @@ const Softphone = ({
   contact,
   autoRegister,
   showStatus = true,
-  contactList,
   callActions,
+  actions,
   styles,
 }: Props) => {
   const { initializeDevice, setAlert } = useSoftphoneDispatch();
@@ -41,7 +41,12 @@ const Softphone = ({
         context: `The identity is required. When Initializing the Softphone.`,
       });
     } else {
-      initializeDevice({ contact, autoRegister, contactList, callActions });
+      initializeDevice({
+        contact,
+        autoRegister,
+        actions,
+        callActions,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contact?.identity]);
