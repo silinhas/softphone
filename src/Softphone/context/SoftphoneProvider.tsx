@@ -6,13 +6,11 @@ import {
   TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN,
 } from "./constants";
 import { InitialState, SoftphoneAction, Status, Views } from "./types";
-import { getToken } from "../services/voice";
 import { Call, Device, TwilioError } from "@twilio/voice-sdk";
 import {
   Contact,
   ContactInput,
   SoftphoneSettings,
-  TwilioServices,
   defaultSoftphoneSettings,
 } from "../types";
 
@@ -83,10 +81,8 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
 
 export const SoftphoneProvider = ({
   children,
-  twilioServices,
 }: {
   children: React.ReactNode;
-  twilioServices: TwilioServices;
 }) => {
   const [softphone, dispatch] = useReducer(softphoneReducer, INITIAL_STATE);
 
@@ -228,7 +224,8 @@ export const SoftphoneProvider = ({
     device.on("error", (twilioError: TwilioError.TwilioError /*, call */) => {
       switch (twilioError.name) {
         case "AccessTokenExpired": {
-          getToken(twilioServices.token, device?.identity || "")
+          softphone.actions
+            .onFetchToken(softphone.contact.identity)
             .then((newToken) => {
               device.updateToken(newToken);
             })
@@ -293,8 +290,7 @@ export const SoftphoneProvider = ({
     device.on("tokenWillExpire", () => {
       const timer = setInterval(async () => {
         if (device?.identity) {
-          const newToken = await getToken(
-            twilioServices.token,
+          const newToken = await softphone.actions.onFetchToken(
             device.identity
           );
           if (device.state === "registered") {
