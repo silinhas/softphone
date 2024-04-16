@@ -52,6 +52,6 @@ export type SoftphoneDispatch = {
   destroyDevice: () => void;
   selectContact: (contact: Contact) => void;
   clearSelectedContact: () => void;
-  makeCall: (contact?: Contact) => void;
+  makeCall: (contact?: Contact, params?: Record<string, unknown>) => void;
   hangUp: () => void;
 };

@@ -3,6 +3,7 @@ import { Box, styled } from "@mui/material";
 import ControlPanel from "./ControlPanel";
 import React from "react";
 import { isValidPhoneNumber } from "libphonenumber-js/min";
+import { contactList } from "./contacts.mock";
 
 const Layout = styled("div")`
   display: flex;
@@ -27,43 +28,6 @@ const App = () => {
     lookupContact(contactToLookup);
   };
 
-  const contactList: ContactInput[] = [
-    {
-      id: "1",
-      identity: "apollo1",
-      label: "Apollo 1",
-      status: "available",
-      avatar:
-        "https://gravatar.com/avatar/3923e72894ae47c4589919409550c9bd?s=400&d=robohash&r=x",
-    },
-    {
-      id: "2",
-      identity: "apollo2",
-      label: "Apollo 2",
-      status: "available",
-      avatar:
-        "https://gravatar.com/avatar/3923e72894ae47c4589919409550r2cd?s=400&d=robohash&r=x",
-    },
-    {
-      id: "3",
-      identity: "jane-doe",
-      label: "Jane Doe",
-      status: "unavailable",
-    },
-    {
-      id: "4",
-      identity: "john-smith",
-      label: "John Smith",
-      status: "available",
-    },
-    {
-      id: "5",
-      identity: "sarah-jones",
-      label: "Sarah Jones",
-      status: "unknown",
-    },
-  ];
-
   const handleFetchToken = async (identity: string) => {
     const response = await fetch(
       `${
@@ -77,7 +41,7 @@ const App = () => {
 
   const handleLookupContact = async (contactToLookup: string) => {
     const results = contactList.filter((contact) =>
-      contact.identity.includes(contactToLookup)
+      contact.label?.toLowerCase()?.includes(contactToLookup.toLowerCase())
     );
 
     if (!results.length && isValidPhoneNumber(contactToLookup, "US")) {
@@ -92,9 +56,28 @@ const App = () => {
     return results;
   };
 
-  // React.useEffect(() => {
-  //   setContact(contactList[0]);
-  // }, []);
+  const handleMakeCall = (contact: ContactInput) => {
+    if (contact.type === "phone") {
+      return {
+        params: {
+          FromTwilioPhone: "17727948352",
+        },
+      };
+    }
+
+    if (contact.type === "identifier") {
+      // TODO: here some logic like get forwards to call
+      return {
+        type: "show-menu",
+        options: [],
+        params: {},
+      };
+    }
+
+    return {
+      type: "make-call",
+    };
+  };
 
   return (
     <Layout>
@@ -111,6 +94,7 @@ const App = () => {
           actions={{
             onFetchToken: handleFetchToken,
             onLookupContact: handleLookupContact,
+            onMakeCall: handleMakeCall,
           }}
         />
       </Box>

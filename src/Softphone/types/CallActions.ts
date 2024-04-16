@@ -10,4 +10,5 @@ export type CallActions = {
 export type Actions = {
   onFetchToken: (identity: string) => Promise<string>;
   onLookupContact?: (contactToLookup: string) => Promise<ContactInput[]>;
+  onMakeCall?: (contact: ContactInput) => { params?: Record<string, unknown> };
 };

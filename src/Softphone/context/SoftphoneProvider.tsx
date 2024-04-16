@@ -382,7 +382,10 @@ export const SoftphoneProvider = ({
     });
   };
 
-  const makeCall = async (contact?: Contact) => {
+  const makeCall = async (
+    contact?: Contact,
+    params?: Record<string, unknown>
+  ) => {
     const contactToCall = contact || softphone.contactSelected;
 
     if (!contactToCall) {
@@ -396,8 +399,9 @@ export const SoftphoneProvider = ({
     try {
       const call = await softphone.device?.connect({
         params: {
-          to: contactToCall.identity,
-          contact: JSON.stringify(softphone.contact),
+          To: contactToCall.identity,
+          From: softphone.contact.toStringify(),
+          ...params,
         },
       });
 

@@ -1,0 +1,57 @@
+import { ContactInput } from "@/Softphone";
+
+export const contactList: ContactInput[] = [
+  {
+    id: "1",
+    identity: "t3tester",
+    label: "Tester 3",
+    status: "available",
+    avatar:
+      "https://gravatar.com/avatar/3923e72894ae47c4589919409550c9bd?s=400&d=robohash&r=x",
+    optionsToCall: [
+      {
+        id: "1",
+        identity: "t4tester",
+        label: "t3tester(forward)",
+        status: "available",
+        avatar:
+          "https://gravatar.com/avatar/3923e72894ae47c4589919409550r2cd?s=400&d=robohash&r=x",
+      },
+    ],
+  },
+  {
+    id: "2",
+    identity: "t4tester",
+    label: "Tester 4",
+    status: "available",
+    avatar:
+      "https://gravatar.com/avatar/3923e72894ae47c4589919409550r2cd?s=400&d=robohash&r=x",
+  },
+  {
+    id: "3",
+    identity: "t2tester",
+    label: "Tester 2",
+    status: "unavailable",
+    avatar: "https://gravatar.com/avatar/3923e72894ae47c4589919409550c9bd",
+  },
+  {
+    id: "4",
+    identity: "9793303975",
+    label: "9793303975",
+    status: "available",
+    optionsToCall: [
+      {
+        id: "1",
+        identity: "17727948352",
+        label: "17727948352",
+        status: "available",
+      },
+    ],
+  },
+  {
+    id: "5",
+    identity: "sarah-jones",
+    label: "Sarah Jones",
+    status: "unknown",
+  },
+];
