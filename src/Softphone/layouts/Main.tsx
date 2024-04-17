@@ -23,7 +23,11 @@ export const Main = ({ actions }: Props) => {
     <>
       <Layout.Top>
         <Box height={"4em"}>
-          {device?.isBusy && call ? <CallStatus /> : <SelectStatus />}
+          {device?.isBusy && call ? (
+            <CallStatus />
+          ) : (
+            <SelectStatus onChangeStatus={actions.onChangeStatus} />
+          )}
         </Box>
       </Layout.Top>
       <Layout.View>

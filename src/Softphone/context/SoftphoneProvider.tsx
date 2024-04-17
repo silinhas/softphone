@@ -86,7 +86,6 @@ export const SoftphoneProvider = ({
   };
 
   const setStatus = async (status: Status) => {
-    console.log(status, softphone.device);
     if (status === "available" && softphone.device) {
       await registerDevice(softphone.device);
     } else if (status === "do-not-disturb" && softphone.device) {
@@ -356,8 +355,34 @@ export const SoftphoneProvider = ({
     });
   };
 
-  const selectContact = (contactSelected: Contact) => {
-    dispatch({ type: "selectContact", payload: { contactSelected } });
+  const selectContact = (contactSelected: ContactInput) => {
+    if (
+      !softphone.contact?.identity ||
+      softphone.device?.state === "destroyed"
+    ) {
+      setAlert({
+        message: "The softphone is not ready to make calls.",
+        severity: "critical",
+        type: "error",
+        context:
+          "lookupContact failed. Identity is missing or device.state is destroyed.",
+      });
+      return;
+    }
+
+    if (contactSelected.identity === softphone.contact.identity) {
+      setAlert({
+        message: "You are registered as this contact.",
+        type: "error",
+        context: "selectContact failed. Cannot select yourself.",
+      });
+      return;
+    }
+
+    dispatch({
+      type: "selectContact",
+      payload: { contactSelected: Contact.buildContact(contactSelected) },
+    });
     dispatch({ type: "setView", payload: { view: "contact" } });
   };
 
@@ -369,10 +394,14 @@ export const SoftphoneProvider = ({
   };
 
   const makeCall = async (
-    contact?: Contact,
+    contact?: ContactInput,
     params?: Record<string, unknown>
   ) => {
-    const contactToCall = contact || softphone.contactSelected;
+    let contactToCall = softphone.contactSelected;
+
+    if (contact) {
+      contactToCall = Contact.buildContact(contact);
+    }
 
     if (!contactToCall) {
       setAlert({
@@ -382,7 +411,43 @@ export const SoftphoneProvider = ({
       return;
     }
 
+    if (
+      !softphone.contact?.identity ||
+      softphone.device?.state === "destroyed"
+    ) {
+      setAlert({
+        message: "The softphone is not ready to make calls.",
+        severity: "critical",
+        type: "error",
+        context:
+          "makeCall failed. Identity is missing or device.state is destroyed.",
+      });
+      return;
+    }
+
+    if (contactToCall.identity === softphone.contact.identity) {
+      setAlert({
+        message: "You are registered as this contact.",
+        type: "error",
+        context: "makeCall failed. Cannot call yourself.",
+      });
+      return;
+    }
+
+    if (softphone.device?.isBusy) {
+      setAlert({
+        message: "The device is busy.",
+        type: "error",
+        context: "makeCall failed. The device is busy.",
+      });
+      return;
+    }
+
     try {
+      if (!softphone.contactSelected) {
+        selectContact(contactToCall);
+      }
+
       const call = await softphone.device?.connect({
         params: {
           To: contactToCall.identity,

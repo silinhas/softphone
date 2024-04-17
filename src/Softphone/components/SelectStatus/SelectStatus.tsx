@@ -7,12 +7,18 @@ import { STATUS } from "../../context/constants";
 import { Status } from "../../context/types";
 import Styles from "./styles";
 import { Box, Typography } from "@mui/material";
+import { Actions } from "@/Softphone/types";
 
-export const SelectStatus = () => {
+interface Props {
+  onChangeStatus: Actions["onChangeStatus"];
+}
+
+export const SelectStatus = ({ onChangeStatus }: Props) => {
   const { status } = useSoftphone();
   const { setStatus } = useSoftphoneDispatch();
 
   const handleChange = (event: SelectChangeEvent) => {
+    if (onChangeStatus) onChangeStatus(event.target.value as Status);
     setStatus(event.target.value as Status);
   };
 

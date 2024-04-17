@@ -35,7 +35,7 @@ const App = () => {
   };
 
   const handleDirectLookupContact = (contactToLookup: string) => {
-    lookupContact(contactToLookup);
+    lookupContact({ identity: contactToLookup });
   };
 
   const handleFetchToken = async (identity: string) => {
@@ -93,16 +93,23 @@ const App = () => {
       contactSelected.data?.forwards
     ) {
       const forwards = contactSelected.data.forwards as unknown[];
-      setMenu({
+
+      const forwardMenu: Menu = {
         type: "identifier",
         open: true,
         title: "Call to Forward",
         options: forwards.map((forward) => ({
-          id: (forward as ContactInput).id,
-          label: (forward as ContactInput).label,
-          value: (forward as ContactInput).identity,
-        })) as never[],
-      });
+          id: (forward as ContactInput).id!,
+          label: (forward as ContactInput).label!,
+          value: (forward as ContactInput).identity!,
+        })),
+      };
+      forwardMenu.options.unshift({
+        id: contactSelected.id!,
+        label: contactSelected.label!,
+        value: contactSelected.identity!,
+      } as never);
+      setMenu(forwardMenu);
       return;
     }
 
@@ -124,7 +131,11 @@ const App = () => {
     }
 
     if (menu.type === "identifier") {
-      makeCall({ identity: option.value });
+      const forwardContact = contactList.find(
+        (contact) => contact.id === option.id
+      );
+
+      makeCall(forwardContact as ContactInput);
       return;
     }
   };
@@ -143,6 +154,7 @@ const App = () => {
           autoRegister
           actions={{
             onFetchToken: handleFetchToken,
+            // onChangeStatus: handleChangeStatus,
             onLookupContact: handleLookupContact,
             onClickMakeCallButton: handleClickCallButton,
           }}

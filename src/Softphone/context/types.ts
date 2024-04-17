@@ -1,5 +1,5 @@
 import { Call, Device } from "@twilio/voice-sdk";
-import { Contact, SoftphoneSettings } from "../types";
+import { Contact, ContactInput, SoftphoneSettings } from "../types";
 
 export type Views =
   | "inactive"
@@ -49,8 +49,8 @@ export type SoftphoneDispatch = {
   setAlert: (alert: InitialState["alert"]) => void;
   clearAlert: () => void;
   destroyDevice: () => void;
-  selectContact: (contact: Contact) => void;
+  selectContact: (contact: ContactInput) => void;
   clearSelectedContact: () => void;
-  makeCall: (contact?: Contact, params?: Record<string, unknown>) => void;
+  makeCall: (contact?: ContactInput, params?: Record<string, unknown>) => void;
   hangUp: () => void;
 };
