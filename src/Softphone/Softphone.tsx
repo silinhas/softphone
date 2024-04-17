@@ -44,7 +44,7 @@ const Softphone = ({
       initializeDevice({
         contact,
         autoRegister,
-        actions,
+        onFetchToken: actions.onFetchToken,
         callActions,
       });
     }
@@ -55,7 +55,7 @@ const Softphone = ({
     <ThemeProvider theme={theme}>
       <Layout styles={styles}>
         <ErrorBoundary>
-          <Main />
+          <Main actions={actions} />
         </ErrorBoundary>
         {showStatus && <Status />}
         <AlertSnackBar />

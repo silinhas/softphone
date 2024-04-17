@@ -20,7 +20,6 @@ export type InitialState = {
   contact: Contact;
   contactSelected?: Contact;
   callActions: SoftphoneSettings["callActions"];
-  actions: SoftphoneSettings["actions"];
   alert?: {
     message: string;
     context?: string;

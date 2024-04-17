@@ -12,7 +12,6 @@ export const INITIAL_STATE: InitialState = {
   status: "do-not-disturb",
   contact: new Contact({ identity: "" }),
   callActions: defaultSoftphoneSettings.callActions,
-  actions: defaultSoftphoneSettings.actions,
 };
 
 export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {

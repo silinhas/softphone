@@ -1,14 +1,33 @@
 import CloseIcon from "@mui/icons-material/Close";
+import PhoneIcon from "@mui/icons-material/Phone";
+import { ActionButton, Contact } from "@/Softphone/components";
 import {
-  ActionButton,
-  Contact,
-  MakeCallToButton,
-} from "@/Softphone/components";
-import { useSoftphoneDispatch } from "@/Softphone/context/context";
+  useSoftphone,
+  useSoftphoneDispatch,
+} from "@/Softphone/context/context";
 import { Stack } from "@/Softphone/layouts/Stack";
+import { Actions } from "@/Softphone/types";
 
-const ContactView = () => {
-  const { setView, clearSelectedContact } = useSoftphoneDispatch();
+interface Props {
+  onClickMakeCallButton: Actions["onClickMakeCallButton"];
+}
+
+const ContactView = ({ onClickMakeCallButton }: Props) => {
+  const { contactSelected, device, contact } = useSoftphone();
+  const { setView, clearSelectedContact, makeCall } = useSoftphoneDispatch();
+
+  const handleMakeCall = () => {
+    if (!contactSelected) {
+      return;
+    }
+
+    if (onClickMakeCallButton) {
+      onClickMakeCallButton(contactSelected, { device, contact });
+      return;
+    }
+
+    makeCall(contactSelected);
+  };
 
   return (
     <Stack>
@@ -35,7 +54,12 @@ const ContactView = () => {
           }}
           icon={<CloseIcon fontSize="large" />}
         />
-        <MakeCallToButton />
+        <ActionButton
+          active
+          color="success"
+          onClick={handleMakeCall}
+          icon={<PhoneIcon fontSize="large" />}
+        />
       </Stack.Segment>
     </Stack>
   );

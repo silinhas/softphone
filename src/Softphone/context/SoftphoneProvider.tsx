@@ -8,6 +8,7 @@ import {
 import { InitialState, SoftphoneAction, Status, Views } from "./types";
 import { Call, Device, TwilioError } from "@twilio/voice-sdk";
 import {
+  Actions,
   Contact,
   ContactInput,
   SoftphoneSettings,
@@ -67,12 +68,6 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         },
       };
     }
-    case "setActions": {
-      return {
-        ...state,
-        actions: action.payload.actions as SoftphoneSettings["actions"],
-      };
-    }
     default: {
       throw Error("Unknown action: " + action.type);
     }
@@ -114,54 +109,47 @@ export const SoftphoneProvider = ({
     dispatch({ type: "setAlert", payload: { alert: undefined } });
   }, []);
 
-  const initializeDevice = useCallback(
-    async (softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings) => {
-      const { contact, autoRegister, callActions, actions } = softphoneSettings;
+  const initializeDevice = async (
+    softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings
+  ) => {
+    const { contact, autoRegister, callActions, onFetchToken } =
+      softphoneSettings;
 
-      const { onFetchToken } = actions;
+    try {
+      setAlert({
+        type: "info",
+        message: "Initializing device...",
+      });
 
-      try {
-        setAlert({
-          type: "info",
-          message: "Initializing device...",
-        });
+      const token = await onFetchToken(contact.identity);
 
-        const token = await onFetchToken(contact.identity);
+      clearAlert();
+      setContact(contact);
 
-        clearAlert();
-        setContact(contact);
+      // await navigator.mediaDevices.getUserMedia({ audio: true });
+      // populate dropdown with available audio devices
+      const device = new Device(token, DEVICE_OPTIONS);
+      addDeviceListeners(device, { onFetchToken });
 
-        // await navigator.mediaDevices.getUserMedia({ audio: true });
-        // populate dropdown with available audio devices
-        const device = new Device(token, DEVICE_OPTIONS);
-        addDeviceListeners(device);
-
-        if (autoRegister) {
-          registerDevice(device);
-        }
-
-        if (callActions) {
-          dispatch({ type: "setCallActions", payload: { callActions } });
-        }
-
-        if (actions) {
-          dispatch({ type: "setActions", payload: { actions } });
-        }
-
-        dispatch({ type: "setView", payload: { view: "active" } });
-        dispatch({ type: "setDevice", payload: { device } });
-      } catch (error) {
-        setAlert({
-          type: "error",
-          message: "Failed to initialize device.",
-          context: error as string,
-          severity: "critical",
-        });
+      if (autoRegister) {
+        registerDevice(device);
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+
+      if (callActions) {
+        dispatch({ type: "setCallActions", payload: { callActions } });
+      }
+
+      dispatch({ type: "setView", payload: { view: "active" } });
+      dispatch({ type: "setDevice", payload: { device } });
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Failed to initialize device.",
+        context: error as string,
+        severity: "critical",
+      });
+    }
+  };
 
   const registerDevice = async (device: Device) => {
     try {
@@ -216,7 +204,7 @@ export const SoftphoneProvider = ({
     });
   };
 
-  const addDeviceListeners = (device: Device) => {
+  const addDeviceListeners = (device: Device, actions: Actions) => {
     device.on("destroyed", () => {
       resetSoftphone();
     });
@@ -224,7 +212,7 @@ export const SoftphoneProvider = ({
     device.on("error", (twilioError: TwilioError.TwilioError /*, call */) => {
       switch (twilioError.name) {
         case "AccessTokenExpired": {
-          softphone.actions
+          actions
             .onFetchToken(softphone.contact.identity)
             .then((newToken) => {
               device.updateToken(newToken);
@@ -290,9 +278,7 @@ export const SoftphoneProvider = ({
     device.on("tokenWillExpire", () => {
       const timer = setInterval(async () => {
         if (device?.identity) {
-          const newToken = await softphone.actions.onFetchToken(
-            device.identity
-          );
+          const newToken = await actions.onFetchToken(device.identity);
           if (device.state === "registered") {
             device.updateToken(newToken);
           }

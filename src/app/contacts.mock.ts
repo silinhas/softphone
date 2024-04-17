@@ -8,16 +8,13 @@ export const contactList: ContactInput[] = [
     status: "available",
     avatar:
       "https://gravatar.com/avatar/3923e72894ae47c4589919409550c9bd?s=400&d=robohash&r=x",
-    optionsToCall: [
-      {
+    data: {
+      vendor: {
         id: "1",
-        identity: "t4tester",
-        label: "t3tester(forward)",
-        status: "available",
-        avatar:
-          "https://gravatar.com/avatar/3923e72894ae47c4589919409550r2cd?s=400&d=robohash&r=x",
+        name: "Cisco",
+        phone: "+17727948352",
       },
-    ],
+    },
   },
   {
     id: "2",
@@ -26,6 +23,18 @@ export const contactList: ContactInput[] = [
     status: "available",
     avatar:
       "https://gravatar.com/avatar/3923e72894ae47c4589919409550r2cd?s=400&d=robohash&r=x",
+    data: {
+      forwards: [
+        {
+          id: "3",
+          identity: "t2tester",
+          label: "Tester 2",
+          status: "unavailable",
+          avatar:
+            "https://gravatar.com/avatar/3923e72894ae47c4589919409550c9bd",
+        },
+      ],
+    },
   },
   {
     id: "3",
@@ -39,14 +48,6 @@ export const contactList: ContactInput[] = [
     identity: "9793303975",
     label: "9793303975",
     status: "available",
-    optionsToCall: [
-      {
-        id: "1",
-        identity: "17727948352",
-        label: "17727948352",
-        status: "available",
-      },
-    ],
   },
   {
     id: "5",

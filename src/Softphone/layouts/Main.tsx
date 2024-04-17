@@ -10,8 +10,13 @@ import {
   RingingView,
 } from "../views";
 import Layout from "./Layout";
+import { Actions } from "../types";
 
-export const Main = () => {
+interface Props {
+  actions: Actions;
+}
+
+export const Main = ({ actions }: Props) => {
   const { view, device, call } = useSoftphone();
 
   return (
@@ -23,8 +28,12 @@ export const Main = () => {
       </Layout.Top>
       <Layout.View>
         {view === "active" && <ActiveView />}
-        {view === "lookup" && <LookupView />}
-        {view === "contact" && <ContactView />}
+        {view === "lookup" && (
+          <LookupView onLookupContact={actions.onLookupContact} />
+        )}
+        {view === "contact" && (
+          <ContactView onClickMakeCallButton={actions.onClickMakeCallButton} />
+        )}
         {view === "ringing" && <RingingView />}
         {view === "on-call" && <OnCallView />}
         {view === "incoming" && <IncomingView />}

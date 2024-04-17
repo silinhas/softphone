@@ -1,9 +1,11 @@
 import { Softphone, ContactInput, useSoftphone } from "../Softphone";
 import { Box, styled } from "@mui/material";
 import ControlPanel from "./ControlPanel";
-import React from "react";
+import { useState } from "react";
 import { isValidPhoneNumber } from "libphonenumber-js/min";
 import { contactList } from "./contacts.mock";
+import { MyMenu } from "./components/Menu/Menu";
+import { Menu } from "./types";
 
 const Layout = styled("div")`
   display: flex;
@@ -14,8 +16,16 @@ const Layout = styled("div")`
 `;
 
 const App = () => {
-  const [contact, setContact] = React.useState<ContactInput>();
-  const { destroyDevice, lookupContact } = useSoftphone();
+  const [contact, setContact] = useState<ContactInput>();
+  const [menu, setMenu] = useState<Menu>({
+    type: undefined,
+    open: false,
+    title: "",
+    options: [],
+  });
+
+  const { destroyDevice, lookupContact, makeCall, contactSelected } =
+    useSoftphone();
 
   const handleSetContact = (contact: ContactInput | undefined) => {
     if (!contact) {
@@ -56,27 +66,67 @@ const App = () => {
     return results;
   };
 
-  const handleMakeCall = (contact: ContactInput) => {
-    if (contact.type === "phone") {
-      return {
-        params: {
-          FromTwilioPhone: "17727948352",
-        },
+  const handleClickCallButton = (contactSelected: ContactInput) => {
+    if (contactSelected.type === "phone" && contact?.data?.vendor) {
+      const vendor = contact.data.vendor as {
+        id: string;
+        name: string;
+        phone: string;
       };
+      setMenu({
+        type: "phone",
+        open: true,
+        title: "Call from",
+        options: [
+          {
+            id: vendor.id,
+            label: vendor.name,
+            value: vendor.phone,
+          } as never,
+        ],
+      });
+      return;
     }
 
-    if (contact.type === "identifier") {
-      // TODO: here some logic like get forwards to call
-      return {
-        type: "show-menu",
-        options: [],
-        params: {},
-      };
+    if (
+      contactSelected.type === "identifier" &&
+      contactSelected.data?.forwards
+    ) {
+      const forwards = contactSelected.data.forwards as unknown[];
+      setMenu({
+        type: "identifier",
+        open: true,
+        title: "Call to Forward",
+        options: forwards.map((forward) => ({
+          id: (forward as ContactInput).id,
+          label: (forward as ContactInput).label,
+          value: (forward as ContactInput).identity,
+        })) as never[],
+      });
+      return;
     }
 
-    return {
-      type: "make-call",
-    };
+    makeCall(contactSelected);
+  };
+
+  const handleMakeCallFromMenu = (option: {
+    id: string;
+    label: string;
+    value: string;
+  }) => {
+    if (!contactSelected) {
+      return;
+    }
+
+    if (menu.type === "phone") {
+      makeCall(contactSelected, { FromTwilioPhone: option.value });
+      return;
+    }
+
+    if (menu.type === "identifier") {
+      makeCall({ identity: option.value });
+      return;
+    }
   };
 
   return (
@@ -94,8 +144,15 @@ const App = () => {
           actions={{
             onFetchToken: handleFetchToken,
             onLookupContact: handleLookupContact,
-            onMakeCall: handleMakeCall,
+            onClickMakeCallButton: handleClickCallButton,
           }}
+        />
+        <MyMenu
+          open={menu.open}
+          title={menu.title}
+          handleClose={() => setMenu({ open: false, options: [], title: "" })}
+          onSelectItem={handleMakeCallFromMenu}
+          options={menu.options}
         />
       </Box>
     </Layout>

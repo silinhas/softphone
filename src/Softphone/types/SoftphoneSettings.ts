@@ -5,12 +5,11 @@ export type SoftphoneSettings = {
   contact: ContactInput;
   autoRegister?: boolean;
   callActions?: CallActions;
-  actions: Actions;
+  onFetchToken: Actions["onFetchToken"];
 };
 
 export const defaultSoftphoneSettings: SoftphoneSettings = {
   contact: { identity: "" },
-  actions: { onFetchToken: async () => "" },
   autoRegister: false,
   callActions: {
     hold: true,
@@ -18,4 +17,5 @@ export const defaultSoftphoneSettings: SoftphoneSettings = {
     keypad: true,
     transfer: true,
   },
+  onFetchToken: async (identity: string) => identity,
 };

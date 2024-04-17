@@ -7,24 +7,22 @@ type ContactConstructorArgs = {
   identity: string;
   id?: string;
   label?: string;
-  data?: unknown;
+  data?: Record<string, unknown>;
   isNew?: boolean;
   status?: ContactStatus;
   avatar?: string;
   type?: "phone" | "identifier";
-  optionsToCall?: ContactInput[];
 };
 
 class Contact {
   identity: string;
   id: string;
   label: string;
-  data?: unknown;
+  data?: Record<string, unknown>;
   type: "phone" | "identifier" = "identifier";
   isNew?: boolean = false;
   status: Status;
   avatar?: string;
-  optionsToCall?: ContactInput[];
 
   constructor(contactConstructorArgs: ContactConstructorArgs) {
     if (!Contact.validateIdentity(contactConstructorArgs.identity)) {
@@ -44,7 +42,6 @@ class Contact {
     this.isNew = contactConstructorArgs.isNew;
     this.status = new Status(contactConstructorArgs.status);
     this.avatar = contactConstructorArgs.avatar;
-    this.optionsToCall = contactConstructorArgs.optionsToCall;
   }
 
   static buildContact(contact: ContactInput): Contact {
