@@ -7,6 +7,7 @@ export type SoftphoneSettings = {
   callActions?: CallActions;
   onFetchToken: Actions["onFetchToken"];
   onChangeStatus?: Actions["onChangeStatus"];
+  onIncomingCall?: Actions["onIncomingCall"];
   actions?: Actions;
 };
 

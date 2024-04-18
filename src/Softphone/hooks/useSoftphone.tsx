@@ -1,12 +1,7 @@
-import {
-  useSoftphoneDispatch,
-  useSoftphone as useInternalSoftphone,
-} from "../context/context";
+import { useSoftphoneDispatch } from "../context/context";
 import { ContactInput } from "../types";
 
 export const useSoftphone = () => {
-  const { contact: contactRegistered, contactSelected } =
-    useInternalSoftphone();
   const {
     destroyDevice,
     selectContact,
@@ -17,16 +12,17 @@ export const useSoftphone = () => {
     selectContact(contactToLookup);
   };
 
-  const makeCall = (
-    contact: ContactInput,
-    params?: Record<string, unknown>
-  ) => {
+  const makeCall = ({
+    contact,
+    params,
+  }: {
+    contact?: ContactInput;
+    params?: Record<string, unknown>;
+  }) => {
     _makeCall(contact, params);
   };
 
   return {
-    contactRegistered,
-    contactSelected,
     destroyDevice,
     lookupContact,
     makeCall,

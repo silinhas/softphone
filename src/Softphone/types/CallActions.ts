@@ -16,4 +16,5 @@ export type Actions = {
   onClickMakeCallButton?: (contact: ContactInput, context: unknown) => void;
   onClickHoldCallButton?: (call: Call) => void;
   onClickTransferCallButton?: (call: Call) => void;
+  onIncomingCall?: (call: Call) => ContactInput | undefined;
 };

@@ -115,8 +115,14 @@ export const SoftphoneProvider = ({
   const initializeDevice = async (
     softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings
   ) => {
-    const { contact, autoRegister, callActions, onFetchToken, onChangeStatus } =
-      softphoneSettings;
+    const {
+      contact,
+      autoRegister,
+      callActions,
+      onFetchToken,
+      onChangeStatus,
+      onIncomingCall,
+    } = softphoneSettings;
 
     try {
       setAlert({
@@ -132,7 +138,7 @@ export const SoftphoneProvider = ({
       // await navigator.mediaDevices.getUserMedia({ audio: true });
       // populate dropdown with available audio devices
       const device = new Device(token, DEVICE_OPTIONS);
-      addDeviceListeners(device, { onFetchToken });
+      addDeviceListeners(device, { onFetchToken, onIncomingCall });
 
       if (autoRegister) {
         if (onChangeStatus) onChangeStatus("available");
@@ -251,17 +257,16 @@ export const SoftphoneProvider = ({
     device.on("incoming", (call: Call) => {
       addCallListeners(call);
 
-      let contact: Contact;
-      const contactFromCustomParams = call?.customParameters?.get("From");
-      const contactFromParams = { identity: call.parameters.From };
+      let contact = new Contact({ identity: call.parameters.From });
 
-      if (contactFromCustomParams) {
-        contact = new Contact(JSON.parse(contactFromCustomParams));
-      } else {
-        contact = new Contact(contactFromParams);
+      if (actions.onIncomingCall) {
+        const contactInput = actions.onIncomingCall(call);
+
+        if (contactInput) {
+          contact = Contact.buildContact(contactInput);
+        }
       }
 
-      console.log({ contact });
       selectContact(contact);
       dispatch({ type: "setCall", payload: { call } });
       setView("incoming");

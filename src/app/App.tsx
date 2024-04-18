@@ -25,8 +25,7 @@ const App = () => {
     options: [],
   });
 
-  const { destroyDevice, lookupContact, makeCall, contactSelected } =
-    useSoftphone();
+  const { destroyDevice, lookupContact, makeCall } = useSoftphone();
 
   const handleSetContact = (contact: ContactInput | undefined) => {
     if (!contact) {
@@ -114,7 +113,7 @@ const App = () => {
       return;
     }
 
-    makeCall(contactSelected);
+    makeCall({ contact: contactSelected });
   };
 
   const handleMakeCallFromMenu = (option: {
@@ -122,12 +121,12 @@ const App = () => {
     label: string;
     value: string;
   }) => {
-    if (!contactSelected) {
-      return;
-    }
-
     if (menu.type === "phone") {
-      makeCall(contactSelected, { FromTwilioPhone: option.value });
+      makeCall({
+        params: {
+          FromTwilioPhone: option.value,
+        },
+      });
       return;
     }
 
@@ -136,7 +135,9 @@ const App = () => {
         (contact) => contact.id === option.id
       );
 
-      makeCall(forwardContact as ContactInput);
+      makeCall({
+        contact: forwardContact,
+      });
       return;
     }
   };
@@ -151,6 +152,11 @@ const App = () => {
 
   const handleClickTransferCallButton = (call: Call) => {
     console.log("Transfer Call", { call });
+  };
+
+  const handleIncomingCall = (call: Call) => {
+    const contactFromCustomParams = call?.customParameters?.get("From");
+    return JSON.parse(contactFromCustomParams || "");
   };
 
   return (
@@ -172,6 +178,7 @@ const App = () => {
             onClickMakeCallButton: handleClickCallButton,
             onClickHoldCallButton: handleClickHoldCallButton,
             onClickTransferCallButton: handleClickTransferCallButton,
+            onIncomingCall: handleIncomingCall,
           }}
         />
         <MyMenu

@@ -46,6 +46,7 @@ const Softphone = ({
         autoRegister,
         onFetchToken: actions.onFetchToken,
         onChangeStatus: actions.onChangeStatus,
+        onIncomingCall: actions.onIncomingCall,
         callActions,
       });
     }
