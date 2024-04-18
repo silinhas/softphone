@@ -39,7 +39,12 @@ export const Main = ({ actions }: Props) => {
           <ContactView onClickMakeCallButton={actions.onClickMakeCallButton} />
         )}
         {view === "ringing" && <RingingView />}
-        {view === "on-call" && <OnCallView />}
+        {view === "on-call" && (
+          <OnCallView
+            onClickTransferCallButton={actions.onClickTransferCallButton}
+            onClickHoldCallButton={actions.onClickHoldCallButton}
+          />
+        )}
         {view === "incoming" && <IncomingView />}
       </Layout.View>
     </>

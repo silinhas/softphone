@@ -37,8 +37,7 @@ export type SoftphoneAction = {
     | "setDevice"
     | "setCall"
     | "selectContact"
-    | "setCallActions"
-    | "setActions";
+    | "setCallActions";
   payload: Partial<InitialState>;
 };
 

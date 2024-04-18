@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from "react";
+import { useCallback, useReducer, useRef } from "react";
 import { SoftphoneContext, SoftphoneDispatchContext } from "./context";
 import {
   DEVICE_OPTIONS,
@@ -81,6 +81,10 @@ export const SoftphoneProvider = ({
 }) => {
   const [softphone, dispatch] = useReducer(softphoneReducer, INITIAL_STATE);
 
+  // To keep the state ref updated inside the callbacks of the device and call events
+  const softphoneRef = useRef<InitialState>(softphone);
+  softphoneRef.current = softphone;
+
   const setView = (view: Views) => {
     dispatch({ type: "setView", payload: { view } });
   };
@@ -111,7 +115,7 @@ export const SoftphoneProvider = ({
   const initializeDevice = async (
     softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings
   ) => {
-    const { contact, autoRegister, callActions, onFetchToken } =
+    const { contact, autoRegister, callActions, onFetchToken, onChangeStatus } =
       softphoneSettings;
 
     try {
@@ -131,6 +135,7 @@ export const SoftphoneProvider = ({
       addDeviceListeners(device, { onFetchToken });
 
       if (autoRegister) {
+        if (onChangeStatus) onChangeStatus("available");
         registerDevice(device);
       }
 
@@ -244,14 +249,11 @@ export const SoftphoneProvider = ({
     });
 
     device.on("incoming", (call: Call) => {
-      console.log("incoming call", { call });
       addCallListeners(call);
 
       let contact: Contact;
-      const contactFromCustomParams = call?.customParameters?.get("contact");
+      const contactFromCustomParams = call?.customParameters?.get("From");
       const contactFromParams = { identity: call.parameters.From };
-
-      console.log({ contactFromCustomParams, contactFromParams });
 
       if (contactFromCustomParams) {
         contact = new Contact(JSON.parse(contactFromCustomParams));
@@ -259,6 +261,7 @@ export const SoftphoneProvider = ({
         contact = new Contact(contactFromParams);
       }
 
+      console.log({ contact });
       selectContact(contact);
       dispatch({ type: "setCall", payload: { call } });
       setView("incoming");
@@ -291,7 +294,7 @@ export const SoftphoneProvider = ({
     call.on("accept", (acceptedCall: Call) => {
       console.log("accept event", { acceptedCall });
       dispatch({ type: "setCall", payload: { call: acceptedCall } });
-      setView("on-call");
+      // setView("on-call");
       // !!! check this issue (https://github.com/twilio/twilio-voice.js/issues/140) and uncomment this line after fixing it and remove messageReceived for call
     });
 
@@ -350,16 +353,17 @@ export const SoftphoneProvider = ({
 
     call.on("messageReceived", (message) => {
       console.log("messageReceived event", { message });
-      //the voiceEventSid can be used for tracking the message
-      console.log("voiceEventSid: ", message.voiceEventSid);
+      const { type } = message.content;
+      if (type === "CALL_CONNECTED") {
+        setView("on-call");
+      }
     });
   };
 
   const selectContact = (contactSelected: ContactInput) => {
-    if (
-      !softphone.contact?.identity ||
-      softphone.device?.state === "destroyed"
-    ) {
+    const { contact, device } = softphoneRef.current;
+
+    if (!contact?.identity || device?.state === "destroyed") {
       setAlert({
         message: "The softphone is not ready to make calls.",
         severity: "critical",
@@ -370,7 +374,7 @@ export const SoftphoneProvider = ({
       return;
     }
 
-    if (contactSelected.identity === softphone.contact.identity) {
+    if (contactSelected.identity === contact.identity) {
       setAlert({
         message: "You are registered as this contact.",
         type: "error",

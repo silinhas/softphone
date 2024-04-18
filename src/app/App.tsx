@@ -6,6 +6,7 @@ import { isValidPhoneNumber } from "libphonenumber-js/min";
 import { contactList } from "./contacts.mock";
 import { MyMenu } from "./components/Menu/Menu";
 import { Menu } from "./types";
+import { Call } from "@twilio/voice-sdk";
 
 const Layout = styled("div")`
   display: flex;
@@ -140,6 +141,18 @@ const App = () => {
     }
   };
 
+  const handleChangeStatus = (status: "available" | "do-not-disturb") => {
+    console.log({ status });
+  };
+
+  const handleClickHoldCallButton = (call: Call) => {
+    console.log("Hold Call", { call });
+  };
+
+  const handleClickTransferCallButton = (call: Call) => {
+    console.log("Transfer Call", { call });
+  };
+
   return (
     <Layout>
       <ControlPanel
@@ -154,9 +167,11 @@ const App = () => {
           autoRegister
           actions={{
             onFetchToken: handleFetchToken,
-            // onChangeStatus: handleChangeStatus,
+            onChangeStatus: handleChangeStatus,
             onLookupContact: handleLookupContact,
             onClickMakeCallButton: handleClickCallButton,
+            onClickHoldCallButton: handleClickHoldCallButton,
+            onClickTransferCallButton: handleClickTransferCallButton,
           }}
         />
         <MyMenu

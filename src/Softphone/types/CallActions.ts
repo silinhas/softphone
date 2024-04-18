@@ -1,3 +1,4 @@
+import { Call } from "@twilio/voice-sdk";
 import { Status } from "../context/types";
 import { ContactInput } from "./Contact";
 
@@ -13,4 +14,6 @@ export type Actions = {
   onChangeStatus?: (status: Status) => void;
   onLookupContact?: (contactToLookup: string) => Promise<ContactInput[]>;
   onClickMakeCallButton?: (contact: ContactInput, context: unknown) => void;
+  onClickHoldCallButton?: (call: Call) => void;
+  onClickTransferCallButton?: (call: Call) => void;
 };

@@ -6,6 +6,8 @@ export type SoftphoneSettings = {
   autoRegister?: boolean;
   callActions?: CallActions;
   onFetchToken: Actions["onFetchToken"];
+  onChangeStatus?: Actions["onChangeStatus"];
+  actions?: Actions;
 };
 
 export const defaultSoftphoneSettings: SoftphoneSettings = {
