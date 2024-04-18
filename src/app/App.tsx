@@ -7,6 +7,10 @@ import { contactList } from "./contacts.mock";
 import { MyMenu } from "./components/Menu/Menu";
 import { Menu } from "./types";
 import { Call } from "@twilio/voice-sdk";
+import BackupTableIcon from "@mui/icons-material/BackupTable";
+import PhonePausedIcon from "@mui/icons-material/PhonePaused";
+import GroupsIcon from "@mui/icons-material/Groups";
+import VoicemailIcon from "@mui/icons-material/Voicemail";
 
 const Layout = styled("div")`
   display: flex;
@@ -15,6 +19,29 @@ const Layout = styled("div")`
   height: 100vh;
   justify-content: space-evenly;
 `;
+
+const PanelOptions = [
+  {
+    id: "RECENT_CALLS",
+    title: "Recent calls",
+    icon: <BackupTableIcon />,
+  },
+  {
+    id: "CALLS_IN_HOLD",
+    title: "Calls in hold",
+    icon: <PhonePausedIcon />,
+  },
+  {
+    id: "CALL_QUEUES",
+    title: "Call groups",
+    icon: <GroupsIcon />,
+  },
+  {
+    id: "PENDING_VOICEMAILS",
+    title: "Pending voicemails",
+    icon: <VoicemailIcon />,
+  },
+];
 
 const App = () => {
   const [contact, setContact] = useState<ContactInput>();
@@ -171,15 +198,18 @@ const App = () => {
         <Softphone
           contact={contact}
           autoRegister
-          actions={{
-            onFetchToken: handleFetchToken,
-            onChangeStatus: handleChangeStatus,
+          handlers={{
             onLookupContact: handleLookupContact,
             onClickMakeCallButton: handleClickCallButton,
             onClickHoldCallButton: handleClickHoldCallButton,
             onClickTransferCallButton: handleClickTransferCallButton,
+          }}
+          events={{
+            onFetchToken: handleFetchToken,
+            onChangeStatus: handleChangeStatus,
             onIncomingCall: handleIncomingCall,
           }}
+          panel={{ options: PanelOptions }}
         />
         <MyMenu
           open={menu.open}

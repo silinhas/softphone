@@ -1,5 +1,5 @@
 import { Call } from "@twilio/voice-sdk";
-import { Status } from "../context/types";
+import { InitialState, Status } from "../context/types";
 import { ContactInput } from "./Contact";
 
 export type CallActions = {
@@ -9,12 +9,27 @@ export type CallActions = {
   transfer?: boolean;
 };
 
-export type Actions = {
-  onFetchToken: (identity: string) => Promise<string>;
-  onChangeStatus?: (status: Status) => void;
+export type Handlers = {
   onLookupContact?: (contactToLookup: string) => Promise<ContactInput[]>;
-  onClickMakeCallButton?: (contact: ContactInput, context: unknown) => void;
+  onClickMakeCallButton?: (contact: ContactInput) => void;
   onClickHoldCallButton?: (call: Call) => void;
   onClickTransferCallButton?: (call: Call) => void;
-  onIncomingCall?: (call: Call) => ContactInput | undefined;
+};
+
+export type EventContext = {
+  device: InitialState["device"];
+  call: InitialState["call"];
+  contact: InitialState["contact"];
+  contactSelected: InitialState["contactSelected"];
+  status: InitialState["status"];
+  view: InitialState["view"];
+};
+
+export type Events = {
+  onFetchToken: (identity: string, context: EventContext) => Promise<string>;
+  onChangeStatus?: (status: Status, context: EventContext) => void;
+  onIncomingCall?: (
+    call: Call,
+    context: EventContext
+  ) => ContactInput | undefined;
 };

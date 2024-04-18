@@ -7,11 +7,11 @@ import {
 } from "@/Softphone/context/context";
 import { Stack } from "@/Softphone/layouts/Stack";
 import React, { useEffect, useMemo, useState } from "react";
-import { Actions, Contact } from "@/Softphone/types";
+import { Contact, Handlers } from "@/Softphone/types";
 import { debounce } from "@mui/material/utils";
 
 interface Props {
-  onLookupContact: Actions["onLookupContact"];
+  onLookupContact?: Handlers["onLookupContact"];
 }
 
 const LookupView = ({ onLookupContact }: Props) => {

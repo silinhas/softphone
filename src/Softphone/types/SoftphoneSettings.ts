@@ -1,14 +1,11 @@
-import { Actions, CallActions } from "./CallActions";
+import { CallActions, Events } from "./CallActions";
 import { ContactInput } from "./Contact";
 
 export type SoftphoneSettings = {
   contact: ContactInput;
   autoRegister?: boolean;
   callActions?: CallActions;
-  onFetchToken: Actions["onFetchToken"];
-  onChangeStatus?: Actions["onChangeStatus"];
-  onIncomingCall?: Actions["onIncomingCall"];
-  actions?: Actions;
+  events: Events;
 };
 
 export const defaultSoftphoneSettings: SoftphoneSettings = {
@@ -20,5 +17,7 @@ export const defaultSoftphoneSettings: SoftphoneSettings = {
     keypad: true,
     transfer: true,
   },
-  onFetchToken: async (identity: string) => identity,
+  events: {
+    onFetchToken: async (identity: string) => identity,
+  },
 };

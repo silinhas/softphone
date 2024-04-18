@@ -6,14 +6,14 @@ import {
   useSoftphoneDispatch,
 } from "@/Softphone/context/context";
 import { Stack } from "@/Softphone/layouts/Stack";
-import { Actions } from "@/Softphone/types";
+import { Handlers } from "@/Softphone/types";
 
 interface Props {
-  onClickMakeCallButton: Actions["onClickMakeCallButton"];
+  onClickMakeCallButton?: Handlers["onClickMakeCallButton"];
 }
 
 const ContactView = ({ onClickMakeCallButton }: Props) => {
-  const { contactSelected, device, contact } = useSoftphone();
+  const { contactSelected } = useSoftphone();
   const { setView, clearSelectedContact, makeCall } = useSoftphoneDispatch();
 
   const handleMakeCall = () => {
@@ -22,7 +22,7 @@ const ContactView = ({ onClickMakeCallButton }: Props) => {
     }
 
     if (onClickMakeCallButton) {
-      onClickMakeCallButton(contactSelected, { device, contact });
+      onClickMakeCallButton(contactSelected);
       return;
     }
 

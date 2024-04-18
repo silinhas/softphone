@@ -17,11 +17,11 @@ import {
 import { Box, Tooltip } from "@mui/material";
 import { Mic } from "@mui/icons-material";
 import { useState } from "react";
-import { Actions } from "@/Softphone/types";
+import { Handlers } from "@/Softphone/types";
 
 interface Props {
-  onClickTransferCallButton: Actions["onClickTransferCallButton"];
-  onClickHoldCallButton: Actions["onClickHoldCallButton"];
+  onClickTransferCallButton?: Handlers["onClickTransferCallButton"];
+  onClickHoldCallButton?: Handlers["onClickHoldCallButton"];
 }
 
 const OnCallView = ({

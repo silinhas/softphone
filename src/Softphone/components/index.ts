@@ -9,3 +9,4 @@ export { Keypad } from "./Keypad/Keypad";
 export { TimeIndicator } from "./TimeIndicator/TimeIndicator";
 export { Contact } from "./Contact/Contact";
 export { ContactListItem } from "./ContactListItem/ContactListItem";
+export { SideBarPanel } from "./SideBarPanel/SideBarPanel";
