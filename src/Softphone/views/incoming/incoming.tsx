@@ -1,5 +1,5 @@
 import { ActionButton, CallLoadingIndicator } from "@/Softphone/components";
-import { useSoftphone } from "@/Softphone/context/context";
+import { useSoftphone } from "@/Softphone/context/Softphone/context";
 import { Avatar, Box, Typography } from "@mui/material";
 import CallEndIcon from "@mui/icons-material/CallEnd";
 import PhoneIcon from "@mui/icons-material/Phone";

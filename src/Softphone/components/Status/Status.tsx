@@ -1,5 +1,5 @@
 import { Box, Collapse, IconButton, Typography } from "@mui/material";
-import { useSoftphone } from "../../context/context";
+import { useSoftphone } from "../../context/Softphone/context";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import InfoIcon from "@mui/icons-material/Info";
 import { useState } from "react";
@@ -7,7 +7,7 @@ import { useState } from "react";
 export const Status = () => {
   const { contact, device } = useSoftphone();
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <Box position={"relative"} zIndex={999}>

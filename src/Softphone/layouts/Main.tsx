@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { CallStatus, SelectStatus } from "../components";
-import { useSoftphone } from "../context/context";
+import { useSoftphone } from "../context/Softphone/context";
 import {
   ActiveView,
   ContactView,
@@ -10,9 +10,20 @@ import {
   RingingView,
 } from "../views";
 import Layout from "./Layout";
+import { Handlers } from "../types";
 
-export const Main = () => {
+interface Props {
+  handlers?: Handlers;
+}
+
+export const Main = ({ handlers }: Props) => {
   const { view, device, call } = useSoftphone();
+  const {
+    onLookupContact,
+    onClickMakeCallButton,
+    onClickTransferCallButton,
+    onClickHoldCallButton,
+  } = handlers || {};
 
   return (
     <>
@@ -23,10 +34,17 @@ export const Main = () => {
       </Layout.Top>
       <Layout.View>
         {view === "active" && <ActiveView />}
-        {view === "lookup" && <LookupView />}
-        {view === "contact" && <ContactView />}
+        {view === "lookup" && <LookupView onLookupContact={onLookupContact} />}
+        {view === "contact" && (
+          <ContactView onClickMakeCallButton={onClickMakeCallButton} />
+        )}
         {view === "ringing" && <RingingView />}
-        {view === "on-call" && <OnCallView />}
+        {view === "on-call" && (
+          <OnCallView
+            onClickTransferCallButton={onClickTransferCallButton}
+            onClickHoldCallButton={onClickHoldCallButton}
+          />
+        )}
         {view === "incoming" && <IncomingView />}
       </Layout.View>
     </>

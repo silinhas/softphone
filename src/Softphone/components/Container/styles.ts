@@ -25,5 +25,7 @@ export default {
     min-height: ${({ styles }) =>
       styles?.minHeight || DEFAULT_STYLES.minHeight};
     background-color: white;
+    position: relative;
+    z-index: 1000;
   `,
 };

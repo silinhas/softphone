@@ -7,17 +7,18 @@ type ContactConstructorArgs = {
   identity: string;
   id?: string;
   label?: string;
-  data?: unknown;
+  data?: Record<string, unknown>;
   isNew?: boolean;
   status?: ContactStatus;
   avatar?: string;
+  type?: "phone" | "identifier";
 };
 
 class Contact {
   identity: string;
-  id?: string;
-  label?: string;
-  data?: unknown;
+  id: string;
+  label: string;
+  data?: Record<string, unknown>;
   type: "phone" | "identifier" = "identifier";
   isNew?: boolean = false;
   status: Status;
@@ -66,7 +67,12 @@ class Contact {
       isNew: this.isNew,
       status: this.status.status,
       avatar: this.avatar,
+      type: this.type,
     };
+  }
+
+  public toStringify(): string {
+    return JSON.stringify(this.toJSON());
   }
 }
 

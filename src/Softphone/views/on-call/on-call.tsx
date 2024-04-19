@@ -13,14 +13,23 @@ import { Stack } from "@/Softphone/layouts/Stack";
 import {
   useSoftphone,
   useSoftphoneDispatch,
-} from "@/Softphone/context/context";
+} from "@/Softphone/context/Softphone/context";
 import { Box, Tooltip } from "@mui/material";
 import { Mic } from "@mui/icons-material";
 import { useState } from "react";
+import { Handlers } from "@/Softphone/types";
 
-const OnCallView = () => {
+interface Props {
+  onClickTransferCallButton?: Handlers["onClickTransferCallButton"];
+  onClickHoldCallButton?: Handlers["onClickHoldCallButton"];
+}
+
+const OnCallView = ({
+  onClickTransferCallButton,
+  onClickHoldCallButton,
+}: Props) => {
   const { callActions, call } = useSoftphone();
-  const { hangUp } = useSoftphoneDispatch();
+  const { hangUp, setAlert } = useSoftphoneDispatch();
   const [showKeypad, setShowKeypad] = useState(false);
 
   const handleMute = () => {
@@ -29,6 +38,32 @@ const OnCallView = () => {
 
   const handleShowKeypad = () => {
     setShowKeypad(!showKeypad);
+  };
+
+  const handleClickHoldCallButton = () => {
+    if (onClickHoldCallButton && call) {
+      onClickHoldCallButton(call);
+      return;
+    }
+
+    setAlert({
+      type: "error",
+      message: "Hold Call action is not available.",
+      context: `The Hold Call action is not available.`,
+    });
+  };
+
+  const handleClickTransferCallButton = () => {
+    if (onClickTransferCallButton && call) {
+      onClickTransferCallButton(call);
+      return;
+    }
+
+    setAlert({
+      type: "error",
+      message: "Transfer Call action is not available.",
+      context: `The Transfer Call action is not available.`,
+    });
   };
 
   return (
@@ -71,7 +106,7 @@ const OnCallView = () => {
               <span>
                 <ActionButton
                   color="primary"
-                  onClick={() => console.log("hold call")}
+                  onClick={handleClickHoldCallButton}
                   icon={<PhonePausedIcon fontSize="large" />}
                 />
               </span>
@@ -93,7 +128,7 @@ const OnCallView = () => {
               <span>
                 <ActionButton
                   color="primary"
-                  onClick={() => console.log("Transfer Call")}
+                  onClick={handleClickTransferCallButton}
                   icon={<PhoneForwardedIcon fontSize="large" />}
                 />
               </span>

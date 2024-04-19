@@ -4,12 +4,30 @@ import { ActionButton, Contact } from "@/Softphone/components";
 import {
   useSoftphone,
   useSoftphoneDispatch,
-} from "@/Softphone/context/context";
+} from "@/Softphone/context/Softphone/context";
 import { Stack } from "@/Softphone/layouts/Stack";
+import { Handlers } from "@/Softphone/types";
 
-const ContactView = () => {
+interface Props {
+  onClickMakeCallButton?: Handlers["onClickMakeCallButton"];
+}
+
+const ContactView = ({ onClickMakeCallButton }: Props) => {
   const { contactSelected } = useSoftphone();
   const { setView, clearSelectedContact, makeCall } = useSoftphoneDispatch();
+
+  const handleMakeCall = () => {
+    if (!contactSelected) {
+      return;
+    }
+
+    if (onClickMakeCallButton) {
+      onClickMakeCallButton(contactSelected);
+      return;
+    }
+
+    makeCall(contactSelected);
+  };
 
   return (
     <Stack>
@@ -39,7 +57,7 @@ const ContactView = () => {
         <ActionButton
           active
           color="success"
-          onClick={() => makeCall(contactSelected)}
+          onClick={handleMakeCall}
           icon={<PhoneIcon fontSize="large" />}
         />
       </Stack.Segment>

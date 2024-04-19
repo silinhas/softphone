@@ -4,7 +4,7 @@ import { Stack } from "@/Softphone/layouts/Stack";
 import {
   useSoftphone,
   useSoftphoneDispatch,
-} from "@/Softphone/context/context";
+} from "@/Softphone/context/Softphone/context";
 import { Avatar, Box, Typography } from "@mui/material";
 
 const RingingView = () => {

@@ -1,5 +1,5 @@
 import { Alert, Box, Collapse, IconButton } from "@mui/material";
-import { useSoftphone } from "../../context/context";
+import { useSoftphone } from "../../context/Softphone/context";
 import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { log } from "../../utils";

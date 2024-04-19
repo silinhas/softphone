@@ -1,29 +1,22 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import PhoneIcon from "@mui/icons-material/Phone";
-import CircleIcon from "@mui/icons-material/Circle";
-import {
-  Autocomplete,
-  Avatar,
-  Box,
-  CircularProgress,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { ActionButton } from "@/Softphone/components";
+import { Autocomplete, Box, CircularProgress, TextField } from "@mui/material";
+import { ActionButton, ContactListItem } from "@/Softphone/components";
 import {
   useSoftphone,
   useSoftphoneDispatch,
-} from "@/Softphone/context/context";
+} from "@/Softphone/context/Softphone/context";
 import { Stack } from "@/Softphone/layouts/Stack";
 import React, { useEffect, useMemo, useState } from "react";
-import FiberNewIcon from "@mui/icons-material/FiberNew";
-import { Contact } from "@/Softphone/types";
+import { Contact, Handlers } from "@/Softphone/types";
 import { debounce } from "@mui/material/utils";
 
-const LookupView = () => {
+interface Props {
+  onLookupContact?: Handlers["onLookupContact"];
+}
+
+const LookupView = ({ onLookupContact }: Props) => {
   const {
     contact: { identity: registeredIdentity },
-    actions: { onLookupContact },
   } = useSoftphone();
   const { setView, selectContact } = useSoftphoneDispatch();
 
@@ -100,29 +93,7 @@ const LookupView = () => {
   ) => {
     return (
       <Box component={"li"} {...props} key={option.id}>
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <Box component={"span"}>
-            <CircleIcon
-              sx={{
-                width: 12,
-                height: 12,
-                borderRadius: "50%",
-                color: option.status.color,
-              }}
-            />
-          </Box>
-          <Avatar
-            src={option.avatar || "/"}
-            alt={option.label}
-            sx={{ width: 24, height: 24 }}
-          >
-            {option.type === "phone" && <PhoneIcon sx={{ fontSize: 16 }} />}
-          </Avatar>
-          <Typography variant="body2" color="textPrimary">
-            {option.label}
-          </Typography>
-          {option.isNew && <FiberNewIcon color="success" />}
-        </Box>
+        <ContactListItem contact={option} />
       </Box>
     );
   };

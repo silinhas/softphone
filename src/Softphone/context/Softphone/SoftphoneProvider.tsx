@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from "react";
+import { useCallback, useReducer, useRef } from "react";
 import { SoftphoneContext, SoftphoneDispatchContext } from "./context";
 import {
   DEVICE_OPTIONS,
@@ -10,9 +10,12 @@ import { Call, Device, TwilioError } from "@twilio/voice-sdk";
 import {
   Contact,
   ContactInput,
+  Events,
   SoftphoneSettings,
   defaultSoftphoneSettings,
-} from "../types";
+} from "@/Softphone/types";
+import { log } from "@/Softphone/utils";
+import { SideBarProvider } from "../SideBarPanel/SideBarProvider";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
   switch (action.type) {
@@ -67,12 +70,6 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         },
       };
     }
-    case "setActions": {
-      return {
-        ...state,
-        actions: action.payload.actions as SoftphoneSettings["actions"],
-      };
-    }
     default: {
       throw Error("Unknown action: " + action.type);
     }
@@ -86,12 +83,26 @@ export const SoftphoneProvider = ({
 }) => {
   const [softphone, dispatch] = useReducer(softphoneReducer, INITIAL_STATE);
 
+  // To keep the state ref updated inside the callbacks of the device and call events
+  const softphoneRef = useRef<InitialState>(softphone);
+  softphoneRef.current = softphone;
+
+  const getEventContext = () => {
+    return {
+      device: softphoneRef.current.device,
+      call: softphoneRef.current.call,
+      contact: softphoneRef.current.contact,
+      contactSelected: softphoneRef.current.contactSelected,
+      status: softphoneRef.current.status,
+      view: softphoneRef.current.view,
+    };
+  };
+
   const setView = (view: Views) => {
     dispatch({ type: "setView", payload: { view } });
   };
 
   const setStatus = async (status: Status) => {
-    console.log(status, softphone.device);
     if (status === "available" && softphone.device) {
       await registerDevice(softphone.device);
     } else if (status === "do-not-disturb" && softphone.device) {
@@ -114,54 +125,49 @@ export const SoftphoneProvider = ({
     dispatch({ type: "setAlert", payload: { alert: undefined } });
   }, []);
 
-  const initializeDevice = useCallback(
-    async (softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings) => {
-      const { contact, autoRegister, callActions, actions } = softphoneSettings;
+  const initializeDevice = async (
+    softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings
+  ) => {
+    const { contact, autoRegister, callActions, events } = softphoneSettings;
 
-      const { onFetchToken } = actions;
+    try {
+      setAlert({
+        type: "info",
+        message: "Initializing device...",
+      });
 
-      try {
-        setAlert({
-          type: "info",
-          message: "Initializing device...",
-        });
+      const token = await events.onFetchToken(
+        contact.identity,
+        getEventContext()
+      );
 
-        const token = await onFetchToken(contact.identity);
+      clearAlert();
+      setContact(contact);
 
-        clearAlert();
-        setContact(contact);
+      // await navigator.mediaDevices.getUserMedia({ audio: true });
+      // populate dropdown with available audio devices
+      const device = new Device(token, DEVICE_OPTIONS);
+      addDeviceListeners(device, events);
 
-        // await navigator.mediaDevices.getUserMedia({ audio: true });
-        // populate dropdown with available audio devices
-        const device = new Device(token, DEVICE_OPTIONS);
-        addDeviceListeners(device);
-
-        if (autoRegister) {
-          registerDevice(device);
-        }
-
-        if (callActions) {
-          dispatch({ type: "setCallActions", payload: { callActions } });
-        }
-
-        if (actions) {
-          dispatch({ type: "setActions", payload: { actions } });
-        }
-
-        dispatch({ type: "setView", payload: { view: "active" } });
-        dispatch({ type: "setDevice", payload: { device } });
-      } catch (error) {
-        setAlert({
-          type: "error",
-          message: "Failed to initialize device.",
-          context: error as string,
-          severity: "critical",
-        });
+      if (autoRegister) {
+        registerDevice(device);
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+
+      if (callActions) {
+        dispatch({ type: "setCallActions", payload: { callActions } });
+      }
+
+      dispatch({ type: "setView", payload: { view: "active" } });
+      dispatch({ type: "setDevice", payload: { device } });
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Failed to initialize device.",
+        context: error as string,
+        severity: "critical",
+      });
+    }
+  };
 
   const registerDevice = async (device: Device) => {
     try {
@@ -216,7 +222,7 @@ export const SoftphoneProvider = ({
     });
   };
 
-  const addDeviceListeners = (device: Device) => {
+  const addDeviceListeners = (device: Device, events: Events) => {
     device.on("destroyed", () => {
       resetSoftphone();
     });
@@ -224,8 +230,8 @@ export const SoftphoneProvider = ({
     device.on("error", (twilioError: TwilioError.TwilioError /*, call */) => {
       switch (twilioError.name) {
         case "AccessTokenExpired": {
-          softphone.actions
-            .onFetchToken(softphone.contact.identity)
+          events
+            .onFetchToken(softphone.contact.identity, getEventContext())
             .then((newToken) => {
               device.updateToken(newToken);
             })
@@ -257,19 +263,16 @@ export const SoftphoneProvider = ({
     });
 
     device.on("incoming", (call: Call) => {
-      console.log("incoming call", { call });
       addCallListeners(call);
 
-      let contact: Contact;
-      const contactFromCustomParams = call?.customParameters?.get("contact");
-      const contactFromParams = { identity: call.parameters.From };
+      let contact = new Contact({ identity: call.parameters.From });
 
-      console.log({ contactFromCustomParams, contactFromParams });
+      if (events.onIncomingCall) {
+        const contactInput = events.onIncomingCall(call, getEventContext());
 
-      if (contactFromCustomParams) {
-        contact = new Contact(JSON.parse(contactFromCustomParams));
-      } else {
-        contact = new Contact(contactFromParams);
+        if (contactInput) {
+          contact = Contact.buildContact(contactInput);
+        }
       }
 
       selectContact(contact);
@@ -278,20 +281,23 @@ export const SoftphoneProvider = ({
     });
 
     device.on("registered", () => {
+      events?.onChangeStatus?.("available", getEventContext());
       dispatch({ type: "setStatus", payload: { status: "available" } });
     });
 
     device.on("registering", () => {});
 
     device.on("unregistered", () => {
+      events?.onChangeStatus?.("do-not-disturb", getEventContext());
       dispatch({ type: "setStatus", payload: { status: "do-not-disturb" } });
     });
 
     device.on("tokenWillExpire", () => {
       const timer = setInterval(async () => {
         if (device?.identity) {
-          const newToken = await softphone.actions.onFetchToken(
-            device.identity
+          const newToken = await events.onFetchToken(
+            device.identity,
+            getEventContext()
           );
           if (device.state === "registered") {
             device.updateToken(newToken);
@@ -304,28 +310,28 @@ export const SoftphoneProvider = ({
 
   const addCallListeners = (call: Call) => {
     call.on("accept", (acceptedCall: Call) => {
-      console.log("accept event", { acceptedCall });
+      log("log", "accept event", { acceptedCall });
       dispatch({ type: "setCall", payload: { call: acceptedCall } });
-      setView("on-call");
+      // setView("on-call");
       // !!! check this issue (https://github.com/twilio/twilio-voice.js/issues/140) and uncomment this line after fixing it and remove messageReceived for call
     });
 
     call.on("cancel", () => {
-      console.log("cancel event");
+      log("log", "cancel event");
       setView("active");
       clearSelectedContact();
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
     call.on("disconnect", (disconnectedCall: Call) => {
-      console.log("disconnect event", { disconnectedCall });
+      log("log", "disconnect event", { disconnectedCall });
       setView("active");
       clearSelectedContact();
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
     call.on("error", (twilioError: TwilioError.TwilioError) => {
-      console.log("error event", { twilioError });
+      log("error", "error event", { twilioError });
       setAlert({
         type: "error",
         message: "An error occurred.",
@@ -338,11 +344,11 @@ export const SoftphoneProvider = ({
     });
 
     call.on("reconnected", () => {
-      console.log("reconnected event");
+      log("log", "reconnected event");
     });
 
     call.on("reconnecting", (twilioError: TwilioError.TwilioError) => {
-      console.log("reconnecting event", { twilioError });
+      log("log", "reconnecting event", { twilioError });
       setAlert({
         type: "error",
         message: "An error occurred. Reconnecting..",
@@ -351,27 +357,54 @@ export const SoftphoneProvider = ({
     });
 
     call.on("reject", () => {
-      console.log("reject event");
+      log("log", "reject event");
       setView("active");
       clearSelectedContact();
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
     call.on("ringing", (hasEarlyMedia: boolean) => {
-      console.log("ringing event", { hasEarlyMedia });
+      log("log", "ringing event", { hasEarlyMedia });
       dispatch({ type: "setCall", payload: { call } });
       setView("ringing");
     });
 
     call.on("messageReceived", (message) => {
-      console.log("messageReceived event", { message });
-      //the voiceEventSid can be used for tracking the message
-      console.log("voiceEventSid: ", message.voiceEventSid);
+      log("log", "messageReceived event", { message });
+      const { type } = message.content;
+      if (type === "CALL_CONNECTED") {
+        setView("on-call");
+      }
     });
   };
 
-  const selectContact = (contactSelected: Contact) => {
-    dispatch({ type: "selectContact", payload: { contactSelected } });
+  const selectContact = (contactSelected: ContactInput) => {
+    const { contact, device } = softphoneRef.current;
+
+    if (!contact?.identity || device?.state === "destroyed") {
+      setAlert({
+        message: "The softphone is not ready to make calls.",
+        severity: "critical",
+        type: "error",
+        context:
+          "lookupContact failed. Identity is missing or device.state is destroyed.",
+      });
+      return;
+    }
+
+    if (contactSelected.identity === contact.identity) {
+      setAlert({
+        message: "You are registered as this contact.",
+        type: "error",
+        context: "selectContact failed. Cannot select yourself.",
+      });
+      return;
+    }
+
+    dispatch({
+      type: "selectContact",
+      payload: { contactSelected: Contact.buildContact(contactSelected) },
+    });
     dispatch({ type: "setView", payload: { view: "contact" } });
   };
 
@@ -382,8 +415,21 @@ export const SoftphoneProvider = ({
     });
   };
 
-  const makeCall = async (contact?: Contact) => {
-    const contactToCall = contact || softphone.contactSelected;
+  const makeCall = async (
+    contact?: ContactInput,
+    params?: Record<string, unknown>
+  ) => {
+    const {
+      contactSelected,
+      contact: contactRegistered,
+      device,
+    } = softphoneRef.current;
+
+    let contactToCall = contactSelected;
+
+    if (contact) {
+      contactToCall = Contact.buildContact(contact);
+    }
 
     if (!contactToCall) {
       setAlert({
@@ -393,11 +439,45 @@ export const SoftphoneProvider = ({
       return;
     }
 
+    if (!contactRegistered?.identity || device?.state === "destroyed") {
+      setAlert({
+        message: "The softphone is not ready to make calls.",
+        severity: "critical",
+        type: "error",
+        context:
+          "makeCall failed. Identity is missing or device.state is destroyed.",
+      });
+      return;
+    }
+
+    if (contactToCall.identity === contactRegistered.identity) {
+      setAlert({
+        message: "You are registered as this contact.",
+        type: "error",
+        context: "makeCall failed. Cannot call yourself.",
+      });
+      return;
+    }
+
+    if (device?.isBusy) {
+      setAlert({
+        message: "The device is busy.",
+        type: "error",
+        context: "makeCall failed. The device is busy.",
+      });
+      return;
+    }
+
     try {
+      if (!contactSelected) {
+        selectContact(contactToCall);
+      }
+
       const call = await softphone.device?.connect({
         params: {
-          to: contactToCall.identity,
-          contact: JSON.stringify(softphone.contact),
+          To: contactToCall.identity,
+          From: contactRegistered.toStringify(),
+          ...params,
         },
       });
 
@@ -427,24 +507,26 @@ export const SoftphoneProvider = ({
   };
 
   return (
-    <SoftphoneContext.Provider value={softphone}>
-      <SoftphoneDispatchContext.Provider
-        value={{
-          setView,
-          setStatus,
-          setAlert,
-          clearAlert,
-          initializeDevice,
-          destroyDevice,
-          selectContact,
-          clearSelectedContact,
-          makeCall,
-          hangUp,
-        }}
-      >
-        {children}
-      </SoftphoneDispatchContext.Provider>
-    </SoftphoneContext.Provider>
+    <SideBarProvider>
+      <SoftphoneContext.Provider value={softphone}>
+        <SoftphoneDispatchContext.Provider
+          value={{
+            setView,
+            setStatus,
+            setAlert,
+            clearAlert,
+            initializeDevice,
+            destroyDevice,
+            selectContact,
+            clearSelectedContact,
+            makeCall,
+            hangUp,
+          }}
+        >
+          {children}
+        </SoftphoneDispatchContext.Provider>
+      </SoftphoneContext.Provider>
+    </SideBarProvider>
   );
 };
 

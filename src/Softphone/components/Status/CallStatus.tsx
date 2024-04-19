@@ -1,4 +1,4 @@
-import { useSoftphone } from "@/Softphone/context/context";
+import { useSoftphone } from "@/Softphone/context/Softphone/context";
 import { Box, Chip } from "@mui/material";
 import CallIcon from "@mui/icons-material/Call";
 

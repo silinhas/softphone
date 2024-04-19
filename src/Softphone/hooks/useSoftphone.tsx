@@ -1,47 +1,30 @@
-import {
-  useSoftphoneDispatch,
-  useSoftphone as useInternalSoftphone,
-} from "../context/context";
-import { Contact, ContactInput } from "../types";
+import { useSoftphoneDispatch } from "../context/Softphone/context";
+import { ContactInput } from "../types";
 
 export const useSoftphone = () => {
-  const { contact: registeredContact, device } = useInternalSoftphone();
-  const { destroyDevice, selectContact, setAlert } = useSoftphoneDispatch();
+  const {
+    destroyDevice,
+    selectContact,
+    makeCall: _makeCall,
+  } = useSoftphoneDispatch();
 
-  const lookupContact = (contactToLookup: string | ContactInput) => {
-    if (!registeredContact?.identity || device?.state === "destroyed") {
-      setAlert({
-        message: "The softphone is not ready to make calls.",
-        severity: "critical",
-        type: "error",
-        context:
-          "lookupContact failed. Identity is missing or device.state is destroyed.",
-      });
-      return;
-    }
+  const lookupContact = (contactToLookup: ContactInput) => {
+    selectContact(contactToLookup);
+  };
 
-    let contact: Contact;
-
-    if (typeof contactToLookup === "string") {
-      contact = new Contact({ identity: contactToLookup });
-    } else {
-      contact = Contact.buildContact(contactToLookup);
-    }
-
-    if (contact.identity === registeredContact.identity) {
-      setAlert({
-        message: "You are registered as this contact.",
-        type: "error",
-        context: "lookupContact failed. Cannot call yourself.",
-      });
-      return;
-    }
-
-    selectContact(contact);
+  const makeCall = ({
+    contact,
+    params,
+  }: {
+    contact?: ContactInput;
+    params?: Record<string, unknown>;
+  }) => {
+    _makeCall(contact, params);
   };
 
   return {
     destroyDevice,
     lookupContact,
+    makeCall,
   };
 };

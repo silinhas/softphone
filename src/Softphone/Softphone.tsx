@@ -4,21 +4,30 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import { ContainerStyles } from "./components/Container/styles";
-import { useSoftphoneDispatch } from "./context/context";
-import { AlertSnackBar, Status } from "./components";
+import { AlertSnackBar, SideBarPanel, Status } from "./components";
 import { useEffect } from "react";
 import Layout from "./layouts/Layout";
 import ErrorBoundary from "./layouts/ErrorBoundary";
 import { Main } from "./layouts/Main";
 import { ThemeProvider, createTheme } from "@mui/material";
-import { Actions, CallActions, ContactInput } from "./types";
+import {
+  CallActions,
+  ContactInput,
+  Handlers,
+  Events,
+  SideBarProps,
+} from "./types";
+import { useSoftphoneDispatch } from "./context/Softphone/context";
 interface Props {
   contact?: ContactInput;
   autoRegister?: boolean;
   showStatus?: boolean;
   callActions?: CallActions;
-  actions: Actions;
+  events: Events;
+  handlers?: Handlers;
   styles?: ContainerStyles;
+  sidebar?: SideBarProps;
+  debug?: boolean;
 }
 const theme = createTheme();
 
@@ -27,8 +36,10 @@ const Softphone = ({
   autoRegister,
   showStatus = true,
   callActions,
-  actions,
+  handlers,
+  events,
   styles,
+  sidebar,
 }: Props) => {
   const { initializeDevice, setAlert } = useSoftphoneDispatch();
 
@@ -44,7 +55,7 @@ const Softphone = ({
       initializeDevice({
         contact,
         autoRegister,
-        actions,
+        events,
         callActions,
       });
     }
@@ -55,8 +66,9 @@ const Softphone = ({
     <ThemeProvider theme={theme}>
       <Layout styles={styles}>
         <ErrorBoundary>
-          <Main />
+          <Main handlers={handlers} />
         </ErrorBoundary>
+        {sidebar && <SideBarPanel {...sidebar} />}
         {showStatus && <Status />}
         <AlertSnackBar />
       </Layout>
