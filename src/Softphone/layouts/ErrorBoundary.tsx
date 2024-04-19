@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import Layout from "./Layout";
-import { useSoftphone } from "../context/context";
+import { useSoftphone } from "../context/Softphone/context";
 import PhoneDisabledIcon from "@mui/icons-material/PhoneDisabled";
 import { log } from "../utils";
 

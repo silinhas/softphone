@@ -1,6 +1,6 @@
 import { Device } from "@twilio/voice-sdk";
 import { InitialState, SoftphoneDispatch, Status } from "./types";
-import { Contact, defaultSoftphoneSettings } from "../types";
+import { Contact, defaultSoftphoneSettings } from "@/Softphone/types";
 
 export const STATUS: { value: Status; label: string; color: string }[] = [
   { value: "available", label: "Available", color: "#3498db" },

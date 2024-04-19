@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { CallStatus, SelectStatus } from "../components";
-import { useSoftphone } from "../context/context";
+import { useSoftphone } from "../context/Softphone/context";
 import {
   ActiveView,
   ContactView,

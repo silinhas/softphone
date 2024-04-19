@@ -1,6 +1,6 @@
 import { Avatar, Box, Tooltip, Typography } from "@mui/material";
 import PhoneIcon from "@mui/icons-material/Phone";
-import { useSoftphone } from "@/Softphone/context/context";
+import { useSoftphone } from "@/Softphone/context/Softphone/context";
 import Styles from "./styles";
 
 export const Contact = () => {

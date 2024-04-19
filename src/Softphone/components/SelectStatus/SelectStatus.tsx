@@ -2,11 +2,14 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { useSoftphone, useSoftphoneDispatch } from "../../context/context";
-import { STATUS } from "../../context/constants";
-import { Status } from "../../context/types";
 import Styles from "./styles";
 import { Box, Typography } from "@mui/material";
+import {
+  useSoftphone,
+  useSoftphoneDispatch,
+} from "@/Softphone/context/Softphone/context";
+import { Status } from "@/Softphone/context/Softphone/types";
+import { STATUS } from "@/Softphone/context/Softphone/constants";
 
 export const SelectStatus = () => {
   const { status } = useSoftphone();

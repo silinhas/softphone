@@ -1,7 +1,7 @@
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import DialpadIcon from "@mui/icons-material/Dialpad";
 import { ActionButton } from "@/Softphone/components";
-import { useSoftphoneDispatch } from "@/Softphone/context/context";
+import { useSoftphoneDispatch } from "@/Softphone/context/Softphone/context";
 import { Stack } from "@/Softphone/layouts/Stack";
 
 const ActiveView = () => {

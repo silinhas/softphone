@@ -1,6 +1,6 @@
 import { Call } from "@twilio/voice-sdk";
-import { InitialState, Status } from "../context/types";
 import { ContactInput } from "./Contact";
+import { InitialState, Status } from "../context/Softphone/types";
 
 export type CallActions = {
   mute?: boolean;

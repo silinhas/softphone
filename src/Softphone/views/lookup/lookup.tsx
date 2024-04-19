@@ -4,7 +4,7 @@ import { ActionButton, ContactListItem } from "@/Softphone/components";
 import {
   useSoftphone,
   useSoftphoneDispatch,
-} from "@/Softphone/context/context";
+} from "@/Softphone/context/Softphone/context";
 import { Stack } from "@/Softphone/layouts/Stack";
 import React, { useEffect, useMemo, useState } from "react";
 import { Contact, Handlers } from "@/Softphone/types";

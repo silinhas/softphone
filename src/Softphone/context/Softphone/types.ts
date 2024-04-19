@@ -1,5 +1,5 @@
 import { Call, Device } from "@twilio/voice-sdk";
-import { Contact, ContactInput, SoftphoneSettings } from "../types";
+import { Contact, ContactInput, SoftphoneSettings } from "../../types";
 
 export type Views =
   | "inactive"

@@ -1,5 +1,5 @@
 import { Softphone, ContactInput, useSoftphone } from "../Softphone";
-import { Box, styled } from "@mui/material";
+import { Box, IconButton, styled } from "@mui/material";
 import ControlPanel from "./ControlPanel";
 import { useState } from "react";
 import { isValidPhoneNumber } from "libphonenumber-js/min";
@@ -11,6 +11,8 @@ import BackupTableIcon from "@mui/icons-material/BackupTable";
 import PhonePausedIcon from "@mui/icons-material/PhonePaused";
 import GroupsIcon from "@mui/icons-material/Groups";
 import VoicemailIcon from "@mui/icons-material/Voicemail";
+import { useSideBar } from "@/Softphone/hooks/useSideBar";
+import Info from "@mui/icons-material/Info";
 
 const Layout = styled("div")`
   display: flex;
@@ -19,29 +21,6 @@ const Layout = styled("div")`
   height: 100vh;
   justify-content: space-evenly;
 `;
-
-const PanelOptions = [
-  {
-    id: "RECENT_CALLS",
-    title: "Recent calls",
-    icon: <BackupTableIcon />,
-  },
-  {
-    id: "CALLS_IN_HOLD",
-    title: "Calls in hold",
-    icon: <PhonePausedIcon />,
-  },
-  {
-    id: "CALL_QUEUES",
-    title: "Call groups",
-    icon: <GroupsIcon />,
-  },
-  {
-    id: "PENDING_VOICEMAILS",
-    title: "Pending voicemails",
-    icon: <VoicemailIcon />,
-  },
-];
 
 const App = () => {
   const [contact, setContact] = useState<ContactInput>();
@@ -53,6 +32,7 @@ const App = () => {
   });
 
   const { destroyDevice, lookupContact, makeCall } = useSoftphone();
+  const { openSideBar } = useSideBar();
 
   const handleSetContact = (contact: ContactInput | undefined) => {
     if (!contact) {
@@ -186,6 +166,14 @@ const App = () => {
     return JSON.parse(contactFromCustomParams || "");
   };
 
+  const handleClickSideBarOption = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    optionId: string
+  ) => {
+    e.preventDefault();
+    openSideBar(optionId);
+  };
+
   return (
     <Layout>
       <ControlPanel
@@ -209,7 +197,82 @@ const App = () => {
             onChangeStatus: handleChangeStatus,
             onIncomingCall: handleIncomingCall,
           }}
-          panel={{ options: PanelOptions }}
+          sidebar={{
+            options: [
+              {
+                id: "RECENT_CALLS",
+                title: "Recent calls",
+                component: (
+                  <IconButton
+                    onClick={(e) => handleClickSideBarOption(e, "RECENT_CALLS")}
+                  >
+                    <BackupTableIcon />
+                  </IconButton>
+                ),
+                panelComponent: <div>Recent calls</div>,
+              },
+              {
+                id: "CALLS_IN_HOLD",
+                title: "Calls in hold",
+                component: (
+                  <IconButton
+                    onClick={(e) =>
+                      handleClickSideBarOption(e, "CALLS_IN_HOLD")
+                    }
+                  >
+                    <PhonePausedIcon />
+                  </IconButton>
+                ),
+                panelComponent: (
+                  <div>
+                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+                    Iure provident soluta pariatur, ut delectus ad aliquid quos
+                    unde possimus? Consequuntur odio dicta, sed corrupti quos
+                    porro ipsum explicabo totam unde? Lorem ipsum, dolor sit
+                    amet consectetur adipisicing elit. Vel cupiditate
+                    exercitationem earum, blanditiis veniam ut nemo minima
+                    laudantium corrupti ratione modi voluptate similique odit
+                    tempora necessitatibus ipsa placeat dolorem non.
+                  </div>
+                ),
+              },
+              {
+                id: "CALL_QUEUES",
+                title: "Call groups",
+                component: (
+                  <IconButton
+                    onClick={(e) => handleClickSideBarOption(e, "CALL_QUEUES")}
+                  >
+                    <GroupsIcon />
+                  </IconButton>
+                ),
+                panelComponent: <div>Call groups</div>,
+              },
+              {
+                id: "PENDING_VOICEMAILS",
+                title: "Pending voicemails",
+                component: (
+                  <IconButton href="/pending-voicemail">
+                    <VoicemailIcon />
+                  </IconButton>
+                ),
+              },
+              {
+                id: "INFO",
+                title: "Info",
+                position: "bottom",
+                component: (
+                  <IconButton
+                    color="primary"
+                    onClick={(e) => handleClickSideBarOption(e, "INFO")}
+                  >
+                    <Info />
+                  </IconButton>
+                ),
+              },
+            ],
+          }}
+          debug
         />
         <MyMenu
           open={menu.open}

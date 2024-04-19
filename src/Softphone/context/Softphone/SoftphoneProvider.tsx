@@ -13,8 +13,9 @@ import {
   Events,
   SoftphoneSettings,
   defaultSoftphoneSettings,
-} from "../types";
-import { log } from "../utils";
+} from "@/Softphone/types";
+import { log } from "@/Softphone/utils";
+import { SideBarProvider } from "../SideBarPanel/SideBarProvider";
 
 function softphoneReducer(state: InitialState, action: SoftphoneAction) {
   switch (action.type) {
@@ -418,7 +419,13 @@ export const SoftphoneProvider = ({
     contact?: ContactInput,
     params?: Record<string, unknown>
   ) => {
-    let contactToCall = softphone.contactSelected;
+    const {
+      contactSelected,
+      contact: contactRegistered,
+      device,
+    } = softphoneRef.current;
+
+    let contactToCall = contactSelected;
 
     if (contact) {
       contactToCall = Contact.buildContact(contact);
@@ -432,10 +439,7 @@ export const SoftphoneProvider = ({
       return;
     }
 
-    if (
-      !softphone.contact?.identity ||
-      softphone.device?.state === "destroyed"
-    ) {
+    if (!contactRegistered?.identity || device?.state === "destroyed") {
       setAlert({
         message: "The softphone is not ready to make calls.",
         severity: "critical",
@@ -446,7 +450,7 @@ export const SoftphoneProvider = ({
       return;
     }
 
-    if (contactToCall.identity === softphone.contact.identity) {
+    if (contactToCall.identity === contactRegistered.identity) {
       setAlert({
         message: "You are registered as this contact.",
         type: "error",
@@ -455,7 +459,7 @@ export const SoftphoneProvider = ({
       return;
     }
 
-    if (softphone.device?.isBusy) {
+    if (device?.isBusy) {
       setAlert({
         message: "The device is busy.",
         type: "error",
@@ -465,14 +469,14 @@ export const SoftphoneProvider = ({
     }
 
     try {
-      if (!softphone.contactSelected) {
+      if (!contactSelected) {
         selectContact(contactToCall);
       }
 
       const call = await softphone.device?.connect({
         params: {
           To: contactToCall.identity,
-          From: softphone.contact.toStringify(),
+          From: contactRegistered.toStringify(),
           ...params,
         },
       });
@@ -503,24 +507,26 @@ export const SoftphoneProvider = ({
   };
 
   return (
-    <SoftphoneContext.Provider value={softphone}>
-      <SoftphoneDispatchContext.Provider
-        value={{
-          setView,
-          setStatus,
-          setAlert,
-          clearAlert,
-          initializeDevice,
-          destroyDevice,
-          selectContact,
-          clearSelectedContact,
-          makeCall,
-          hangUp,
-        }}
-      >
-        {children}
-      </SoftphoneDispatchContext.Provider>
-    </SoftphoneContext.Provider>
+    <SideBarProvider>
+      <SoftphoneContext.Provider value={softphone}>
+        <SoftphoneDispatchContext.Provider
+          value={{
+            setView,
+            setStatus,
+            setAlert,
+            clearAlert,
+            initializeDevice,
+            destroyDevice,
+            selectContact,
+            clearSelectedContact,
+            makeCall,
+            hangUp,
+          }}
+        >
+          {children}
+        </SoftphoneDispatchContext.Provider>
+      </SoftphoneContext.Provider>
+    </SideBarProvider>
   );
 };
 

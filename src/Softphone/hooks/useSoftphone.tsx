@@ -1,4 +1,4 @@
-import { useSoftphoneDispatch } from "../context/context";
+import { useSoftphoneDispatch } from "../context/Softphone/context";
 import { ContactInput } from "../types";
 
 export const useSoftphone = () => {
