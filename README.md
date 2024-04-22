@@ -1,6 +1,6 @@
 # Softphone Component
 
-The `Softphone` component is a comprehensive solution for call management within your React applications. It provides a rich and extensible interface for making and managing calls. Additionally, it includes options to customize the appearance and behavior of the component.
+The `Softphone` component is a comprehensive solution for call management within your React applications. It provides a rich and extensible interface for making and managing calls. Additionally, it includes options to customize the appearance and behavior of the component. You can see a live demo [here](https://telaclaims.github.io/softphone).
 
 ## Features
 
