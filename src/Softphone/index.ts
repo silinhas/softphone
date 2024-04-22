@@ -1,4 +1,14 @@
-export { type ContactInput } from "./types";
+export {
+  type SoftphoneSettings,
+  type Handlers,
+  type Events,
+  type EventContext,
+  type ContactInput,
+  type SideBarProps,
+  type SideBarOption,
+  Contact,
+} from "./types";
+
 export { useSoftphone } from "./hooks/useSoftphone";
 export { default as Softphone } from "./Softphone";
 export { default as SoftphoneProvider } from "./context/Softphone/SoftphoneProvider";

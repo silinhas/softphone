@@ -19,7 +19,6 @@ export type InitialState = {
   status: Status;
   contact: Contact;
   contactSelected?: Contact;
-  callActions: SoftphoneSettings["callActions"];
   alert?: {
     message: string;
     context?: string;
@@ -36,8 +35,7 @@ export type SoftphoneAction = {
     | "setAlert"
     | "setDevice"
     | "setCall"
-    | "selectContact"
-    | "setCallActions";
+    | "selectContact";
   payload: Partial<InitialState>;
 };
 
@@ -52,4 +50,5 @@ export type SoftphoneDispatch = {
   clearSelectedContact: () => void;
   makeCall: (contact?: ContactInput, params?: Record<string, unknown>) => void;
   hangUp: () => void;
+  refreshContact: () => void;
 };

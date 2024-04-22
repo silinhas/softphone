@@ -2,18 +2,12 @@ import { Call } from "@twilio/voice-sdk";
 import { ContactInput } from "./Contact";
 import { InitialState, Status } from "../context/Softphone/types";
 
-export type CallActions = {
-  mute?: boolean;
-  hold?: boolean;
-  keypad?: boolean;
-  transfer?: boolean;
-};
-
 export type Handlers = {
   onLookupContact?: (contactToLookup: string) => Promise<ContactInput[]>;
   onClickMakeCallButton?: (contact: ContactInput) => void;
   onClickHoldCallButton?: (call: Call) => void;
   onClickTransferCallButton?: (call: Call) => void;
+  onRenderContact?: (contact: ContactInput) => React.ReactNode | undefined;
 };
 
 export type EventContext = {

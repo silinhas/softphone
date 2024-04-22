@@ -31,12 +31,12 @@ const App = () => {
     options: [],
   });
 
-  const { destroyDevice, lookupContact, makeCall } = useSoftphone();
+  const { lookupContact, makeCall } = useSoftphone();
   const { openSideBar } = useSideBar();
 
   const handleSetContact = (contact: ContactInput | undefined) => {
     if (!contact) {
-      destroyDevice();
+      return setContact(undefined);
     }
     setContact(contact);
   };
@@ -45,7 +45,7 @@ const App = () => {
     lookupContact({ identity: contactToLookup });
   };
 
-  const handleFetchToken = async (identity: string) => {
+  const onFetchToken = async (identity: string) => {
     const response = await fetch(
       `${
         import.meta.env.SOFTPHONE_TWILIO_FUNCTIONS_DOMAIN
@@ -163,7 +163,9 @@ const App = () => {
 
   const handleIncomingCall = (call: Call) => {
     const contactFromCustomParams = call?.customParameters?.get("From");
-    return JSON.parse(contactFromCustomParams || "");
+    if (contactFromCustomParams) {
+      return JSON.parse(contactFromCustomParams);
+    }
   };
 
   const handleClickSideBarOption = (
@@ -172,6 +174,21 @@ const App = () => {
   ) => {
     e.preventDefault();
     openSideBar(optionId);
+  };
+
+  const handleExtendContactRender = (contact: ContactInput) => {
+    const data = contact.data;
+    if (data) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { vendor, email, role } = data as any;
+      return (
+        <>
+          {role && <div>{role}</div>}
+          {email && <div>{email}</div>}
+          {vendor?.name && <div>{vendor.name}</div>}
+        </>
+      );
+    }
   };
 
   return (
@@ -184,16 +201,17 @@ const App = () => {
       />
       <Box>
         <Softphone
-          contact={contact}
+          contact={contact || { identity: "" }}
           autoRegister
           handlers={{
             onLookupContact: handleLookupContact,
             onClickMakeCallButton: handleClickCallButton,
             onClickHoldCallButton: handleClickHoldCallButton,
             onClickTransferCallButton: handleClickTransferCallButton,
+            onRenderContact: handleExtendContactRender,
           }}
           events={{
-            onFetchToken: handleFetchToken,
+            onFetchToken,
             onChangeStatus: handleChangeStatus,
             onIncomingCall: handleIncomingCall,
           }}
@@ -272,7 +290,6 @@ const App = () => {
               },
             ],
           }}
-          debug
         />
         <MyMenu
           open={menu.open}

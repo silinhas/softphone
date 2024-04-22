@@ -23,6 +23,7 @@ export const Main = ({ handlers }: Props) => {
     onClickMakeCallButton,
     onClickTransferCallButton,
     onClickHoldCallButton,
+    onRenderContact,
   } = handlers || {};
 
   return (
@@ -36,13 +37,17 @@ export const Main = ({ handlers }: Props) => {
         {view === "active" && <ActiveView />}
         {view === "lookup" && <LookupView onLookupContact={onLookupContact} />}
         {view === "contact" && (
-          <ContactView onClickMakeCallButton={onClickMakeCallButton} />
+          <ContactView
+            onClickMakeCallButton={onClickMakeCallButton}
+            onRenderContact={onRenderContact}
+          />
         )}
         {view === "ringing" && <RingingView />}
         {view === "on-call" && (
           <OnCallView
             onClickTransferCallButton={onClickTransferCallButton}
             onClickHoldCallButton={onClickHoldCallButton}
+            onRenderContact={onRenderContact}
           />
         )}
         {view === "incoming" && <IncomingView />}

@@ -61,15 +61,6 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         contactSelected: action.payload.contactSelected as Contact,
       };
     }
-    case "setCallActions": {
-      return {
-        ...state,
-        callActions: {
-          ...state.callActions,
-          ...(action.payload.callActions as SoftphoneSettings["callActions"]),
-        },
-      };
-    }
     default: {
       throw Error("Unknown action: " + action.type);
     }
@@ -128,7 +119,7 @@ export const SoftphoneProvider = ({
   const initializeDevice = async (
     softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings
   ) => {
-    const { contact, autoRegister, callActions, events } = softphoneSettings;
+    const { contact, autoRegister, events } = softphoneSettings;
 
     try {
       setAlert({
@@ -151,10 +142,6 @@ export const SoftphoneProvider = ({
 
       if (autoRegister) {
         registerDevice(device);
-      }
-
-      if (callActions) {
-        dispatch({ type: "setCallActions", payload: { callActions } });
       }
 
       dispatch({ type: "setView", payload: { view: "active" } });
@@ -267,12 +254,19 @@ export const SoftphoneProvider = ({
 
       let contact = new Contact({ identity: call.parameters.From });
 
-      if (events.onIncomingCall) {
-        const contactInput = events.onIncomingCall(call, getEventContext());
+      try {
+        const contactInput = events?.onIncomingCall?.(call, getEventContext());
 
         if (contactInput) {
           contact = Contact.buildContact(contactInput);
         }
+      } catch (error) {
+        setAlert({
+          type: "warning",
+          message: "Failed to get contact information.",
+          context: JSON.stringify(error),
+        });
+        // contact = new Contact({ identity: call.parameters.From });
       }
 
       selectContact(contact);
@@ -506,6 +500,31 @@ export const SoftphoneProvider = ({
     }
   };
 
+  const refreshContact = () => {
+    const { contactSelected } = softphoneRef.current;
+    const callerFrom = softphone.call?.parameters.From;
+
+    if (contactSelected) {
+      dispatch({
+        type: "selectContact",
+        payload: { contactSelected: Contact.buildContact(contactSelected) },
+      });
+      return;
+    }
+
+    if (callerFrom) {
+      dispatch({
+        type: "selectContact",
+        payload: {
+          contactSelected: new Contact({
+            identity: callerFrom,
+          }),
+        },
+      });
+      return;
+    }
+  };
+
   return (
     <SideBarProvider>
       <SoftphoneContext.Provider value={softphone}>
@@ -521,6 +540,7 @@ export const SoftphoneProvider = ({
             clearSelectedContact,
             makeCall,
             hangUp,
+            refreshContact,
           }}
         >
           {children}

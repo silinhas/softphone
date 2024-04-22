@@ -1,12 +1,12 @@
-import { useSoftphoneDispatch } from "../context/Softphone/context";
+import {
+  useSoftphoneDispatch,
+  useSoftphone as _useSoftphone,
+} from "../context/Softphone/context";
 import { ContactInput } from "../types";
 
 export const useSoftphone = () => {
-  const {
-    destroyDevice,
-    selectContact,
-    makeCall: _makeCall,
-  } = useSoftphoneDispatch();
+  const { device, call } = _useSoftphone();
+  const { selectContact, makeCall: _makeCall } = useSoftphoneDispatch();
 
   const lookupContact = (contactToLookup: ContactInput) => {
     selectContact(contactToLookup);
@@ -23,7 +23,8 @@ export const useSoftphone = () => {
   };
 
   return {
-    destroyDevice,
+    isBusy: Boolean(device?.isBusy),
+    currentCall: call,
     lookupContact,
     makeCall,
   };
