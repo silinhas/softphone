@@ -7,7 +7,7 @@ import {
 } from "@/Softphone/context/Softphone/context";
 import { Stack } from "@/Softphone/layouts/Stack";
 import React, { useEffect, useMemo, useState } from "react";
-import { Contact, Handlers } from "@/Softphone/types";
+import { Contact, ContactInput, Handlers } from "@/Softphone/types";
 import { debounce } from "@mui/material/utils";
 
 interface Props {
@@ -27,21 +27,28 @@ const LookupView = ({ onLookupContact }: Props) => {
   const fetch = useMemo(
     () =>
       debounce(
-        (
+        async (
           request: { input: string },
           callback: (results?: readonly Contact[]) => void
         ) => {
-          if (onLookupContact) {
-            setLoading(true);
-            onLookupContact(request.input).then((results) => {
-              callback(
-                results
-                  .filter((contact) => contact.identity !== registeredIdentity)
-                  .map((contact) => Contact.buildContact(contact))
-              );
-              setLoading(false);
-            });
+          setLoading(true);
+          let results = await onLookupContact?.(request.input);
+
+          if (!results) {
+            results = [
+              {
+                identity: request.input,
+                isNew: true,
+              } as ContactInput,
+            ];
           }
+
+          callback(
+            results
+              .filter((contact) => contact.identity !== registeredIdentity)
+              .map((contact) => Contact.buildContact(contact))
+          );
+          setLoading(false);
         },
         500
       ),

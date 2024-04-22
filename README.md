@@ -1,292 +1,330 @@
-## Softphone Functionality Overview
+# Softphone Component
 
-### Device Registration and Status
+The `Softphone` component is a comprehensive solution for call management within your React applications. It provides a rich and extensible interface for making and managing calls. Additionally, it includes options to customize the appearance and behavior of the component.
 
-- **Display Register & Device Status:** The Softphone should continuously display and update the registration and device status.
-  - **Device Permissions:** Before creating the device, it is essential to request device permissions as per best practices. For more details, refer to [Working with Microphones and getUserMedia](https://www.twilio.com/docs/voice/sdks/javascript/best-practices#working-with-microphones-and-getusermedia).
-  - **Input Devices:** Display a list of available input devices, focusing on microphones to ensure proper voice input.
-  - **AccessTokens Management:** Keep AccessTokens up to date to maintain seamless communication. See [Keep AccessTokens Up to Date](https://www.twilio.com/docs/voice/sdks/javascript/best-practices#keep-accesstokens-up-to-date) for guidance.
+## Features
 
-### Core Functions
+- **Call Management**: Make calls and manage their status.
+- **Automatic Registration**: Supports automatic user registration.
+- **Customizable Rendering**: Customize how contacts are displayed.
+- **Various Events**: Manage events such as call reception and status changes.
+- **Sidebar Integration**: Includes configurable options for an interactive sidebar.
 
-- **Register a Device:** Initial setup for device registration to enable communication services.
-- **Make a Call:** Outgoing call functionality with comprehensive call management options.
-- **Receive a Call:** Handle incoming calls effectively, providing users with the option to answer.
-- **Display Call Status:** Real-time updates on the current status of the call, including connecting, active, and disconnected states.
-- **Hang Up Current Call:** Offer a straightforward method for users to terminate an ongoing call.
-- **Mute/Unmute Current Call:** Enable users to mute their microphone during a call and unmute it when needed.
+## Installation
 
-### Error Handling
+```bash
+npm install @telaclaims-tech/softphone
+```
 
-- **Display and Handle Errors Gracefully:** Ensure that all potential errors are not only displayed to the user but also handled in a way that minimizes disruption in the communication experience.
+## Requirements and Dependencies
 
-## Softphone Context: Device Object
+- [Node.js v16.16.0](https://nodejs.org/en/download/) - Required for running JavaScript applications.
+- [React v17.0.2](https://www.npmjs.com/package/react) - Required for building user interfaces.
+- [MUI Material v5.15.15](https://www.npmjs.com/package/@mui/material) - Provides Material Design UI components.
+- [Twilio Voice SDK v2.10.2](https://www.npmjs.com/package/@twilio/voice-sdk) - Allows making and receiving phone calls directly in your apps.
+- [libphonenumber-js v1.10.60](https://www.npmjs.com/package/libphonenumber-js) - A library for parsing, formatting, and validating international phone numbers.
 
-The Device Object is a central component of the Softphone, enabling seamless communication functionality through various methods, event handling, and properties.
+## Usage
 
-### Initialization
+Below is a basic example of how to use the `Softphone` component:
 
-To begin using the Device Object:
+```jsx
+import Softphone from "@telaclaims-tech/softphone";
 
-- **Initiate with an Identity and Fetch a New Token:** Begin the initialization process by providing an identity. Additionally, configure the device with the following options:
-  - `logLevel` (boolean): Specifies the verbosity of the log output.
-  - `codecPreferences` (string[]): Determines the preferred audio codecs.
-  - `edge` (string[]): Defines the network edge locations.
-  - `closeProtection` (boolean): Enables or disables close protection.
-  - `enableImprovedSignalingErrorPrecision` (boolean): Improves the precision of signaling errors.
-  - `tokenRefreshMs` (number): Sets the interval for token refresh in milliseconds.
+function App() {
+  const onFetchToken = async (identity) => {
+    // Fetch and return a Twilio token for the given identity.
+  };
 
-### Core Methods
+  return <Softphone contact={{ identity: "test" }} events={{ onFetchToken }} />;
+}
+```
 
-- `.register()`: Registers the device to receive incoming calls. This action emits a `registered` event. Note that outgoing calls do not require device registration.
-- `.unregister()`: Unregisters the device, preventing it from receiving incoming calls, and emits an `unregistered` event.
-- `.connect()`: Initiates a call from the device.
-- `.destroy()`: Disconnects the device and all associated calls. This process cleans all event listeners attached to the device and emits `unregistered` and `destroyed` events.
-- `.disconnectAll()`: Disconnects all active calls, aiding in a global hang-up functionality.
-- `.on` and `.off`: Attach or detach event listeners to the device for custom event handling.
-- `.updateToken()`: Updates the device's token for authentication purposes. More information can be found [here](https://www.twilio.com/docs/voice/sdks/javascript/twiliodevice#deviceupdatetokentoken).
+## Types
 
-### Events
+### `ContactInput`
 
-The Device Object supports a range of events to handle real-time updates and changes:
+This type represents the input structure required for contact-related operations in the Softphone component.
 
-- `destroyed`, `error`, `incoming`, `registered`, `registering`, `tokenWillExpire`, `unregistered`.
-- For detailed event information, including error handling, refer to the [Device Events documentation](https://www.twilio.com/docs/voice/sdks/javascript/twiliodevice#error-event).
+```typescript
+type ContactInput = ContactConstructorArgs | Contact;
+```
 
-### Accessors
+### `ContactConstructorArgs`
 
-Accessors provide read-only access to the device's state and configuration:
+This type represents the constructor arguments for creating a new contact.
 
-- `identity`: The current AccessToken's associated identity string.
-- `isBusy`: Boolean value indicating if the device is on an active call.
-- `state`: The device's current state, with possible values including 'unregistered', 'registering', 'registered', and 'destroyed'.
-- Additional accessors include `token`, `audio`, `calls`, `edge`, and `home`.
+```typescript
+type ContactConstructorArgs = {
+  identity: string;
+  id?: string;
+  label?: string;
+  isNew?: boolean;
+  status?: ContactStatus;
+  avatar?: string;
+  type?: "phone" | "identifier";
+  data?: Record<string, unknown>;
+};
+```
 
-### Static Accessors
+**Properties:**
 
-- `isSupported`: Boolean indicating if the current browser supports the SDK.
+- **`identity`** _`required`_: The unique identifier for the contact used to communicate with Twilio and associated to the token.
 
-### Error Handling
+- **`id`** _`(default: uuidv4)`_: Other unique identifier for the contact.
 
-Comprehensive error handling is crucial for robust application behavior. Detailed information on managing signaling errors is available [here](https://www.twilio.com/docs/voice/sdks/javascript/twiliodevice#improved-signaling-errors).
+- **`label`** _`(default: identity)`_: The display name for the contact.
 
-## Call Object
+- **`isNew`** _`(default: false)`_: Indicates if the contact is new. display a New Icon in the contact list.
 
-The Call Object represents an individual call, encapsulating the methods, events, properties, and accessors needed to manage call behavior and state effectively.
+- **`status`** _`("available" | "unavailable" | "unknown"(default))`_: The status of the Device.
 
-### Methods
+- **`avatar`** _`(default: "/")`_: The URL of the contact's avatar.
 
-- `.status()`: Returns the current status of the Call instance. Possible values include:
-  - `closed`: The media session has been disconnected.
-  - `connecting`: Setting up the media session post-acceptance or initiation.
-  - `open`: The media session is established.
-  - `pending`: An incoming call that hasn't been accepted yet.
-  - `reconnecting`: Reconnection triggered after an ICE connection disruption.
-  - `ringing`: The callee has been notified but hasn't responded.
-- `.accept()`: Accepts an incoming call. The call status transitions to 'connecting' and then to 'open'.
-- `.disconnect()`: Closes the media session associated with the call.
-- `.reject()`: Rejects an incoming call, effectively hanging up on the caller.
-- `.ignore()`: Ignores an incoming call without sending a hangup message. The caller continues to hear ringing until the call is accepted by another device or times out.
-- `.isMuted()`: Checks if the call's input audio is muted.
-- `.mute(shouldMute?)`: Mutes or unmutes the call's input audio.
-- `.sendDigits(digits)`: Sends DTMF tones during the call.
-- `.sendMessage(message)`: Sends a message to the server-side application.
-- **Feature Implementation**: Implement a feedback mechanism for call quality, as detailed [here](https://www.twilio.com/docs/voice/sdks/javascript/twiliocall#callpostfeedbackscore-issue).
+- **`type`** _`("phone" | "identifier"(default))`_: The type of contact. phone if the identity is a valid Phone Number. identifier otherwise.
 
-### Events
+- **`data`** _`({})`_: Additional data for the contact. Used in combination to the `onRenderContact` to extend the contact view
 
-The Call Object emits various events to indicate changes in state or to report activities:
+### `Contact`
 
-- `accept`, `cancel`, `disconnect`, `error`, `messageReceived`, `messageSent`, `mute`, `reconnected`, `reconnecting`, `reject`, `ringing`, `sample`, `volume`, `warning`, `warning-cleared`.
-- These events cover a range of activities from accepting calls, handling disconnections, to reporting call quality warnings and clearing them.
+This is a base class for the contact object. It represents a contact in the Softphone component. Exported to use.
 
-### Properties
+```typescript
+const contact = new Contact(...ContactConstructorArgs);
+```
 
-- `customParameters`: Returns a Map of custom parameters passed in the `ConnectOptions.params` when initiating a call.
-- `parameters`: Provides call parameters received from Twilio, such as `From`, `CallSid`, `To`, and `AccountSid`. These vary between incoming and outgoing calls.
+or
 
-### Accessors
+```typescript
+const contact = Contact.buildContact(...ContactInput);
+```
 
-- `codec`: Identifies the audio codec used in the call's RTCPeerConnection.
-- `direction`: Indicates whether the call is incoming or outgoing, providing context for call handling and user interface indications.
+### `SoftphoneSettings`
 
-## Project Requirements
+This type represents the settings for the Softphone component.
 
-Ensure all necessary tools and packages are installed and prepared for the Softphone project development.
+```typescript
+type SoftphoneSettings = {
+  contact: ContactInput;
+  autoRegister?: boolean;
+  events: Events;
+};
+```
 
-### Setup Twilio
+**Properties:**
 
-Follow the steps outlined in the Twilio documentation to properly set up your environment for Twilio integration:
+- **`contact`** _`required`_: The registered contact.
 
-- **[Twilio Quickstart Guide](https://www.twilio.com/docs/voice/sdks/javascript/get-started#serverless-quickstart)**
-  - Install Twilio CLI.
-  - Install Twilio Serverless Plugin.
+- **`events`** _`required`_: The event handlers for the Softphone component. See the `Events` type for more details.
 
-### Create and Prepare a Softphone NPM Package
+- **`autoRegister`** _`(default: false)`_: Automatically register the device on initialization.
 
-Set up the NPM package with the required dependencies for Softphone development:
+### `Events`
 
-- **Dependencies:**
-  - React
-  - @twilio/voice-sdk
-  - Material UI or native styles
+This type represents the event handlers for the Softphone component. They are dispatched when specific events occur within the component.
 
-### Unformatted
+```typescript
+type Events = {
+  onFetchToken: (identity: string, context: EventContext) => Promise<string>;
+  onChangeStatus?: (status: Status, context: EventContext) => void;
+  onIncomingCall?: (
+    call: Call,
+    context: EventContext
+  ) => ContactInput | undefined;
+};
+```
 
-<details>
-  <summary>Click to expand!</summary>
+**Properties:**
 
-- What Softphone should do:
+- **`onFetchToken`** _`required`_: Fetches the Twilio token for the given identity.
 
-  - Display register & device status (with updates)
-    . Asking for device permissions before creating the device (https://www.twilio.com/docs/voice/sdks/javascript/best-practices#working-with-microphones-and-getusermedia)
-    . Display available input devices (microphones).
-    . Keep AccessTokens up to date (https://www.twilio.com/docs/voice/sdks/javascript/best-practices#keep-accesstokens-up-to-date)
+- **`onChangeStatus`** _`(optional)`_: Handles the status change event for the device(`registered`, `unregistered`). Triggered when the device status changes.
 
-  - Register a device
+- **`onIncomingCall`** _`(optional)`_: Handles the incoming call event. Triggered when a call is received.
 
-  - Make a call
+### `EventContext`
 
-  - Receive a call
+This type represents the context object for the event handlers in the Softphone component. It provides information about the current state of the component.
 
-  - Display call status
+```typescript
+type EventContext = {
+  device?: Device;
+  call?: Call;
+  contact: Contact;
+  contactSelected?: Contact;
+  status: Status;
+  view: Views;
+};
+```
 
-  - Hang up current call
+**Properties:**
 
-  - Mute(Un-mute) current call
+- **`device`** _`(optional)`_: The current Twilio device instance.
 
-  - Display and handle errors gracefully
+- **`call`** _`(optional)`_: The current Twilio call instance.
 
-- Softphone Context:
+- **`contact`** _`required`_: The registered Contact.
 
-  - Device object
-
-    - Initiate using an identity and fetch a new token (pass options like debug and edge location)
+- **`contactSelected`** _`(optional)`_: The contact selected. This contact selected could be selected by the user in the contact list, or the contact that is calling. Also using the functions `lookupContact` or `makeCall` using the useSoftphone hook.
 
-      - Options:
-        .logLevel: boolean
-        .codecPreferences: string[]
-        .edge: string[]
-        .closeProtection: boolean
-        .enableImprovedSignalingErrorPrecision: boolean
-        .tokenRefreshMs: number
-
-    - .register() register the device and allow it to receive incoming calls
-      - registered event will be emitted
-      - Note: It's not necessary to call device.register() in order to make outgoing calls
-    - .unregister() unregister the device and prevent it from receiving incoming calls
-      - unregistered event will be emitted
-    - .connect() to make a call
-    - .destroy() to disconnect the device and all calls,
-      - unregistered event will be emitted
-      - destroyed event will be emitted
-      - clean all event listeners attached to the device
-    - .disconnectAll() to disconnect all calls (for hang up)
-    - .on and .off to attach and detach event listeners
-    - .updateToken() to update the token. Important info (https://www.twilio.com/docs/voice/sdks/javascript/twiliodevice#deviceupdatetokentoken)
-    - rest of methods in (https://www.twilio.com/docs/voice/sdks/javascript/twiliodevice#methods)
-
-    - Events list
-
-      - destroyed
-      - error [twilioError, call] (https://www.twilio.com/docs/voice/sdks/javascript/twiliodevice#error-event)
-      - incoming [call]
-      - registered
-      - registering
-      - tokenWillExpire (https://www.twilio.com/docs/voice/sdks/javascript/twiliodevice#tokenwillexpire-event)
-      - unregistered
-
-    - Accessors
-
-      - identity Returns the identity string that is associated with the Device instance's current AccessToken.
-      - isBusy Returns a Boolean for whether the Device instance is currently on an active Call
-      - state Returns the state of the Device instance. Possible values are ['unregistered', 'registering', 'registered', 'destroyed']
-      - token
-      - audio
-      - calls
-      - edge
-      - home
-
-    - Static accessors
-
-      - isSupported Returns a Boolean for whether or not this SDK is supported by the current browser
-
-    - Errors (https://www.twilio.com/docs/voice/sdks/javascript/twiliodevice#improved-signaling-errors)
-
-  - Call Object
-
-    - Methods
-
-      - .status() Return the status of the Call instance. Possible values are
-      - closed, -> The media session associated with the call has been disconnected.
-      - connecting, -> The call was accepted by or initiated by the local Device instance and the media session is being set up.
-      - open, -> The media session associated with the call has been established.
-      - pending, -> The call is incoming and hasn't yet been accepted.
-      - reconnecting, -> The ICE connection was disconnected and a reconnection has been triggered.
-      - ringing -> The callee has been notified of the call but has not yet responded.
-      - .accept() to accept an incoming call
-      - call.status() will be 'connecting' while the media session for the Call instance is being set up.
-      - call.status() will be 'open' once the media session has been established.
-      - .disconnect() close the media session associated with the Call instance
-      - .reject() this will cause a hangup to be issued to the dialing party.
-      - .ignore() to ignore an incoming call
-      - call.status() will be 'closed' once the Call instance has been ignored.
-      - This method will not send a hangup message to the dialing party.
-      - The dialing party will continue to hear ringing until another Device instance with the same identity accepts the Call or if the Call times out.
-      - .isMuted() Returns a Boolean indicating whether the input audio of the local Device instance is muted.
-      - .call.mute(shouldMute?)
-      - .sendDigits(digits) to send DTMF tones
-      - .sendMessage(message) to send a message to the server-side application
-      - !(Feature) Implement a feedback mechanism for the call quality using (https://www.twilio.com/docs/voice/sdks/javascript/twiliocall#callpostfeedbackscore-issue)
-
-    - Events list
-
-      - accept[call] -> Emitted when an incoming Call is accepted. For outgoing calls, the'accept' event is emitted when the media session for the call has finished being set up.
-      - cancel -> Emitted when the Call instance has been canceled and the call.status() has transitioned to 'closed'.
-        Two ways to cancel
-        - 1. Invoking call.ignore() on an incoming call
-        - 2. Invoking call.disconnect() on an outgoing call before the recipient has answered.
-      - disconnect[call] -> Emitted when the media session associated with the Call instance is disconnected.
-      - error[twilioError] -> Emitted when the Call instance receives an error (https://www.twilio.com/docs/voice/sdks/javascript/twiliocall#error-event)
-      - messageReceived[message] -> Emitted when the Call instance receives a message sent from the server-side application. (https://www.twilio.com/docs/voice/sdks/call-message-events)
-      - messageSent[message] -> Emitted when the Call instance sends a message to the server-side application using the call.sendMessage() method. (https://www.twilio.com/docs/voice/sdks/call-message-events)
-      - mute[isMuted, call] -> Emitted when the input audio associated with the Call instance is muted or unmuted.
-      - reconnected -> Emitted when the Call instance has regained media and/or signaling connectivity.
-      - reconnecting[twilioError] -> Emitted when the Call instance has lost media and/or signaling connectivity and is reconnecting.
-      - reject -> Emitted when call.reject() was invoked and the call.status() is closed.
-      - ringing[hasEarlyMedia] -> Emitted when the Call has entered the ringing state. (https://www.twilio.com/docs/voice/sdks/javascript/twiliocall#ringing-event)
-      - sample[sample] -> Emitted when the Call instance receives a WebRTC sample object. This event is published every second
-      - volume[inputVolume, outputVolume] -> Emitted every 50 milliseconds with the current input and output volumes on every animation frame.
-        - Note: You may want to use this to display volume levels in the browser.
-      - warning[warningName, warningData] -> Emitted when a call quality metric has crossed a threshold. (https://www.twilio.com/docs/voice/sdks/javascript/twiliocall#warning-event)
-        - Note: This event is raised when the SDK detects a drop in call quality or other conditions that may indicate the user is having trouble with the call. You can implement callbacks on these events to alert the user of an issue.
-      - warning-cleared[warningName] -> Emitted when a call quality metric has returned to normal.
-
-    - Properties
-
-      - customParameters -> Returns a Map object containing the custom parameters that were passed in the ConnectOptions.params property when invoking device.connect(). (https://www.twilio.com/docs/voice/sdks/javascript/twiliocall#callcustomparameters)
-      - parameters -> Returns the Call parameters received from Twilio (https://www.twilio.com/docs/voice/sdks/javascript/twiliocall#callparameters)
-        - For incoming calls, the call.parameters may look like this:
-          {
-          From: "+15554448888",
-          CallSid: "CAxxxx...",
-          To: "client:YourDeviceIdentity",
-          AccountSid: "ACxxxx..."
-          }
-        - For outgoing calls, the call may not yet have a CallSID. You can find the CallSID by waiting until the Twilio.Call instance has emitted the 'accept' event.
-          call.parameters will be in accept event
-
-    - Accessors
-      - codec -> Returns the audio codec used for the RTCPeerConnection associated with the Call instance.
-      - direction -> Returns the directionality of the Call instance. Possible values are "INCOMING" and "OUTGOING".
-        - An incoming call is one that is directed towards your Device instance.
-        - An outgoing call is one that is made by invoking device.connect().
-
-- Project requirements:
-  - Setup twilio(https://www.twilio.com/docs/voice/sdks/javascript/get-started#serverless-quickstart)
-    - Install twilio cli
-    - Install twilio serverless plugin
-  - Create and prepare a Softphone npm package
-    - Dependencies: react, @twilio/voice-sdk, material UI or native styles
-
-</details>
+- **`status`** _`required`_: The current status of the device.
+
+- **`view`** _`required`_: The current view of the Softphone component. Example: `"ringing"` | `"on-call"` | `"incoming"`
+
+### `Handlers`
+
+This type represents the handlers for the Softphone component.
+
+```typescript
+type Handlers = {
+  onLookupContact?: (contactToLookup: string) => Promise<ContactInput[]>;
+  onClickMakeCallButton?: (contact: ContactInput) => void;
+  onClickHoldCallButton?: (call: Call) => void;
+  onClickTransferCallButton?: (call: Call) => void;
+  onRenderContact?: (contact: ContactInput) => React.ReactNode | undefined;
+};
+```
+
+**Properties:**
+
+- **`onLookupContact`** _`(optional)`_: Looks up a contact by the given identity. This function is called when the user type for a contact in the search contact input. Provide the input typed by the user and return the contacts that match the input.
+
+- **`onClickMakeCallButton`** _`(optional)`_: Handles the click event on the make call button. This function is called when the user clicks on the make call button. Provide the contact selected by the user to make the call.
+
+- **`onClickHoldCallButton`** _`(optional)`_: Handles the click event on the hold call button. This function is called when the user clicks on the hold call button. Provide the call to hold.
+
+- **`onClickTransferCallButton`** _`(optional)`_: Handles the click event on the transfer call button. This function is called when the user clicks on the transfer call button. Provide the call to transfer.
+
+- **`onRenderContact`** _`(optional)`_: Renders the contact in the `contact` view. This function is called when the contact view is rendered. Provide the contact to render and return the JSX to render the contact. This is for customizing the contact view and extend the Contact selected.
+
+### `Note`
+
+The main difference between `Events` and `Handlers` is that `Events` are dispatched when specific events occur within the internal state between `Softphone` and `Twilio SDK` events. These events do not have access to the current state of the component. To access the current state of the component, the context object provided in the `Events` should be used. On the other hand, `Handlers` are functions that are called when the user interacts with the component, and they do have access to the current state of the component.
+
+## Softphone Props
+
+The `Softphone` component accepts the following props:
+
+- **`contact`** _`ContactInput`_: The contact to register with the Softphone component.
+
+- **`events`** _`Events`_: The event handlers for the Softphone component.
+
+- **`autoRegister`** _`(default: false)`_: Automatically register the device on initialization.
+
+- **`handlers`** _`Handlers`_: The handlers for the Softphone component.
+
+- **`showStatus`** _`(default: false)`_: Show the status of the device in a bottom bar.
+
+- **`styles`** _`ContainerStyles`_: Custom styles for the Softphone component. Styles that can be used are `width`, `height`, and `minHeight`.
+
+- **`sidebar`** _`SideBarProps`_: Extend the softphone with a sidebar. The sidebar is a component that can be used to display additional information or actions.
+
+## SideBar
+
+The `SideBar` component is a component that can be used to display additional information or actions. It is a component that can be used to extend the Softphone component with additional information or actions.
+
+### `SideBarProps`
+
+This type represents the props for the SideBar component.
+
+```typescript
+type SideBarProps = {
+  styles?: ContainerStyles;
+  options?: SideBarOption[];
+  onClickSideBarOption?: (option: SideBarOption) => void;
+};
+```
+
+**Properties:**
+
+- **`styles`** _`ContainerStyles`_: Custom styles for the SideBar component. Styles that can be used are `width`, `height`, and `minHeight`.
+
+- **`options`** _`SideBarOption[]`_: The options to display in the SideBar component.
+
+- **`onClickSideBarOption`** _`(optional)`_: Handles the click event on the SideBar option. This function is called when the user clicks on a SideBar option. Provide the option clicked by the user.
+
+### `SideBarOption`
+
+This type represents the options for the SideBar component.
+
+```typescript
+type SideBarOption = {
+  id: string;
+  title: string;
+  position?: "top" | "bottom";
+  component: React.ReactNode;
+  panelComponent?: React.ReactNode;
+};
+```
+
+**Properties:**
+
+- **`id`** _`required`_: The unique identifier for the option.
+
+- **`title`** _`required`_: The title of the option.
+
+- **`position`** _`(default: "top")`_: The position of the option in the SideBar component.
+
+- **`component`** _`required`_: The option component to render.
+
+- **`panelComponent`** _`(optional)`_: The panel component to render when the option is clicked.
+
+## Hooks
+
+### `useSoftphone`
+
+The `useSoftphone` hook provides access to the Softphone component's state and methods. It can be used to interact with the Softphone component programmatically.
+
+```jsx
+import { useSoftphone } from "@telaclaims-tech/softphone";
+
+function App() {
+  const {
+    isBusy,
+    currentCall,
+    lookupContact,
+    makeCall } = useSoftphone();
+
+  return (
+   // ...
+  );
+}
+```
+
+**Properties:**
+
+- **`isBusy`** _`boolean`_
+  : Indicates if the Softphone component is busy.
+
+- **`currentCall`** _`Call`_ : The current call object.
+
+- **`lookupContact`** _`(contactToLookup: ContactInput): void`_ : Select a contact directly.
+
+- **`makeCall`** `({
+  contact,
+  params,
+}: {
+  contact?: ContactInput;
+  params?: Record<string, unknown>;
+}): void` : Start a call with the given contact using the params provided.
+
+### `useSideBar`
+
+The `useSideBar` hook provides access to the SideBar component's state and methods. It can be used to interact with the SideBar component programmatically.
+
+```jsx
+import { useSideBar } from "@telaclaims-tech/softphone";
+
+function App() {
+  const {
+    openSideBar } = useSideBar();
+
+  return (
+   // ...
+  );
+}
+```
+
+**Properties:**
+
+- **`openSideBar`** _`(optionId: string): void`_ : Open the SideBar with the given option id.

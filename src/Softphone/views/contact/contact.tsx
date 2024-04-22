@@ -10,9 +10,10 @@ import { Handlers } from "@/Softphone/types";
 
 interface Props {
   onClickMakeCallButton?: Handlers["onClickMakeCallButton"];
+  onRenderContact?: Handlers["onRenderContact"];
 }
 
-const ContactView = ({ onClickMakeCallButton }: Props) => {
+const ContactView = ({ onClickMakeCallButton, onRenderContact }: Props) => {
   const { contactSelected } = useSoftphone();
   const { setView, clearSelectedContact, makeCall } = useSoftphoneDispatch();
 
@@ -29,6 +30,8 @@ const ContactView = ({ onClickMakeCallButton }: Props) => {
     makeCall(contactSelected);
   };
 
+  if (!contactSelected) return null;
+
   return (
     <Stack>
       <Stack.Segment
@@ -37,7 +40,7 @@ const ContactView = ({ onClickMakeCallButton }: Props) => {
         justifyContent={"center"}
         alignItems={"center"}
       >
-        <Contact />
+        <Contact onRenderContact={onRenderContact} />
       </Stack.Segment>
       <Stack.Segment
         flex={0.3}

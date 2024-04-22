@@ -22,13 +22,15 @@ import { Handlers } from "@/Softphone/types";
 interface Props {
   onClickTransferCallButton?: Handlers["onClickTransferCallButton"];
   onClickHoldCallButton?: Handlers["onClickHoldCallButton"];
+  onRenderContact?: Handlers["onRenderContact"];
 }
 
 const OnCallView = ({
   onClickTransferCallButton,
   onClickHoldCallButton,
+  onRenderContact,
 }: Props) => {
-  const { callActions, call } = useSoftphone();
+  const { call } = useSoftphone();
   const { hangUp, setAlert } = useSoftphoneDispatch();
   const [showKeypad, setShowKeypad] = useState(false);
 
@@ -78,30 +80,32 @@ const OnCallView = ({
         alignItems={"center"}
       >
         <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
-          {showKeypad ? <Keypad /> : <Contact />}
+          {showKeypad ? (
+            <Keypad />
+          ) : (
+            <Contact onRenderContact={onRenderContact} />
+          )}
         </Box>
       </Stack.Segment>
       <Stack.Segment flex={0.3}>
         <Box display={"flex"} gap={1} justifyContent={"center"}>
-          {callActions?.mute && (
-            <Tooltip title={call?.isMuted() ? "Unmute" : "Mute"}>
-              <span>
-                <ActionButton
-                  active={call?.isMuted()}
-                  color="primary"
-                  onClick={handleMute}
-                  icon={
-                    call?.isMuted() ? (
-                      <MicOffIcon fontSize="large" />
-                    ) : (
-                      <Mic fontSize="large" />
-                    )
-                  }
-                />
-              </span>
-            </Tooltip>
-          )}
-          {callActions?.hold && (
+          <Tooltip title={call?.isMuted() ? "Unmute" : "Mute"}>
+            <span>
+              <ActionButton
+                active={call?.isMuted()}
+                color="primary"
+                onClick={handleMute}
+                icon={
+                  call?.isMuted() ? (
+                    <MicOffIcon fontSize="large" />
+                  ) : (
+                    <Mic fontSize="large" />
+                  )
+                }
+              />
+            </span>
+          </Tooltip>
+          {onClickHoldCallButton && (
             <Tooltip title="Hold Call">
               <span>
                 <ActionButton
@@ -112,18 +116,16 @@ const OnCallView = ({
               </span>
             </Tooltip>
           )}
-          {callActions?.keypad && (
-            <Tooltip title="Keypad">
-              <span>
-                <ActionButton
-                  color="primary"
-                  onClick={handleShowKeypad}
-                  icon={<DialpadIcon fontSize="large" />}
-                />
-              </span>
-            </Tooltip>
-          )}
-          {callActions?.transfer && (
+          <Tooltip title="Keypad">
+            <span>
+              <ActionButton
+                color="primary"
+                onClick={handleShowKeypad}
+                icon={<DialpadIcon fontSize="large" />}
+              />
+            </span>
+          </Tooltip>
+          {onClickTransferCallButton && (
             <Tooltip title="Transfer Call">
               <span>
                 <ActionButton

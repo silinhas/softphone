@@ -10,24 +10,16 @@ import Layout from "./layouts/Layout";
 import ErrorBoundary from "./layouts/ErrorBoundary";
 import { Main } from "./layouts/Main";
 import { ThemeProvider, createTheme } from "@mui/material";
-import {
-  CallActions,
-  ContactInput,
-  Handlers,
-  Events,
-  SideBarProps,
-} from "./types";
+import { ContactInput, Handlers, Events, SideBarProps } from "./types";
 import { useSoftphoneDispatch } from "./context/Softphone/context";
 interface Props {
-  contact?: ContactInput;
+  contact: ContactInput;
   autoRegister?: boolean;
   showStatus?: boolean;
-  callActions?: CallActions;
   events: Events;
   handlers?: Handlers;
   styles?: ContainerStyles;
   sidebar?: SideBarProps;
-  debug?: boolean;
 }
 const theme = createTheme();
 
@@ -35,7 +27,6 @@ const Softphone = ({
   contact,
   autoRegister,
   showStatus = true,
-  callActions,
   handlers,
   events,
   styles,
@@ -56,7 +47,6 @@ const Softphone = ({
         contact,
         autoRegister,
         events,
-        callActions,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
