@@ -5,8 +5,10 @@ import {
   SoftphoneSettings,
 } from "./SoftphoneSettings";
 import { SideBarOption, SideBarProps } from "./SideBarOption";
+import { ContactStatus } from "../context/Softphone/types";
 
 export { Contact, type ContactInput };
 export { type Handlers, type Events, type EventContext };
 export { defaultSoftphoneSettings, type SoftphoneSettings };
 export { type SideBarOption, type SideBarProps };
+export { type ContactStatus };

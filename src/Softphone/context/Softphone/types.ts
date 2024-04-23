@@ -10,13 +10,17 @@ export type Views =
   | "on-call"
   | "incoming";
 
-export type Status = "available" | "do-not-disturb";
+export type ContactStatus =
+  | "available"
+  | "do-not-disturb"
+  | "offline"
+  | "unknown";
 
 export type InitialState = {
   device?: Device;
   call?: Call;
   view: Views;
-  status: Status;
+  status: ContactStatus;
   contact: Contact;
   contactSelected?: Contact;
   alert?: {
@@ -41,7 +45,7 @@ export type SoftphoneAction = {
 
 export type SoftphoneDispatch = {
   setView: (view: Views) => void;
-  setStatus: (status: Status) => void;
+  setStatus: (status: ContactStatus) => void;
   initializeDevice: (softphoneSettings: SoftphoneSettings) => void;
   setAlert: (alert: InitialState["alert"]) => void;
   clearAlert: () => void;

@@ -8,7 +8,7 @@ import {
   useSoftphone,
   useSoftphoneDispatch,
 } from "@/Softphone/context/Softphone/context";
-import { Status } from "@/Softphone/context/Softphone/types";
+import { ContactStatus } from "@/Softphone/context/Softphone/types";
 import { STATUS } from "@/Softphone/context/Softphone/constants";
 
 export const SelectStatus = () => {
@@ -16,7 +16,7 @@ export const SelectStatus = () => {
   const { setStatus } = useSoftphoneDispatch();
 
   const handleChange = (event: SelectChangeEvent) => {
-    setStatus(event.target.value as Status);
+    setStatus(event.target.value as ContactStatus);
   };
 
   return (

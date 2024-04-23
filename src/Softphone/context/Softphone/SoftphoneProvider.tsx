@@ -5,7 +5,7 @@ import {
   INITIAL_STATE,
   TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN,
 } from "./constants";
-import { InitialState, SoftphoneAction, Status, Views } from "./types";
+import { InitialState, SoftphoneAction, ContactStatus, Views } from "./types";
 import { Call, Device, TwilioError } from "@twilio/voice-sdk";
 import {
   Contact,
@@ -28,7 +28,7 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
     case "setStatus": {
       return {
         ...state,
-        status: action.payload.status as Status,
+        status: action.payload.status as ContactStatus,
       };
     }
     case "setContact": {
@@ -93,7 +93,7 @@ export const SoftphoneProvider = ({
     dispatch({ type: "setView", payload: { view } });
   };
 
-  const setStatus = async (status: Status) => {
+  const setStatus = async (status: ContactStatus) => {
     if (status === "available" && softphone.device) {
       await registerDevice(softphone.device);
     } else if (status === "do-not-disturb" && softphone.device) {

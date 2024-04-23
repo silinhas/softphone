@@ -1,7 +1,6 @@
+import { ContactStatus } from "@/Softphone/context/Softphone/types";
 import { isValidPhoneNumber, parsePhoneNumber } from "libphonenumber-js";
 import { v4 as uuidv4 } from "uuid";
-
-type ContactStatus = "available" | "unavailable" | "unknown";
 
 type ContactConstructorArgs = {
   identity: string;
@@ -85,8 +84,10 @@ class Status {
     switch (this.status) {
       case "available":
         return "#4caf50";
-      case "unavailable":
+      case "do-not-disturb":
         return "#f44336";
+      case "offline":
+        return "#607d8b";
       default:
         return "#9e9e9e";
     }
@@ -96,8 +97,10 @@ class Status {
     switch (this.status) {
       case "available":
         return "Available";
-      case "unavailable":
-        return "Unavailable";
+      case "do-not-disturb":
+        return "Do Not Disturb";
+      case "offline":
+        return "Offline";
       default:
         return "Unknown";
     }

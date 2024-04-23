@@ -1,6 +1,6 @@
 import { Call } from "@twilio/voice-sdk";
 import { ContactInput } from "./Contact";
-import { InitialState, Status } from "../context/Softphone/types";
+import { InitialState, ContactStatus } from "../context/Softphone/types";
 
 export type Handlers = {
   onLookupContact?: (contactToLookup: string) => Promise<ContactInput[]>;
@@ -21,7 +21,7 @@ export type EventContext = {
 
 export type Events = {
   onFetchToken: (identity: string, context: EventContext) => Promise<string>;
-  onChangeStatus?: (status: Status, context: EventContext) => void;
+  onChangeStatus?: (status: ContactStatus, context: EventContext) => void;
   onIncomingCall?: (
     call: Call,
     context: EventContext

@@ -13,6 +13,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import VoicemailIcon from "@mui/icons-material/Voicemail";
 import { useSideBar } from "@/Softphone/hooks/useSideBar";
 import Info from "@mui/icons-material/Info";
+import { ContactStatus } from "@/Softphone/types";
 
 const Layout = styled("div")`
   display: flex;
@@ -149,7 +150,7 @@ const App = () => {
     }
   };
 
-  const handleChangeStatus = (status: "available" | "do-not-disturb") => {
+  const handleChangeStatus = (status: ContactStatus) => {
     console.log({ status });
   };
 
