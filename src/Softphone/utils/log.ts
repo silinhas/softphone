@@ -9,7 +9,7 @@ export const log = (
   message: unknown,
   context?: unknown
 ) => {
-  if (import.meta.env.SOFTPHONE_DEBUG) {
+  if (import.meta.env.DEV) {
     console?.[type](
       `%c@telaclaims-tech/softphone ${type}: `,
       STYLES[type],
