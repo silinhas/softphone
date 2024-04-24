@@ -295,7 +295,6 @@ export const SoftphoneProvider = ({
           message: "Failed to get contact information.",
           context: JSON.stringify(error),
         });
-        // contact = new Contact({ identity: call.parameters.From });
       }
 
       selectContact(contact);
@@ -450,6 +449,7 @@ export const SoftphoneProvider = ({
 
     if (contact) {
       contactToCall = Contact.buildContact(contact);
+      selectContact(contactToCall);
     }
 
     if (!contactToCall) {
@@ -490,10 +490,6 @@ export const SoftphoneProvider = ({
     }
 
     try {
-      if (!contactSelected) {
-        selectContact(contactToCall);
-      }
-
       const call = await softphone.device?.connect({
         params: {
           To: contactToCall.identity,
