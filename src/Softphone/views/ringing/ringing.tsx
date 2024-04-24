@@ -6,10 +6,17 @@ import {
   useSoftphoneDispatch,
 } from "@/Softphone/context/Softphone/context";
 import { Avatar, Box, Typography } from "@mui/material";
+import { Handlers } from "@/Softphone/types";
 
-const RingingView = () => {
+interface Props {
+  onRenderRingingView?: Handlers["onRenderRingingView"];
+}
+
+const RingingView = ({ onRenderRingingView }: Props) => {
   const { contactSelected } = useSoftphone();
   const { hangUp } = useSoftphoneDispatch();
+
+  if (!contactSelected) return null;
 
   return (
     <Stack>
@@ -22,15 +29,16 @@ const RingingView = () => {
         <Box display={"flex"} flexDirection={"column"}>
           <Box display={"flex"} alignItems={"center"} gap={1}>
             <Avatar
-              alt={contactSelected?.label}
+              alt={contactSelected.label}
               sx={{ width: 30, height: 30, border: "1px solid" }}
-              src={contactSelected?.avatar}
+              src={contactSelected.avatar}
             />
             <Typography variant="body1" fontWeight={400}>
               {contactSelected?.label}
             </Typography>
           </Box>
           <CallLoadingIndicator />
+          {onRenderRingingView?.(contactSelected)}
         </Box>
       </Stack.Segment>
       <Stack.Segment flex={0.3}>
