@@ -218,7 +218,28 @@ export const SoftphoneProvider = ({
       switch (twilioError.name) {
         case "AccessTokenExpired": {
           events
-            .onFetchToken(softphone.contact.identity, getEventContext())
+            .onFetchToken(
+              device.identity || softphoneRef.current.contact.identity,
+              getEventContext()
+            )
+            .then((newToken) => {
+              device.updateToken(newToken);
+            })
+            .catch((error) => {
+              setAlert({
+                type: "error",
+                message: "An error occurred.",
+                context: JSON.stringify(error),
+              });
+            });
+          break;
+        }
+        case "AccessTokenInvalid": {
+          events
+            .onFetchToken(
+              device.identity || softphoneRef.current.contact.identity,
+              getEventContext()
+            )
             .then((newToken) => {
               device.updateToken(newToken);
             })
@@ -235,6 +256,14 @@ export const SoftphoneProvider = ({
           setAlert({
             type: "error",
             message: "An error occurred.",
+            context: JSON.stringify(twilioError),
+          });
+          break;
+        }
+        case "ConnectionError": {
+          setAlert({
+            type: "error",
+            message: "A connection error occurred",
             context: JSON.stringify(twilioError),
           });
           break;
@@ -288,16 +317,14 @@ export const SoftphoneProvider = ({
 
     device.on("tokenWillExpire", () => {
       const timer = setInterval(async () => {
-        if (device?.identity) {
-          const newToken = await events.onFetchToken(
-            device.identity,
-            getEventContext()
-          );
-          if (device.state === "registered") {
-            device.updateToken(newToken);
-          }
-          clearInterval(timer);
+        const newToken = await events.onFetchToken(
+          device?.identity || softphoneRef.current.contact.identity,
+          getEventContext()
+        );
+        if (device.state === "registered") {
+          device.updateToken(newToken);
         }
+        clearInterval(timer);
       }, TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN);
     });
   };
