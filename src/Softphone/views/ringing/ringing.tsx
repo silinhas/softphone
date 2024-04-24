@@ -6,13 +6,8 @@ import {
   useSoftphoneDispatch,
 } from "@/Softphone/context/Softphone/context";
 import { Avatar, Box, Typography } from "@mui/material";
-import { Handlers } from "@/Softphone/types";
 
-interface Props {
-  onRenderRingingView?: Handlers["onRenderRingingView"];
-}
-
-const RingingView = ({ onRenderRingingView }: Props) => {
+const RingingView = () => {
   const { contactSelected } = useSoftphone();
   const { hangUp } = useSoftphoneDispatch();
 
@@ -38,7 +33,6 @@ const RingingView = ({ onRenderRingingView }: Props) => {
             </Typography>
           </Box>
           <CallLoadingIndicator />
-          {onRenderRingingView?.(contactSelected)}
         </Box>
       </Stack.Segment>
       <Stack.Segment flex={0.3}>

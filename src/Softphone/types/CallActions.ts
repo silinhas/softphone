@@ -8,7 +8,7 @@ export type Handlers = {
   onClickHoldCallButton?: (call: Call) => void;
   onClickTransferCallButton?: (call: Call) => void;
   onRenderContact?: (contact: ContactInput) => React.ReactNode | undefined;
-  onRenderRingingView?: (contact: ContactInput) => React.ReactNode | undefined;
+  onRenderIncomingView?: (contact: ContactInput) => React.ReactNode | undefined;
 };
 
 export type EventContext = {
