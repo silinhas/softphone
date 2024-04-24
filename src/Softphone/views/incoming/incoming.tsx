@@ -25,7 +25,7 @@ const IncomingView = ({ onRenderIncomingView }: Props) => {
         justifyContent={"center"}
         alignItems={"center"}
       >
-        <Box display={"flex"} flexDirection={"column"}>
+        <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
           <Box display={"flex"} alignItems={"center"} gap={1}>
             <Avatar
               alt={contactSelected?.label}
