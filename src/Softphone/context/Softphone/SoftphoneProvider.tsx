@@ -61,6 +61,13 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         contactSelected: action.payload.contactSelected as Contact,
       };
     }
+    case "setEvents": {
+      return {
+        ...state,
+        events: action.payload.events as Events,
+      };
+    }
+
     default: {
       throw Error("Unknown action: " + action.type);
     }
@@ -144,6 +151,7 @@ export const SoftphoneProvider = ({
         registerDevice(device);
       }
 
+      dispatch({ type: "setEvents", payload: { events } });
       dispatch({ type: "setView", payload: { view: "active" } });
       dispatch({ type: "setDevice", payload: { device } });
     } catch (error) {
@@ -279,7 +287,7 @@ export const SoftphoneProvider = ({
     });
 
     device.on("incoming", (call: Call) => {
-      addCallListeners(call);
+      addCallListeners(call, events);
 
       let contact = new Contact({ identity: call.parameters.From });
 
@@ -328,7 +336,7 @@ export const SoftphoneProvider = ({
     });
   };
 
-  const addCallListeners = (call: Call) => {
+  const addCallListeners = (call: Call, events: Events) => {
     call.on("accept", (acceptedCall: Call) => {
       log("log", "accept event", { acceptedCall });
       dispatch({ type: "setCall", payload: { call: acceptedCall } });
@@ -395,6 +403,8 @@ export const SoftphoneProvider = ({
       if (type === "CALL_CONNECTED") {
         setView("on-call");
       }
+
+      events?.onCallMessageReceived?.(message, getEventContext());
     });
   };
 
@@ -500,7 +510,7 @@ export const SoftphoneProvider = ({
 
       if (call) {
         dispatch({ type: "setCall", payload: { call } });
-        addCallListeners(call);
+        addCallListeners(call, softphoneRef.current.events!);
       }
     } catch (error) {
       setAlert({

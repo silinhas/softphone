@@ -27,4 +27,5 @@ export type Events = {
     call: Call,
     context: EventContext
   ) => ContactInput | undefined;
+  onCallMessageReceived?: (message: string, context: EventContext) => void;
 };

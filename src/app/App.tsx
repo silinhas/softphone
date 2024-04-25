@@ -192,6 +192,10 @@ const App = () => {
     }
   };
 
+  const handleCallMessageReceived = (message: string) => {
+    console.log("Call message received", { message });
+  };
+
   return (
     <Layout>
       <ControlPanel
@@ -215,6 +219,7 @@ const App = () => {
             onFetchToken,
             onChangeStatus: handleChangeStatus,
             onIncomingCall: handleIncomingCall,
+            onCallMessageReceived: handleCallMessageReceived,
           }}
           sidebar={{
             options: [
