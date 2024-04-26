@@ -356,6 +356,7 @@ export const SoftphoneProvider = ({
       log("log", "cancel event");
       setView("active");
       clearSelectedContact();
+      clearCallActions();
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
@@ -363,6 +364,7 @@ export const SoftphoneProvider = ({
       log("log", "disconnect event", { disconnectedCall });
       setView("active");
       clearSelectedContact();
+      clearCallActions();
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
@@ -396,6 +398,7 @@ export const SoftphoneProvider = ({
       log("log", "reject event");
       setView("active");
       clearSelectedContact();
+      clearCallActions();
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
@@ -450,6 +453,20 @@ export const SoftphoneProvider = ({
     dispatch({
       type: "selectContact",
       payload: { contactSelected: undefined },
+    });
+  };
+
+  const clearCallActions = () => {
+    const callActions = softphoneRef.current.callActions;
+
+    callActions?.forEach((callAction) => {
+      callAction.loading = false;
+      callAction.disabled = false;
+    });
+
+    dispatch({
+      type: "setCallActions",
+      payload: { callActions },
     });
   };
 
