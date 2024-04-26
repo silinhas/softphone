@@ -1,6 +1,7 @@
 import { Call } from "@twilio/voice-sdk";
 import { ContactInput } from "./Contact";
 import { InitialState, ContactStatus } from "../context/Softphone/types";
+import React from "react";
 
 export type Handlers = {
   onLookupContact?: (contactToLookup: string) => Promise<ContactInput[]>;
@@ -28,4 +29,13 @@ export type Events = {
     context: EventContext
   ) => ContactInput | undefined;
   onCallMessageReceived?: (message: string, context: EventContext) => void;
+};
+
+export type CallAction = {
+  id: string;
+  label: string;
+  onClick: (action: CallAction, call: Call) => void;
+  disabled: boolean;
+  loading: boolean;
+  icon: React.ReactNode;
 };

@@ -21,8 +21,6 @@ export const Main = ({ handlers }: Props) => {
   const {
     onLookupContact,
     onClickMakeCallButton,
-    onClickTransferCallButton,
-    onClickHoldCallButton,
     onRenderContact,
     onRenderIncomingView,
   } = handlers || {};
@@ -44,13 +42,7 @@ export const Main = ({ handlers }: Props) => {
           />
         )}
         {view === "ringing" && <RingingView />}
-        {view === "on-call" && (
-          <OnCallView
-            onClickTransferCallButton={onClickTransferCallButton}
-            onClickHoldCallButton={onClickHoldCallButton}
-            onRenderContact={onRenderContact}
-          />
-        )}
+        {view === "on-call" && <OnCallView onRenderContact={onRenderContact} />}
         {view === "incoming" && (
           <IncomingView onRenderIncomingView={onRenderIncomingView} />
         )}

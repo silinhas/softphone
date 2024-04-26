@@ -8,6 +8,7 @@ import {
 import { InitialState, SoftphoneAction, ContactStatus, Views } from "./types";
 import { Call, Device, TwilioError } from "@twilio/voice-sdk";
 import {
+  CallAction,
   Contact,
   ContactInput,
   Events,
@@ -65,6 +66,12 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
       return {
         ...state,
         events: action.payload.events as Events,
+      };
+    }
+    case "setCallActions": {
+      return {
+        ...state,
+        callActions: action.payload.callActions as CallAction[],
       };
     }
 
@@ -126,7 +133,7 @@ export const SoftphoneProvider = ({
   const initializeDevice = async (
     softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings
   ) => {
-    const { contact, autoRegister, events } = softphoneSettings;
+    const { contact, autoRegister, events, callActions } = softphoneSettings;
 
     try {
       setAlert({
@@ -152,6 +159,7 @@ export const SoftphoneProvider = ({
       }
 
       dispatch({ type: "setEvents", payload: { events } });
+      dispatch({ type: "setCallActions", payload: { callActions } });
       dispatch({ type: "setView", payload: { view: "active" } });
       dispatch({ type: "setDevice", payload: { device } });
     } catch (error) {
@@ -558,6 +566,29 @@ export const SoftphoneProvider = ({
     }
   };
 
+  const updateCallAction = (
+    callActionId: string,
+    { loading, disabled }: { loading?: boolean; disabled?: boolean }
+  ) => {
+    const callActions = softphoneRef.current.callActions;
+
+    const callAction = callActions?.find(
+      (callAction) => callAction.id === callActionId
+    );
+
+    if (!callAction) {
+      throw new Error(`Call action with id ${callActionId} not found`);
+    }
+
+    callAction.loading = loading ?? callAction.loading;
+    callAction.disabled = disabled ?? callAction.disabled;
+
+    dispatch({
+      type: "setCallActions",
+      payload: { callActions },
+    });
+  };
+
   return (
     <SideBarProvider>
       <SoftphoneContext.Provider value={softphone}>
@@ -574,6 +605,7 @@ export const SoftphoneProvider = ({
             makeCall,
             hangUp,
             refreshContact,
+            updateCallAction,
           }}
         >
           {children}
