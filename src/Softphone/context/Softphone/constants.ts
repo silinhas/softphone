@@ -26,6 +26,7 @@ export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {
   makeCall: () => {},
   hangUp: () => {},
   refreshContact: () => {},
+  updateCallAction: () => {},
 };
 
 export const TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN = 300000; // each 5 min;
