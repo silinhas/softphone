@@ -5,7 +5,7 @@ import {
 import { CallAction, ContactInput } from "../types";
 
 export const useSoftphone = () => {
-  const { device, call } = _useSoftphone();
+  const { device, call, contact, contactSelected } = _useSoftphone();
   const {
     selectContact,
     makeCall: _makeCall,
@@ -36,6 +36,8 @@ export const useSoftphone = () => {
   return {
     isBusy: Boolean(device?.isBusy),
     currentCall: call,
+    registeredContact: contact,
+    contactSelected,
     lookupContact,
     makeCall,
     updateCallAction,
