@@ -35,8 +35,8 @@ export const useSoftphone = () => {
   };
 
   const displayOnCallView = (contact: ContactInput) => {
-    setView("on-call");
     selectContact(contact);
+    setView("on-call");
   };
 
   return {
