@@ -34,6 +34,11 @@ export const useSoftphone = () => {
     _updateCallAction(callActionId, { loading, disabled });
   };
 
+  const displayOnCallView = (contact: ContactInput) => {
+    setView("on-call");
+    selectContact(contact);
+  };
+
   return {
     isBusy: Boolean(device?.isBusy),
     currentCall: call,
@@ -42,7 +47,6 @@ export const useSoftphone = () => {
     lookupContact,
     makeCall,
     updateCallAction,
-    selectContact,
-    setView,
+    displayOnCallView,
   };
 };
