@@ -19,10 +19,11 @@ import { CallAction, Handlers } from "@/Softphone/types";
 
 interface Props {
   onRenderContact?: Handlers["onRenderContact"];
+  callActions?: CallAction[];
 }
 
-const OnCallView = ({ onRenderContact }: Props) => {
-  const { call, callActions } = useSoftphone();
+const OnCallView = ({ onRenderContact, callActions }: Props) => {
+  const { call, callActions: _callActions } = useSoftphone();
   const { hangUp } = useSoftphoneDispatch();
   const [showKeypad, setShowKeypad] = useState(false);
 
@@ -39,7 +40,16 @@ const OnCallView = ({ onRenderContact }: Props) => {
     action: CallAction
   ) => {
     event.preventDefault();
-    action.onClick(action, call!);
+
+    const callAction = callActions?.find(
+      (callAction) => callAction.id === action.id
+    );
+
+    if (callAction) {
+      callAction.onClick(action, call!);
+    } else {
+      action.onClick(action, call!);
+    }
   };
 
   return (
@@ -63,7 +73,7 @@ const OnCallView = ({ onRenderContact }: Props) => {
       </Stack.Segment>
       <Stack.Segment flex={0.3}>
         <Box display={"flex"} gap={1} justifyContent={"center"}>
-          {callActions?.map((action) => (
+          {_callActions?.map((action) => (
             <Tooltip title={action.label} key={action.id}>
               <span>
                 <ActionButton

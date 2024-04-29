@@ -65,7 +65,7 @@ const Softphone = ({
     <ThemeProvider theme={theme}>
       <Layout styles={styles}>
         <ErrorBoundary>
-          <Main handlers={handlers} />
+          <Main handlers={handlers} callActions={callActions} />
         </ErrorBoundary>
         {sidebar && <SideBarPanel {...sidebar} />}
         {showStatus && <Status />}

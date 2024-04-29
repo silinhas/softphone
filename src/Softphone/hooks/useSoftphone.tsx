@@ -10,7 +10,6 @@ export const useSoftphone = () => {
     selectContact,
     makeCall: _makeCall,
     updateCallAction: _updateCallAction,
-    setView,
   } = useSoftphoneDispatch();
 
   const lookupContact = (contactToLookup: ContactInput) => {
@@ -35,8 +34,7 @@ export const useSoftphone = () => {
   };
 
   const displayOnCallView = (contact: ContactInput) => {
-    selectContact(contact);
-    setView("on-call");
+    selectContact(contact, "on-call");
   };
 
   return {

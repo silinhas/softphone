@@ -313,9 +313,8 @@ export const SoftphoneProvider = ({
         });
       }
 
-      selectContact(contact);
+      selectContact(contact, "incoming");
       dispatch({ type: "setCall", payload: { call } });
-      setView("incoming");
     });
 
     device.on("registered", () => {
@@ -419,7 +418,7 @@ export const SoftphoneProvider = ({
     });
   };
 
-  const selectContact = (contactSelected: ContactInput) => {
+  const selectContact = (contactSelected: ContactInput, view?: Views) => {
     const { contact, device } = softphoneRef.current;
 
     if (!contact?.identity || device?.state === "destroyed") {
@@ -446,7 +445,7 @@ export const SoftphoneProvider = ({
       type: "selectContact",
       payload: { contactSelected: Contact.buildContact(contactSelected) },
     });
-    dispatch({ type: "setView", payload: { view: "contact" } });
+    dispatch({ type: "setView", payload: { view: view || "contact" } });
   };
 
   const clearSelectedContact = () => {
