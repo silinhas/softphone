@@ -7,7 +7,7 @@ export { CallStatus } from "./Status/CallStatus";
 export { CallLoadingIndicator } from "./CallLoadingIndicator/CallLoadingIndicator";
 export { Keypad } from "./Keypad/Keypad";
 export { TimeIndicator } from "./TimeIndicator/TimeIndicator";
-export { Contact } from "./Contact/Contact";
+export { ContactUI } from "./Contact/Contact";
 export { ContactListItem } from "./ContactListItem/ContactListItem";
 export { SideBarPanel } from "./SideBarPanel/SideBarPanel";
 export { LookupInput } from "./LookupInput/LookupInput";

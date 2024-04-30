@@ -1,51 +1,14 @@
-import {
-  Avatar,
-  Box,
-  IconButton,
-  Skeleton,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Avatar, Box, Tooltip, Typography } from "@mui/material";
 import PhoneIcon from "@mui/icons-material/Phone";
-import {
-  useSoftphone,
-  useSoftphoneDispatch,
-} from "@/Softphone/context/Softphone/context";
 import Styles from "./styles";
-import { Handlers } from "@/Softphone/types";
-import { Refresh } from "@mui/icons-material";
+import { Contact, Handlers } from "@/Softphone/types";
 
 interface Props {
   onRenderContact?: Handlers["onRenderContact"];
+  contactSelected: Contact;
 }
 
-export const Contact = ({ onRenderContact }: Props) => {
-  const { contactSelected } = useSoftphone();
-  const { refreshContact } = useSoftphoneDispatch();
-
-  const handleRefreshContact = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    refreshContact();
-  };
-
-  if (!contactSelected) {
-    return (
-      <Box
-        display={"flex"}
-        flexDirection={"column"}
-        alignItems={"center"}
-        gap={2}
-      >
-        <Skeleton variant="circular" width={120} height={120} />
-        <IconButton onClick={handleRefreshContact} color="primary">
-          <Refresh fontSize="medium" />
-        </IconButton>
-      </Box>
-    );
-  }
-
+export const ContactUI = ({ onRenderContact, contactSelected }: Props) => {
   return (
     <Box
       display={"flex"}

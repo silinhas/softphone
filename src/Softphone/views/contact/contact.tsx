@@ -1,6 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import PhoneIcon from "@mui/icons-material/Phone";
-import { ActionButton, Contact } from "@/Softphone/components";
+import { ActionButton, ContactUI } from "@/Softphone/components";
 import {
   useSoftphone,
   useSoftphoneDispatch,
@@ -40,7 +40,10 @@ const ContactView = ({ onClickMakeCallButton, onRenderContact }: Props) => {
         justifyContent={"center"}
         alignItems={"center"}
       >
-        <Contact onRenderContact={onRenderContact} />
+        <ContactUI
+          contactSelected={contactSelected}
+          onRenderContact={onRenderContact}
+        />
       </Stack.Segment>
       <Stack.Segment
         flex={0.3}

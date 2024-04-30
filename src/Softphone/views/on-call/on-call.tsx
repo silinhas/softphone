@@ -1,6 +1,6 @@
 import {
   ActionButton,
-  Contact,
+  ContactUI,
   Keypad,
   TimeIndicator,
 } from "@/Softphone/components";
@@ -23,7 +23,7 @@ interface Props {
 }
 
 const OnCallView = ({ onRenderContact, callActions }: Props) => {
-  const { call, callActions: _callActions } = useSoftphone();
+  const { call, callActions: _callActions, contactSelected } = useSoftphone();
   const { hangUp } = useSoftphoneDispatch();
   const [showKeypad, setShowKeypad] = useState(false);
 
@@ -67,7 +67,10 @@ const OnCallView = ({ onRenderContact, callActions }: Props) => {
           {showKeypad ? (
             <Keypad />
           ) : (
-            <Contact onRenderContact={onRenderContact} />
+            <ContactUI
+              contactSelected={contactSelected!}
+              onRenderContact={onRenderContact}
+            />
           )}
         </Box>
       </Stack.Segment>
