@@ -43,8 +43,14 @@ const App = () => {
     setContact(contact);
   };
 
-  const handleDirectLookupContact = (contactToLookup: string) => {
-    lookupContact({ identity: contactToLookup });
+  const handleDirectLookupContact = (
+    contactToLookup: string | ContactInput
+  ) => {
+    if (typeof contactToLookup === "string") {
+      return lookupContact({ identity: contactToLookup });
+    } else {
+      lookupContact(contactToLookup);
+    }
   };
 
   const onFetchToken = async (identity: string) => {
@@ -209,7 +215,7 @@ const App = () => {
         contactList={contactList}
         contact={contact}
         handleSetContact={handleSetContact}
-        handleLookupContact={handleDirectLookupContact}
+        handleDirectLookupContact={handleDirectLookupContact}
       />
       <Box>
         <Softphone

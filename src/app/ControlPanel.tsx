@@ -1,4 +1,4 @@
-import { ContactInput } from "@/Softphone";
+import { ContactInput, LookupInput } from "@/Softphone";
 import {
   Avatar,
   Box,
@@ -12,19 +12,20 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import { useState } from "react";
 
 interface Props {
   contactList: ContactInput[];
   contact?: ContactInput;
   handleSetContact: (contact: ContactInput | undefined) => void;
-  handleLookupContact: (contactToLookup: string) => void;
+  handleDirectLookupContact: (contactToLookup: string | ContactInput) => void;
 }
 
 const ControlPanel = ({
   contact,
   handleSetContact,
-  handleLookupContact,
+  handleDirectLookupContact,
   contactList,
 }: Props) => {
   const [contactInput, setContactInput] = useState("");
@@ -46,8 +47,29 @@ const ControlPanel = ({
       | React.KeyboardEvent<HTMLDivElement>
   ) => {
     event.preventDefault();
-    handleLookupContact(contactInput);
+    handleDirectLookupContact(contactInput);
     setContactInput("");
+  };
+
+  const onLookupContact = async (contactToLookup: string) => {
+    const results = contactList.filter((contact) =>
+      contact.label?.toLowerCase()?.includes(contactToLookup.toLowerCase())
+    );
+
+    if (!results.length && isValidPhoneNumber(contactToLookup, "US")) {
+      return [
+        {
+          identity: contactToLookup,
+          isNew: true,
+        },
+      ];
+    }
+
+    return results;
+  };
+
+  const onSelectContact = (contact: ContactInput) => {
+    handleDirectLookupContact(contact);
   };
 
   return (
@@ -64,7 +86,6 @@ const ControlPanel = ({
     >
       <Box display={"flex"} flexDirection={"column"} gap={2}>
         <Typography variant="h4">Control Panel</Typography>
-
         <Box>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">
@@ -140,6 +161,14 @@ const ControlPanel = ({
           >
             Set Contact
           </Button>
+        </Box>
+
+        <Box>
+          <Typography>Lookup Input Component</Typography>
+          <LookupInput
+            onLookupContact={onLookupContact}
+            onSelectContact={onSelectContact}
+          />
         </Box>
       </Box>
     </Paper>

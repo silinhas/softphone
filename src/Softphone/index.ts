@@ -9,7 +9,10 @@ export {
   Contact,
 } from "./types";
 
+import { LookupInput } from "./components";
+
 export { useSoftphone } from "./hooks/useSoftphone";
 export { default as Softphone } from "./Softphone";
 export { default as SoftphoneProvider } from "./context/Softphone/SoftphoneProvider";
 export { utils } from "./utils/index";
+export { LookupInput };
