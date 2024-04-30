@@ -4,11 +4,11 @@ import Styles from "./styles";
 import { Contact, Handlers } from "@/Softphone/types";
 
 interface Props {
+  contact: Contact;
   onRenderContact?: Handlers["onRenderContact"];
-  contactSelected: Contact;
 }
 
-export const ContactUI = ({ onRenderContact, contactSelected }: Props) => {
+export const ContactUI = ({ onRenderContact, contact }: Props) => {
   return (
     <Box
       display={"flex"}
@@ -18,27 +18,25 @@ export const ContactUI = ({ onRenderContact, contactSelected }: Props) => {
     >
       <Box position={"relative"}>
         <Avatar
-          alt={contactSelected.label}
+          alt={contact.label}
           sx={{
             height: 80,
             width: 80,
             fontSize: 40,
             border: "1px solid ",
           }}
-          src={contactSelected.avatar || "/"}
+          src={contact.avatar || "/"}
         >
-          {contactSelected.type === "phone" && (
-            <PhoneIcon sx={{ fontSize: 40 }} />
-          )}
+          {contact.type === "phone" && <PhoneIcon sx={{ fontSize: 40 }} />}
         </Avatar>
-        <Tooltip title={contactSelected.status.label} placement="right">
-          <Styles.StyledBadge color={contactSelected.status.color} />
+        <Tooltip title={contact.status.label} placement="right">
+          <Styles.StyledBadge color={contact.status.color} />
         </Tooltip>
       </Box>
       <Typography variant="body1" fontWeight={400}>
-        {contactSelected.label}
+        {contact.label}
       </Typography>
-      {onRenderContact?.(contactSelected)}
+      {onRenderContact?.(contact)}
     </Box>
   );
 };

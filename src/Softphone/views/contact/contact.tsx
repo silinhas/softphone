@@ -41,7 +41,7 @@ const ContactView = ({ onClickMakeCallButton, onRenderContact }: Props) => {
         alignItems={"center"}
       >
         <ContactUI
-          contactSelected={contactSelected}
+          contact={contactSelected}
           onRenderContact={onRenderContact}
         />
       </Stack.Segment>

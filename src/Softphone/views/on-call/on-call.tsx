@@ -68,7 +68,7 @@ const OnCallView = ({ onRenderContact, callActions }: Props) => {
             <Keypad />
           ) : (
             <ContactUI
-              contactSelected={contactSelected!}
+              contact={contactSelected!}
               onRenderContact={onRenderContact}
             />
           )}
