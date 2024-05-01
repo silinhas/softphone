@@ -37,6 +37,10 @@ export const useSoftphone = () => {
     selectContact(contact, "on-call");
   };
 
+  const displayOnRingingView = (contact: ContactInput) => {
+    selectContact(contact, "ringing");
+  };
+
   return {
     isBusy: Boolean(device?.isBusy),
     currentCall: call,
@@ -46,5 +50,6 @@ export const useSoftphone = () => {
     makeCall,
     updateCallAction,
     displayOnCallView,
+    displayOnRingingView,
   };
 };
