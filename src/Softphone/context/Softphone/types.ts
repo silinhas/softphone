@@ -37,6 +37,7 @@ export type InitialState = {
     severity?: "critical" | "regular";
     type: "error" | "warning" | "info" | "success";
   };
+  ledIndicator?: boolean;
 };
 
 export type SoftphoneAction = {
@@ -49,7 +50,8 @@ export type SoftphoneAction = {
     | "setCall"
     | "selectContact"
     | "setEvents"
-    | "setCallActions";
+    | "setCallActions"
+    | "setLedIndicator";
   payload: Partial<InitialState>;
 };
 
@@ -64,9 +66,9 @@ export type SoftphoneDispatch = {
   clearSelectedContact: () => void;
   makeCall: (contact?: ContactInput, params?: Record<string, unknown>) => void;
   hangUp: () => void;
-  refreshContact: () => void;
   updateCallAction: (
     callActionId: string,
     { loading, disabled }: { loading?: boolean; disabled?: boolean }
   ) => void;
+  setLedIndicator: (status: boolean) => void;
 };

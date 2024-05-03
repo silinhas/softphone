@@ -11,13 +11,15 @@ import {
 } from "../views";
 import Layout from "./Layout";
 import { CallAction, Handlers } from "../types";
+import { DefaultCallActions } from "../types/CallActions";
 
 interface Props {
   handlers?: Handlers;
   callActions?: CallAction[];
+  defaultCallActions?: DefaultCallActions;
 }
 
-export const Main = ({ handlers, callActions }: Props) => {
+export const Main = ({ handlers, callActions, defaultCallActions }: Props) => {
   const { view, device, call } = useSoftphone();
   const {
     onLookupContact,
@@ -47,6 +49,7 @@ export const Main = ({ handlers, callActions }: Props) => {
           <OnCallView
             onRenderContact={onRenderContact}
             callActions={callActions}
+            defaultCallActions={defaultCallActions}
           />
         )}
         {view === "incoming" && (

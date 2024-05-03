@@ -10,6 +10,7 @@ export const useSoftphone = () => {
     selectContact,
     makeCall: _makeCall,
     updateCallAction: _updateCallAction,
+    setLedIndicator,
   } = useSoftphoneDispatch();
 
   const lookupContact = (contactToLookup: ContactInput) => {
@@ -41,6 +42,10 @@ export const useSoftphone = () => {
     selectContact(contact, "ringing");
   };
 
+  const stopLedIndicator = () => {
+    setLedIndicator(false);
+  };
+
   return {
     isBusy: Boolean(device?.isBusy),
     currentCall: call,
@@ -51,5 +56,6 @@ export const useSoftphone = () => {
     updateCallAction,
     displayOnCallView,
     displayOnRingingView,
+    stopLedIndicator,
   };
 };

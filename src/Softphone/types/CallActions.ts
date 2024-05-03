@@ -39,3 +39,7 @@ export type CallAction = {
   loading: boolean;
   icon: React.ReactNode;
 };
+
+export type DefaultCallActions = {
+  onClickLedIndicator?: (ledIndicator: boolean) => void | Promise<void>;
+};

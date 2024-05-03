@@ -33,7 +33,8 @@ const App = () => {
     options: [],
   });
 
-  const { lookupContact, makeCall, updateCallAction } = useSoftphone();
+  const { lookupContact, makeCall, updateCallAction, stopLedIndicator } =
+    useSoftphone();
   const { openSideBar } = useSideBar();
 
   const handleSetContact = (contact: ContactInput | undefined) => {
@@ -209,6 +210,12 @@ const App = () => {
     console.log("Call message received", { message });
   };
 
+  const onClickLedIndicator = (ledIndicator: boolean) => {
+    if (ledIndicator) {
+      stopLedIndicator();
+    }
+  };
+
   return (
     <Layout>
       <ControlPanel
@@ -231,6 +238,9 @@ const App = () => {
             onChangeStatus: handleChangeStatus,
             onIncomingCall: handleIncomingCall,
             onCallMessageReceived: handleCallMessageReceived,
+          }}
+          defaultCallActions={{
+            onClickLedIndicator,
           }}
           callActions={[
             {

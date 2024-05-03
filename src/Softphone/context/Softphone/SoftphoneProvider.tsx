@@ -74,6 +74,12 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         callActions: action.payload.callActions as CallAction[],
       };
     }
+    case "setLedIndicator": {
+      return {
+        ...state,
+        ledIndicator: action.payload.ledIndicator as boolean,
+      };
+    }
 
     default: {
       throw Error("Unknown action: " + action.type);
@@ -557,31 +563,6 @@ export const SoftphoneProvider = ({
     }
   };
 
-  const refreshContact = () => {
-    const { contactSelected } = softphoneRef.current;
-    const callerFrom = softphone.call?.parameters.From;
-
-    if (contactSelected) {
-      dispatch({
-        type: "selectContact",
-        payload: { contactSelected: Contact.buildContact(contactSelected) },
-      });
-      return;
-    }
-
-    if (callerFrom) {
-      dispatch({
-        type: "selectContact",
-        payload: {
-          contactSelected: new Contact({
-            identity: callerFrom,
-          }),
-        },
-      });
-      return;
-    }
-  };
-
   const updateCallAction = (
     callActionId: string,
     { loading, disabled }: { loading?: boolean; disabled?: boolean }
@@ -605,6 +586,10 @@ export const SoftphoneProvider = ({
     });
   };
 
+  const setLedIndicator = async (status: boolean) => {
+    dispatch({ type: "setLedIndicator", payload: { ledIndicator: status } });
+  };
+
   return (
     <SideBarProvider>
       <SoftphoneContext.Provider value={softphone}>
@@ -620,8 +605,8 @@ export const SoftphoneProvider = ({
             clearSelectedContact,
             makeCall,
             hangUp,
-            refreshContact,
             updateCallAction,
+            setLedIndicator,
           }}
         >
           {children}

@@ -18,6 +18,7 @@ import {
   CallAction,
 } from "./types";
 import { useSoftphoneDispatch } from "./context/Softphone/context";
+import { DefaultCallActions } from "./types/CallActions";
 interface Props {
   contact: ContactInput;
   autoRegister?: boolean;
@@ -27,6 +28,7 @@ interface Props {
   styles?: ContainerStyles;
   sidebar?: SideBarProps;
   callActions?: CallAction[];
+  defaultCallActions?: DefaultCallActions;
 }
 const theme = createTheme();
 
@@ -39,6 +41,7 @@ const Softphone = ({
   styles,
   sidebar,
   callActions,
+  defaultCallActions,
 }: Props) => {
   const { initializeDevice, setAlert } = useSoftphoneDispatch();
 
@@ -65,7 +68,11 @@ const Softphone = ({
     <ThemeProvider theme={theme}>
       <Layout styles={styles}>
         <ErrorBoundary>
-          <Main handlers={handlers} callActions={callActions} />
+          <Main
+            handlers={handlers}
+            callActions={callActions}
+            defaultCallActions={defaultCallActions}
+          />
         </ErrorBoundary>
         {sidebar && <SideBarPanel {...sidebar} />}
         {showStatus && <Status />}

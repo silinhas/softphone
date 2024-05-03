@@ -16,13 +16,19 @@ import { Box, Tooltip } from "@mui/material";
 import { Mic } from "@mui/icons-material";
 import { useState } from "react";
 import { CallAction, Handlers } from "@/Softphone/types";
+import { DefaultCallActions } from "@/Softphone/types/CallActions";
 
 interface Props {
   onRenderContact?: Handlers["onRenderContact"];
   callActions?: CallAction[];
+  defaultCallActions?: DefaultCallActions;
 }
 
-const OnCallView = ({ onRenderContact, callActions }: Props) => {
+const OnCallView = ({
+  onRenderContact,
+  callActions,
+  defaultCallActions,
+}: Props) => {
   const { call, callActions: _callActions, contactSelected } = useSoftphone();
   const { hangUp } = useSoftphoneDispatch();
   const [showKeypad, setShowKeypad] = useState(false);
@@ -55,7 +61,9 @@ const OnCallView = ({ onRenderContact, callActions }: Props) => {
   return (
     <Stack>
       <Stack.Segment flex={0.1} display={"flex"} justifyContent={"center"}>
-        <TimeIndicator />
+        <TimeIndicator
+          onClickLedIndicator={defaultCallActions?.onClickLedIndicator}
+        />
       </Stack.Segment>
       <Stack.Segment
         flex={0.7}

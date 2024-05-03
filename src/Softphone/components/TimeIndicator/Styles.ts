@@ -1,23 +1,29 @@
 import { styled } from "@mui/system";
 
-export default {
-  LedIndicator: styled("div")`
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: red;
-    animation: blink 1.5s linear infinite;
+interface LedIndicatorProps {
+  stop?: boolean;
+}
 
-    @keyframes blink {
-      0% {
-        opacity: 0.4;
+export default {
+  LedIndicator: styled("div")<LedIndicatorProps>(
+    ({ stop }) => `
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: ${stop ? "lightgray" : "red"};
+      animation: ${stop ? "none" : "blink 1.5s linear infinite"};
+
+      @keyframes blink {
+        0% {
+          opacity: 0.4;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.4;
+        }
       }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0.4;
-      }
-    }
-  `,
+    `
+  ),
 };
