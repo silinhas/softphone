@@ -2,10 +2,7 @@ import { Box, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import Styles from "./Styles";
 import { DefaultCallActions } from "@/Softphone/types/CallActions";
-import {
-  useSoftphone,
-  useSoftphoneDispatch,
-} from "@/Softphone/context/Softphone/context";
+import { useSoftphone } from "@/Softphone/context/Softphone/context";
 
 interface TimeIndicatorProps {
   onClickLedIndicator?: DefaultCallActions["onClickLedIndicator"];
@@ -13,7 +10,6 @@ interface TimeIndicatorProps {
 
 export const TimeIndicator = ({ onClickLedIndicator }: TimeIndicatorProps) => {
   const { ledIndicator } = useSoftphone();
-  const { setLedIndicator } = useSoftphoneDispatch();
   const [time, setTime] = useState(0);
 
   const formatTime = (totalSeconds: number) => {
@@ -38,9 +34,7 @@ export const TimeIndicator = ({ onClickLedIndicator }: TimeIndicatorProps) => {
 
     return () => {
       clearInterval(timerId);
-      setLedIndicator(true);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

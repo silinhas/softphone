@@ -37,7 +37,7 @@ export type InitialState = {
     severity?: "critical" | "regular";
     type: "error" | "warning" | "info" | "success";
   };
-  ledIndicator: boolean;
+  ledIndicator?: boolean;
 };
 
 export type SoftphoneAction = {

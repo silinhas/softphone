@@ -320,6 +320,7 @@ export const SoftphoneProvider = ({
       }
 
       selectContact(contact, "incoming");
+      setLedIndicator(true);
       dispatch({ type: "setCall", payload: { call } });
     });
 
@@ -353,6 +354,7 @@ export const SoftphoneProvider = ({
     call.on("accept", (acceptedCall: Call) => {
       log("log", "accept event", { acceptedCall });
       dispatch({ type: "setCall", payload: { call: acceptedCall } });
+      setLedIndicator(true);
       // setView("on-call");
       // !!! check this issue (https://github.com/twilio/twilio-voice.js/issues/140) and uncomment this line after fixing it and remove messageReceived for call
     });
@@ -362,6 +364,7 @@ export const SoftphoneProvider = ({
       setView("active");
       clearSelectedContact();
       clearCallActions();
+      setLedIndicator(false);
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
@@ -370,6 +373,7 @@ export const SoftphoneProvider = ({
       setView("active");
       clearSelectedContact();
       clearCallActions();
+      setLedIndicator(false);
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
@@ -404,6 +408,7 @@ export const SoftphoneProvider = ({
       setView("active");
       clearSelectedContact();
       clearCallActions();
+      setLedIndicator(false);
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
@@ -540,6 +545,7 @@ export const SoftphoneProvider = ({
 
       if (call) {
         dispatch({ type: "setCall", payload: { call } });
+        setLedIndicator(true);
         addCallListeners(call, softphoneRef.current.events!);
       }
     } catch (error) {
