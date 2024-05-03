@@ -12,6 +12,7 @@ export const INITIAL_STATE: InitialState = {
   view: "active",
   status: "do-not-disturb",
   contact: new Contact({ identity: "" }),
+  ledIndicator: true,
 };
 
 export const SOFTPHONE_DISPATCH: SoftphoneDispatch = {

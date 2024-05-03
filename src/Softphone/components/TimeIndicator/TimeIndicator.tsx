@@ -36,11 +36,9 @@ export const TimeIndicator = ({ onClickLedIndicator }: TimeIndicatorProps) => {
       setTime((seconds) => seconds + 1);
     }, 1000);
 
-    setLedIndicator(true);
-
     return () => {
       clearInterval(timerId);
-      setLedIndicator(false);
+      setLedIndicator(true);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
