@@ -9,10 +9,12 @@ import { Menu } from "./types";
 import { Call } from "@twilio/voice-sdk";
 import BackupTableIcon from "@mui/icons-material/BackupTable";
 import PhonePausedIcon from "@mui/icons-material/PhonePaused";
+import PhoneForwardedIcon from "@mui/icons-material/PhoneForwarded";
 import GroupsIcon from "@mui/icons-material/Groups";
 import VoicemailIcon from "@mui/icons-material/Voicemail";
 import { useSideBar } from "@/Softphone/hooks/useSideBar";
 import Info from "@mui/icons-material/Info";
+import { CallAction, ContactStatus } from "@/Softphone/types";
 
 const Layout = styled("div")`
   display: flex;
@@ -31,7 +33,8 @@ const App = () => {
     options: [],
   });
 
-  const { lookupContact, makeCall } = useSoftphone();
+  const { lookupContact, makeCall, updateCallAction, stopLedIndicator } =
+    useSoftphone();
   const { openSideBar } = useSideBar();
 
   const handleSetContact = (contact: ContactInput | undefined) => {
@@ -41,8 +44,14 @@ const App = () => {
     setContact(contact);
   };
 
-  const handleDirectLookupContact = (contactToLookup: string) => {
-    lookupContact({ identity: contactToLookup });
+  const handleDirectLookupContact = (
+    contactToLookup: string | ContactInput
+  ) => {
+    if (typeof contactToLookup === "string") {
+      return lookupContact({ identity: contactToLookup });
+    } else {
+      lookupContact(contactToLookup);
+    }
   };
 
   const onFetchToken = async (identity: string) => {
@@ -149,16 +158,22 @@ const App = () => {
     }
   };
 
-  const handleChangeStatus = (status: "available" | "do-not-disturb") => {
+  const handleChangeStatus = (status: ContactStatus) => {
     console.log({ status });
   };
 
-  const handleClickHoldCallButton = (call: Call) => {
+  const handleClickHoldCallButton = (action: CallAction, call: Call) => {
     console.log("Hold Call", { call });
+    updateCallAction("hold", { disabled: !action.disabled });
   };
 
-  const handleClickTransferCallButton = (call: Call) => {
+  const handleClickTransferCallButton = (action: CallAction, call: Call) => {
     console.log("Transfer Call", { call });
+    updateCallAction("transfer", { loading: !action.loading });
+
+    setTimeout(() => {
+      updateCallAction("transfer", { loading: false });
+    }, 5000);
   };
 
   const handleIncomingCall = (call: Call) => {
@@ -191,30 +206,62 @@ const App = () => {
     }
   };
 
+  const handleCallMessageReceived = (message: string) => {
+    console.log("Call message received", { message });
+  };
+
+  const onClickLedIndicator = (ledIndicator: boolean) => {
+    if (ledIndicator) {
+      stopLedIndicator();
+    }
+  };
+
   return (
     <Layout>
       <ControlPanel
         contactList={contactList}
         contact={contact}
         handleSetContact={handleSetContact}
-        handleLookupContact={handleDirectLookupContact}
+        handleDirectLookupContact={handleDirectLookupContact}
       />
       <Box>
         <Softphone
           contact={contact || { identity: "" }}
           autoRegister
-          handlers={{
-            onLookupContact: handleLookupContact,
-            onClickMakeCallButton: handleClickCallButton,
-            onClickHoldCallButton: handleClickHoldCallButton,
-            onClickTransferCallButton: handleClickTransferCallButton,
-            onRenderContact: handleExtendContactRender,
-          }}
           events={{
             onFetchToken,
             onChangeStatus: handleChangeStatus,
             onIncomingCall: handleIncomingCall,
+            onCallMessageReceived: handleCallMessageReceived,
           }}
+          handlers={{
+            onLookupContact: handleLookupContact,
+            onClickMakeCallButton: handleClickCallButton,
+            onRenderContact: handleExtendContactRender,
+          }}
+          defaultCallActions={{
+            onClickLedIndicator,
+          }}
+          callActions={[
+            {
+              id: "hold",
+              label: "Hold",
+              disabled: false,
+              loading: false,
+              icon: <PhonePausedIcon fontSize="large" />,
+              onClick: (action, call: Call) =>
+                handleClickHoldCallButton(action, call),
+            },
+            {
+              id: "transfer",
+              label: "Transfer",
+              disabled: false,
+              loading: false,
+              icon: <PhoneForwardedIcon fontSize="large" />,
+              onClick: (action, call: Call) =>
+                handleClickTransferCallButton(action, call),
+            },
+          ]}
           sidebar={{
             options: [
               {

@@ -5,9 +5,10 @@ import {
   INITIAL_STATE,
   TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN,
 } from "./constants";
-import { InitialState, SoftphoneAction, Status, Views } from "./types";
+import { InitialState, SoftphoneAction, ContactStatus, Views } from "./types";
 import { Call, Device, TwilioError } from "@twilio/voice-sdk";
 import {
+  CallAction,
   Contact,
   ContactInput,
   Events,
@@ -28,7 +29,7 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
     case "setStatus": {
       return {
         ...state,
-        status: action.payload.status as Status,
+        status: action.payload.status as ContactStatus,
       };
     }
     case "setContact": {
@@ -61,6 +62,25 @@ function softphoneReducer(state: InitialState, action: SoftphoneAction) {
         contactSelected: action.payload.contactSelected as Contact,
       };
     }
+    case "setEvents": {
+      return {
+        ...state,
+        events: action.payload.events as Events,
+      };
+    }
+    case "setCallActions": {
+      return {
+        ...state,
+        callActions: action.payload.callActions as CallAction[],
+      };
+    }
+    case "setLedIndicator": {
+      return {
+        ...state,
+        ledIndicator: action.payload.ledIndicator as boolean,
+      };
+    }
+
     default: {
       throw Error("Unknown action: " + action.type);
     }
@@ -93,7 +113,7 @@ export const SoftphoneProvider = ({
     dispatch({ type: "setView", payload: { view } });
   };
 
-  const setStatus = async (status: Status) => {
+  const setStatus = async (status: ContactStatus) => {
     if (status === "available" && softphone.device) {
       await registerDevice(softphone.device);
     } else if (status === "do-not-disturb" && softphone.device) {
@@ -119,7 +139,7 @@ export const SoftphoneProvider = ({
   const initializeDevice = async (
     softphoneSettings: SoftphoneSettings = defaultSoftphoneSettings
   ) => {
-    const { contact, autoRegister, events } = softphoneSettings;
+    const { contact, autoRegister, events, callActions } = softphoneSettings;
 
     try {
       setAlert({
@@ -144,6 +164,8 @@ export const SoftphoneProvider = ({
         registerDevice(device);
       }
 
+      dispatch({ type: "setEvents", payload: { events } });
+      dispatch({ type: "setCallActions", payload: { callActions } });
       dispatch({ type: "setView", payload: { view: "active" } });
       dispatch({ type: "setDevice", payload: { device } });
     } catch (error) {
@@ -218,7 +240,28 @@ export const SoftphoneProvider = ({
       switch (twilioError.name) {
         case "AccessTokenExpired": {
           events
-            .onFetchToken(softphone.contact.identity, getEventContext())
+            .onFetchToken(
+              device.identity || softphoneRef.current.contact.identity,
+              getEventContext()
+            )
+            .then((newToken) => {
+              device.updateToken(newToken);
+            })
+            .catch((error) => {
+              setAlert({
+                type: "error",
+                message: "An error occurred.",
+                context: JSON.stringify(error),
+              });
+            });
+          break;
+        }
+        case "AccessTokenInvalid": {
+          events
+            .onFetchToken(
+              device.identity || softphoneRef.current.contact.identity,
+              getEventContext()
+            )
             .then((newToken) => {
               device.updateToken(newToken);
             })
@@ -239,6 +282,17 @@ export const SoftphoneProvider = ({
           });
           break;
         }
+        case "ConnectionError": {
+          setAlert({
+            type: "error",
+            message: "A connection error occurred",
+            context: JSON.stringify(twilioError),
+          });
+          setTimeout(() => {
+            clearAlert();
+          }, 5000);
+          break;
+        }
         default: {
           setAlert({
             type: "error",
@@ -250,11 +304,12 @@ export const SoftphoneProvider = ({
     });
 
     device.on("incoming", (call: Call) => {
-      addCallListeners(call);
+      addCallListeners(call, events);
 
       let contact = new Contact({ identity: call.parameters.From });
 
       try {
+        setLedIndicator(true);
         const contactInput = events?.onIncomingCall?.(call, getEventContext());
 
         if (contactInput) {
@@ -266,12 +321,10 @@ export const SoftphoneProvider = ({
           message: "Failed to get contact information.",
           context: JSON.stringify(error),
         });
-        // contact = new Contact({ identity: call.parameters.From });
       }
 
-      selectContact(contact);
+      selectContact(contact, "incoming");
       dispatch({ type: "setCall", payload: { call } });
-      setView("incoming");
     });
 
     device.on("registered", () => {
@@ -288,21 +341,19 @@ export const SoftphoneProvider = ({
 
     device.on("tokenWillExpire", () => {
       const timer = setInterval(async () => {
-        if (device?.identity) {
-          const newToken = await events.onFetchToken(
-            device.identity,
-            getEventContext()
-          );
-          if (device.state === "registered") {
-            device.updateToken(newToken);
-          }
-          clearInterval(timer);
+        const newToken = await events.onFetchToken(
+          device?.identity || softphoneRef.current.contact.identity,
+          getEventContext()
+        );
+        if (device.state === "registered") {
+          device.updateToken(newToken);
         }
+        clearInterval(timer);
       }, TIME_TO_CHECK_CALL_TO_UPDATE_TOKEN);
     });
   };
 
-  const addCallListeners = (call: Call) => {
+  const addCallListeners = (call: Call, events: Events) => {
     call.on("accept", (acceptedCall: Call) => {
       log("log", "accept event", { acceptedCall });
       dispatch({ type: "setCall", payload: { call: acceptedCall } });
@@ -314,6 +365,7 @@ export const SoftphoneProvider = ({
       log("log", "cancel event");
       setView("active");
       clearSelectedContact();
+      clearCallActions();
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
@@ -321,6 +373,7 @@ export const SoftphoneProvider = ({
       log("log", "disconnect event", { disconnectedCall });
       setView("active");
       clearSelectedContact();
+      clearCallActions();
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
@@ -354,6 +407,7 @@ export const SoftphoneProvider = ({
       log("log", "reject event");
       setView("active");
       clearSelectedContact();
+      clearCallActions();
       dispatch({ type: "setCall", payload: { call: undefined } });
     });
 
@@ -369,10 +423,12 @@ export const SoftphoneProvider = ({
       if (type === "CALL_CONNECTED") {
         setView("on-call");
       }
+
+      events?.onCallMessageReceived?.(message, getEventContext());
     });
   };
 
-  const selectContact = (contactSelected: ContactInput) => {
+  const selectContact = (contactSelected: ContactInput, view?: Views) => {
     const { contact, device } = softphoneRef.current;
 
     if (!contact?.identity || device?.state === "destroyed") {
@@ -399,13 +455,27 @@ export const SoftphoneProvider = ({
       type: "selectContact",
       payload: { contactSelected: Contact.buildContact(contactSelected) },
     });
-    dispatch({ type: "setView", payload: { view: "contact" } });
+    dispatch({ type: "setView", payload: { view: view || "contact" } });
   };
 
   const clearSelectedContact = () => {
     dispatch({
       type: "selectContact",
       payload: { contactSelected: undefined },
+    });
+  };
+
+  const clearCallActions = () => {
+    const callActions = softphoneRef.current.callActions;
+
+    callActions?.forEach((callAction) => {
+      callAction.loading = false;
+      callAction.disabled = false;
+    });
+
+    dispatch({
+      type: "setCallActions",
+      payload: { callActions },
     });
   };
 
@@ -423,6 +493,7 @@ export const SoftphoneProvider = ({
 
     if (contact) {
       contactToCall = Contact.buildContact(contact);
+      selectContact(contactToCall);
     }
 
     if (!contactToCall) {
@@ -463,10 +534,6 @@ export const SoftphoneProvider = ({
     }
 
     try {
-      if (!contactSelected) {
-        selectContact(contactToCall);
-      }
-
       const call = await softphone.device?.connect({
         params: {
           To: contactToCall.identity,
@@ -476,8 +543,9 @@ export const SoftphoneProvider = ({
       });
 
       if (call) {
+        setLedIndicator(true);
         dispatch({ type: "setCall", payload: { call } });
-        addCallListeners(call);
+        addCallListeners(call, softphoneRef.current.events!);
       }
     } catch (error) {
       setAlert({
@@ -500,29 +568,31 @@ export const SoftphoneProvider = ({
     }
   };
 
-  const refreshContact = () => {
-    const { contactSelected } = softphoneRef.current;
-    const callerFrom = softphone.call?.parameters.From;
+  const updateCallAction = (
+    callActionId: string,
+    { loading, disabled }: { loading?: boolean; disabled?: boolean }
+  ) => {
+    const callActions = softphoneRef.current.callActions;
 
-    if (contactSelected) {
-      dispatch({
-        type: "selectContact",
-        payload: { contactSelected: Contact.buildContact(contactSelected) },
-      });
-      return;
+    const callAction = callActions?.find(
+      (callAction) => callAction.id === callActionId
+    );
+
+    if (!callAction) {
+      throw new Error(`Call action with id ${callActionId} not found`);
     }
 
-    if (callerFrom) {
-      dispatch({
-        type: "selectContact",
-        payload: {
-          contactSelected: new Contact({
-            identity: callerFrom,
-          }),
-        },
-      });
-      return;
-    }
+    callAction.loading = loading ?? callAction.loading;
+    callAction.disabled = disabled ?? callAction.disabled;
+
+    dispatch({
+      type: "setCallActions",
+      payload: { callActions },
+    });
+  };
+
+  const setLedIndicator = async (status: boolean) => {
+    dispatch({ type: "setLedIndicator", payload: { ledIndicator: status } });
   };
 
   return (
@@ -540,7 +610,8 @@ export const SoftphoneProvider = ({
             clearSelectedContact,
             makeCall,
             hangUp,
-            refreshContact,
+            updateCallAction,
+            setLedIndicator,
           }}
         >
           {children}

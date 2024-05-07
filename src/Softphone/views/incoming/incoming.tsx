@@ -4,11 +4,16 @@ import { Avatar, Box, Typography } from "@mui/material";
 import CallEndIcon from "@mui/icons-material/CallEnd";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { Stack } from "@/Softphone/layouts/Stack";
+import { Handlers } from "@/Softphone/types";
 
-const IncomingView = () => {
+interface Props {
+  onRenderIncomingView?: Handlers["onRenderIncomingView"];
+}
+
+const IncomingView = ({ onRenderIncomingView }: Props) => {
   const { contactSelected, call } = useSoftphone();
 
-  if (!call) {
+  if (!call || !contactSelected) {
     return null;
   }
 
@@ -20,7 +25,7 @@ const IncomingView = () => {
         justifyContent={"center"}
         alignItems={"center"}
       >
-        <Box display={"flex"} flexDirection={"column"}>
+        <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
           <Box display={"flex"} alignItems={"center"} gap={1}>
             <Avatar
               alt={contactSelected?.label}
@@ -32,6 +37,7 @@ const IncomingView = () => {
             </Typography>
           </Box>
           <CallLoadingIndicator />
+          {onRenderIncomingView?.(contactSelected)}
         </Box>
       </Stack.Segment>
       <Stack.Segment

@@ -1,13 +1,13 @@
 import { Call } from "@twilio/voice-sdk";
 import { ContactInput } from "./Contact";
-import { InitialState, Status } from "../context/Softphone/types";
+import { InitialState, ContactStatus } from "../context/Softphone/types";
+import React from "react";
 
 export type Handlers = {
   onLookupContact?: (contactToLookup: string) => Promise<ContactInput[]>;
   onClickMakeCallButton?: (contact: ContactInput) => void;
-  onClickHoldCallButton?: (call: Call) => void;
-  onClickTransferCallButton?: (call: Call) => void;
   onRenderContact?: (contact: ContactInput) => React.ReactNode | undefined;
+  onRenderIncomingView?: (contact: ContactInput) => React.ReactNode | undefined;
 };
 
 export type EventContext = {
@@ -21,9 +21,23 @@ export type EventContext = {
 
 export type Events = {
   onFetchToken: (identity: string, context: EventContext) => Promise<string>;
-  onChangeStatus?: (status: Status, context: EventContext) => void;
+  onChangeStatus?: (status: ContactStatus, context: EventContext) => void;
   onIncomingCall?: (
     call: Call,
     context: EventContext
   ) => ContactInput | undefined;
+  onCallMessageReceived?: (message: string, context: EventContext) => void;
+};
+
+export type CallAction = {
+  id: string;
+  label: string;
+  onClick: (action: CallAction, call: Call) => void;
+  disabled: boolean;
+  loading: boolean;
+  icon: React.ReactNode;
+};
+
+export type DefaultCallActions = {
+  onClickLedIndicator?: (ledIndicator: boolean) => void | Promise<void>;
 };

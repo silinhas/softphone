@@ -29,7 +29,7 @@ export const contactList: ContactInput[] = [
           id: "3",
           identity: "t2tester",
           label: "Tester 2",
-          status: "unavailable",
+          status: "do-not-disturb",
           avatar:
             "https://gravatar.com/avatar/3923e72894ae47c4589919409550c9bd",
         },
@@ -40,7 +40,7 @@ export const contactList: ContactInput[] = [
     id: "3",
     identity: "t2tester",
     label: "Tester 2",
-    status: "unavailable",
+    status: "offline",
     avatar: "https://gravatar.com/avatar/3923e72894ae47c4589919409550c9bd",
   },
   {

@@ -1,108 +1,20 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Autocomplete, Box, CircularProgress, TextField } from "@mui/material";
-import { ActionButton, ContactListItem } from "@/Softphone/components";
-import {
-  useSoftphone,
-  useSoftphoneDispatch,
-} from "@/Softphone/context/Softphone/context";
+import { Box } from "@mui/material";
+import { ActionButton, LookupInput } from "@/Softphone/components";
+import { useSoftphoneDispatch } from "@/Softphone/context/Softphone/context";
 import { Stack } from "@/Softphone/layouts/Stack";
-import React, { useEffect, useMemo, useState } from "react";
-import { Contact, ContactInput, Handlers } from "@/Softphone/types";
-import { debounce } from "@mui/material/utils";
+import { Contact, Handlers } from "@/Softphone/types";
 
 interface Props {
   onLookupContact?: Handlers["onLookupContact"];
 }
 
 const LookupView = ({ onLookupContact }: Props) => {
-  const {
-    contact: { identity: registeredIdentity },
-  } = useSoftphone();
-  const { setView, selectContact } = useSoftphoneDispatch();
+  const { setView } = useSoftphoneDispatch();
+  const { selectContact } = useSoftphoneDispatch();
 
-  const [inputValue, setInputValue] = useState("");
-  const [contactList, setContactList] = useState<readonly Contact[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetch = useMemo(
-    () =>
-      debounce(
-        async (
-          request: { input: string },
-          callback: (results?: readonly Contact[]) => void
-        ) => {
-          setLoading(true);
-          let results = await onLookupContact?.(request.input);
-
-          if (!results) {
-            results = [
-              {
-                identity: request.input,
-                isNew: true,
-              } as ContactInput,
-            ];
-          }
-
-          callback(
-            results
-              .filter((contact) => contact.identity !== registeredIdentity)
-              .map((contact) => Contact.buildContact(contact))
-          );
-          setLoading(false);
-        },
-        500
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  useEffect(() => {
-    let active = true;
-
-    if (inputValue === "") {
-      setContactList([]);
-      return;
-    }
-
-    if (inputValue.length < 3) {
-      return;
-    }
-
-    fetch({ input: inputValue }, (results?: readonly Contact[]) => {
-      if (active) {
-        let newOptions: readonly Contact[] = [];
-
-        if (results) {
-          newOptions = [...newOptions, ...results];
-        }
-
-        setContactList(newOptions);
-      }
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [inputValue, fetch]);
-
-  const handleChangeLookup = (
-    event: React.SyntheticEvent,
-    contact: Contact | null
-  ) => {
-    event.preventDefault();
-    if (!contact || !contact.identity) return;
+  const onSelectContact = (contact: Contact) => {
     selectContact(contact);
-  };
-
-  const renderOption = (
-    props: React.HTMLAttributes<HTMLLIElement>,
-    option: Contact
-  ) => {
-    return (
-      <Box component={"li"} {...props} key={option.id}>
-        <ContactListItem contact={option} />
-      </Box>
-    );
   };
 
   return (
@@ -114,43 +26,9 @@ const LookupView = ({ onLookupContact }: Props) => {
         justifyContent={"center"}
       >
         <Box width={"100%"} mx={4}>
-          <Autocomplete
-            options={contactList}
-            autoComplete
-            filterSelectedOptions
-            loading={loading}
-            renderOption={renderOption}
-            onChange={handleChangeLookup}
-            onInputChange={(event, newInputValue) => {
-              event.preventDefault();
-              setInputValue(newInputValue);
-            }}
-            filterOptions={(x) => x}
-            getOptionKey={(option) => option.id || option.identity}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            fullWidth
-            size="small"
-            selectOnFocus
-            clearOnBlur
-            loadingText={"Loading..."}
-            noOptionsText={"No results found."}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Search User or Phone Number"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <React.Fragment>
-                      {loading ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  ),
-                }}
-              />
-            )}
+          <LookupInput
+            onLookupContact={onLookupContact}
+            onSelectContact={onSelectContact}
           />
         </Box>
       </Stack.Segment>

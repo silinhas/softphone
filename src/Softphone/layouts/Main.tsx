@@ -10,20 +10,22 @@ import {
   RingingView,
 } from "../views";
 import Layout from "./Layout";
-import { Handlers } from "../types";
+import { CallAction, Handlers } from "../types";
+import { DefaultCallActions } from "../types/CallActions";
 
 interface Props {
   handlers?: Handlers;
+  callActions?: CallAction[];
+  defaultCallActions?: DefaultCallActions;
 }
 
-export const Main = ({ handlers }: Props) => {
+export const Main = ({ handlers, callActions, defaultCallActions }: Props) => {
   const { view, device, call } = useSoftphone();
   const {
     onLookupContact,
     onClickMakeCallButton,
-    onClickTransferCallButton,
-    onClickHoldCallButton,
     onRenderContact,
+    onRenderIncomingView,
   } = handlers || {};
 
   return (
@@ -45,12 +47,14 @@ export const Main = ({ handlers }: Props) => {
         {view === "ringing" && <RingingView />}
         {view === "on-call" && (
           <OnCallView
-            onClickTransferCallButton={onClickTransferCallButton}
-            onClickHoldCallButton={onClickHoldCallButton}
             onRenderContact={onRenderContact}
+            callActions={callActions}
+            defaultCallActions={defaultCallActions}
           />
         )}
-        {view === "incoming" && <IncomingView />}
+        {view === "incoming" && (
+          <IncomingView onRenderIncomingView={onRenderIncomingView} />
+        )}
       </Layout.View>
     </>
   );
