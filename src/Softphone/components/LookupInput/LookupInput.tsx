@@ -83,7 +83,6 @@ export const LookupInput = ({ onLookupContact, onSelectContact }: Props) => {
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue, fetch]);
 
   const handleChangeLookup = (
