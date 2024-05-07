@@ -6,8 +6,6 @@ import React from "react";
 export type Handlers = {
   onLookupContact?: (contactToLookup: string) => Promise<ContactInput[]>;
   onClickMakeCallButton?: (contact: ContactInput) => void;
-  onClickHoldCallButton?: (call: Call) => void;
-  onClickTransferCallButton?: (call: Call) => void;
   onRenderContact?: (contact: ContactInput) => React.ReactNode | undefined;
   onRenderIncomingView?: (contact: ContactInput) => React.ReactNode | undefined;
 };

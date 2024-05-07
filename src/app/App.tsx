@@ -228,16 +228,16 @@ const App = () => {
         <Softphone
           contact={contact || { identity: "" }}
           autoRegister
-          handlers={{
-            onLookupContact: handleLookupContact,
-            onClickMakeCallButton: handleClickCallButton,
-            onRenderContact: handleExtendContactRender,
-          }}
           events={{
             onFetchToken,
             onChangeStatus: handleChangeStatus,
             onIncomingCall: handleIncomingCall,
             onCallMessageReceived: handleCallMessageReceived,
+          }}
+          handlers={{
+            onLookupContact: handleLookupContact,
+            onClickMakeCallButton: handleClickCallButton,
+            onRenderContact: handleExtendContactRender,
           }}
           defaultCallActions={{
             onClickLedIndicator,

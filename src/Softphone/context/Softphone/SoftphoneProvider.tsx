@@ -288,6 +288,9 @@ export const SoftphoneProvider = ({
             message: "A connection error occurred",
             context: JSON.stringify(twilioError),
           });
+          setTimeout(() => {
+            clearAlert();
+          }, 5000);
           break;
         }
         default: {
